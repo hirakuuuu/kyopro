@@ -50,6 +50,7 @@ int makeKDTree(int l, int r, int depth){
     T[t].l = makeKDTree(l, mid, depth+1);
     T[t].r = makeKDTree(mid+1, r, depth+1);
 
+
     return t;
 }
 
