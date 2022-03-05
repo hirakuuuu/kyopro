@@ -12,7 +12,7 @@ const int mod = 998244353;
        非連結になるとき、頂点uをグラフＧの関節点または切断点という
 
 関節点を求めるアルゴリズム
-1．適当な一つの頂点から深さ優先探索をして各頂点に対して次の値を求める
+1．適当な一つの頂点から深さ優先探索をして各頂点uに対して次の値を求める
 ・prenum[u]: uを訪問した順番
 ・parent[u]: DFSによって生成される木(DFS Tree)におけるuの親
 ・lowest[u]: 次の3つの値の最小値
@@ -30,7 +30,7 @@ const int mod = 998244353;
 vector<vector<int>> g(100005);
 vector<int> prenum(100005);
 vector<int> lowest(100005);
-vector<int> parent(100005, -1);
+vector<int> parent(100005);
 vector<int> visited(100005);
 
 // 何番目に訪れたか
@@ -62,15 +62,23 @@ void dfs(int pos, int pre){
 }
 
 void art_point(int v){
+    // 0を根としてDFS
     dfs(0, -1);
+    // 関節点の集合
     set<int> ap;
+    // 根の子の数
     int rc = 0;
+    // 根以外の頂点でループ
     rep(i, 1, v){
         int p = parent[i];
+        // 親が根である場合
         if(p == 0) rc++;
+        // 関節点かどうかの判定
         else if(prenum[p] <= lowest[i]) ap.insert(p);
     }
+    // 根の子の数が2以上ならば根は関節点
     if(rc >= 2) ap.insert(0);
+    // 出力
     for(auto itr = ap.begin(); itr != ap.end(); ++itr){
         cout << *itr << endl;
     }
