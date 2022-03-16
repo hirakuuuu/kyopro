@@ -13,10 +13,10 @@ vector<int> dh={1, 0, -1, 0}, dw={0, 1, 0, -1};
 
 void dijk(int r1, int c1){
     rep(i, 0, 4) dist[r1][c1][i] = 0;
-    priority_queue<pii, vector<pii>, greater<pii>> que;
+    queue<pii> que;
     que.push({r1, c1});
     while(!que.empty()){
-        pii q = que.top(); que.pop();
+        pii q = que.front(); que.pop();
         rep(i, 0, 4){
             if(s[q.first+dh[i]][q.second+dw[i]]) continue;
             if(dist[q.first+dh[i]][q.second+dw[i]][i] > dist[q.first][q.second][i]){
@@ -28,7 +28,6 @@ void dijk(int r1, int c1){
             }
         }
     }
-
 }
 
 
