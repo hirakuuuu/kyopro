@@ -7,6 +7,10 @@ using namespace std;
 const int MOD = 1000000007;
 const int mod = 998244353;
 
+// 問題
+// https://atcoder.jp/contests/joi2022yo1c/tasks/joi2022_yo1c_a
+
+
 int main(){
   
 }

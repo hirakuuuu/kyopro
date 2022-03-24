@@ -7,6 +7,15 @@ using namespace std;
 const int MOD = 1000000007;
 const int mod = 998244353;
 
+
 int main(){
+    int n, k; cin >> n >> k;
+    int ans = 0;
+    rep(i, 1, n+1){
+        rep(j, 1, k+1){
+            ans += i*100+j;
+        }
+    }
+    cout << ans << endl;
   
 }
