@@ -8,5 +8,6 @@ const int MOD = 1000000007;
 const int mod = 998244353;
 
 int main(){
-  
+    
+    return 0;
 }
