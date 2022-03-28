@@ -50,12 +50,6 @@ int main(){
             }
         }
     }
-    rep(i, 0, h){
-        rep(j, 0, w){
-            cout << dp[i][j] << " ";
-        }
-        cout << endl;
-    }
     cout << dp[h-1][w-1] << endl;
     return 0;
 }
