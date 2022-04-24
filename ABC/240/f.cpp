@@ -7,30 +7,39 @@ using namespace std;
 const int MOD = 1000000007;
 const int mod = 998244353;
 
+// 問題
+// https://atcoder.jp/contests/abc240/tasks/abc240_f
+
 int main(){
-    int t; cin >> t;
-    vector<ll> ans;
-    while(t--){
-        int n, m; cin >> n >> m;
-        vector<ll> a, b, c;
-        rep(i, 0, n){
-            ll x, y; cin >> x >> y;
-            rep(j, 0, y){
-                c[i] = x;
-                i++;
-            }
-        }
-        b[0] = c[0];
-        a[0] = b[0];
-        ll maxa = a[0];
-        rep(i, 1, n){
-            b[i] = b[i-1] + c[i];
-            a[i] = a[i-1] + b[i];
-            if(a[i] > maxa) maxa = a[i];
-        }
-        ans.push_back(maxa);
+    int n; cin >> n;
+    vector<int> a(n), b(n);
+    vector<vector<int>> pres;
+    rep(i, 0, n){
+        cin >> a[i];
+        pres.push_back({a[i], 0, i});
     }
-    for(auto aa: ans){
-        cout << aa << endl;
+    rep(i, 0, n){
+        cin >> b[i];
+        pres.push_back({b[i], 1, i});
     }
+    sort(pres.begin(), pres.end());
+    reverse(pres.begin(), pres.end());
+    vector<bool> fa(n), fb(n);
+
+    multiset<int> oa, ob;
+    rep(i, 0, n) oa.insert(a[i]);
+    rep(i, 0, n) ob.insert(b[i]);
+
+    ll ans = n;
+    for(auto p: pres){
+        if(!p[1]){
+            ans += distance(ob.lower_bound(p[0]), ob.end())-1;
+            ob.erase(p[0]);   
+        }else{
+            ans += distance(oa.lower_bound(p[0]), oa.end())-1;
+            oa.erase(p[0]); 
+        }
+    }
+    cout << ans << endl;
+    return 0;
 }
