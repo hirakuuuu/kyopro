@@ -11,8 +11,7 @@ const int mod = 998244353;
 // https://atcoder.jp/contests/abc249/tasks/abc249_a
 
 int main(){
-    int a, b, c, d, e, f; cin >> a >> b >> c >> d >> e >> f;
-    int x; cin >> x;
+    int a, b, c, d, e, f, x; cin >> a >> b >> c >> d >> e >> f >> x;
     int taka = x/(a+c)*a*b+min(a, x%(a+c))*b;
     int aoki = x/(d+f)*d*e+min(d, x%(d+f))*e;
     if(taka > aoki) cout << "Takahashi" << endl;
