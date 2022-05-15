@@ -10,6 +10,10 @@ const int mod = 998244353;
 // 問題
 // https://atcoder.jp/contests/typical90/tasks/typical90_q
 
+/*
+余事象を考える、そしてフェニック木で高速化
+*/
+
 
 ll n, m;
 
