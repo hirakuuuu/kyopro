@@ -14,11 +14,14 @@ const int mod = 998244353;
 int main(){
     ll n, L; cin >> n >> L;
     vector<ll> a(n);
+    ll s = 0;
     priority_queue<ll, vector<ll>, greater<ll>> que;
     rep(i, 0, n){
         cin >> a[i];
+        s += a[i];
         que.push(a[i]);
     }
+    if(L > s) que.push(L-s);
     ll ans = 0;
     while(que.size() > 1){
         ll q1 = que.top(); que.pop();
@@ -26,7 +29,7 @@ int main(){
         ans += q1+q2;
         que.push(q1+q2);
     }
-    if(L > que.top()) ans += L;
+
     cout << ans << endl;
     
     return 0;
