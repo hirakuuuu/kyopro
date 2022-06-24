@@ -22,19 +22,20 @@ int main(){
         cin >> d[2][i];
     }
     bool f = true;
-    int ans = 1000;
-    if(n == 4 and d[1][3]*d[1][4] == 2 and d[2][3]*d[2][4] == 2){
-        cout << "! 3" << endl;
+    int ans = 1000, u = 0, v = 0;
+    rep(i, 3, n+1){
+        if(abs(d[1][i]-d[2][i]) != 1) f = false;
+        ans = min(ans, d[1][i]+d[2][i]);
+        if(d[1][i]+d[2][i] == 3 and !u) u = v = i;
+        else if(d[1][i]+d[2][i] == 3) v = i;
+    }
+    if(f){
+        cout << "? " << u << " " << v << endl;
+        int dist; cin >> dist;
+        if(dist == 1) cout << "! 3" << endl;
+        else cout << "! 1" << endl;
     }else{
-        rep(i, 3, n+1){
-            if(abs(d[1][i]-d[2][i]) != 1) f = false;
-            ans = min(ans, d[1][i]+d[2][i]);
-        }
-        if(f){
-            cout << "! 1" << endl;
-        }else{
-            cout << "! " << ans << endl; 
-        }
+        cout << "! " << ans << endl; 
     }
 
     return 0;
