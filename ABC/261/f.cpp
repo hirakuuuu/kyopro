@@ -10,37 +10,59 @@ const int mod = 998244353;
 // 問題
 // https://atcoder.jp/contests/abc261/tasks/abc261_f
 
+void add(vector<int> &bit, int pos, int val){
+    while(pos < bit.size()){
+        bit[pos] += val;
+        pos += pos&(-pos);
+    }
+}
+
+int get(vector<int> &bit, int pos){
+    int ans = 0;
+    while(pos > 0){
+        ans += bit[pos];
+        pos -= pos&(-pos);
+    }
+    return ans;
+}
+
 int main(){
     int n; cin >> n;
-    vector<int> c(n), x(n), cnt_c(n+1), cnt_pos(n);
-    priority_queue<vector<int>> que;
+    vector<int> c(n), x(n);
+    map<int, vector<int>> m;
     rep(i, 0, n) cin >> c[i];
-    rep(i, 0, n) cin >> x[i];
     rep(i, 0, n){
-        que.push({x[i], i, c[i]});
-        cnt_pos[i] = cnt_c[c[i]];
-        cnt_c[c[i]]++;
+        cin >> x[i];
+        m[c[i]].push_back(x[i]);
     }
 
-    map<int, set<int>> m;
-    set<int> deleted_pos;
-    int ans = 0, r = n-1;
+    vector<int> bit(n+1);
 
-    while(!que.empty()){
-        vector<int> q = que.top(); que.pop();
-        int pos = distance(m[q[2]].lower_bound(q[1]), m[q[2]].end());
+    ll cost = 0;
 
-
-        int now_pos = q[1]-distance(deleted_pos.begin(), deleted_pos.lower_bound(q[1]));
-        // cout << r << " " << now_pos << " " << (cnt_c[q[2]]-1-cnt_pos[q[1]]-pos) << endl;
-        ans += r-now_pos-(cnt_c[q[2]]-1-cnt_pos[q[1]]-pos);
-        // cout << ans << endl;
-        m[q[2]].insert(q[1]);
-        deleted_pos.insert(q[1]);
-        r--;
+    for(int i = n-1; i >= 0; i--){
+        add(bit, x[i], 1);
+        cost += get(bit, x[i]-1);
     }
 
-    cout << ans << endl;
+    for(int i = n-1; i >= 0; i--){
+        add(bit, x[i], -1);
+    }
+
+
+    rep(i, 1, n+1){
+        for(int j = m[i].size()-1; j >= 0; j--){
+            add(bit, m[i][j], 1);
+            cost -= get(bit, m[i][j]-1);
+        }
+        for(int j = m[i].size()-1; j >= 0; j--){
+            add(bit, m[i][j], -1);
+        }
+    }
+
+    cout << cost << endl;
+
+
 
 
 
