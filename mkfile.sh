@@ -19,32 +19,34 @@ echo "${ARR[-1]}のファイルを作成"
 
 # URLの末尾を取得
 s=${ARR[-1]}
+directory_path="/home/hiraku/kyopro/AtCoder/"
 # ファイルとディレクトリのパスを取得
+# エイリアスの設定に合わせてどのディレクトリ下でも使えるように絶対パスに変更
 if [ ${s:0:3} = "abc" ]; then
-    DIL="ABC/${s:3:3}"
-    FILE="ABC/${s:3:3}/${s: -1}.cpp"
+    DIL="${directory_path}ABC/${s:3:3}"
+    FILE="${directory_path}ABC/${s:3:3}/${s##*_}.cpp"
 elif [ ${s:0:3} = "arc" ]; then
-    DIL="ARC/${s:3:3}"
-    FILE="ARC/${s:3:3}/${s: -1}.cpp"
+    DIL="${directory_path}ARC/${s:3:3}"
+    FILE="${directory_path}ARC/${s:3:3}/${s##*_}.cpp"
 elif [ ${s:0:3} = "agc" ]; then
-    DIL="AGC/${s:3:3}"
-    FILE="AGC/${s:3:3}/${s: -1}.cpp"
+    DIL="${directory_path}AGC/${s:3:3}"
+    FILE="${directory_path}AGC/${s:3:3}/${s##*_}.cpp"
 elif [ ${s:0:3} = "ahc" ]; then
-    DIL="AHC/${s:3:3}"
-    FILE="AHC/${s:3:3}/${s: -1}.cpp"
+    DIL="${directory_path}AHC/${s:3:3}"
+    FILE="${directory_path}AHC/${s:3:3}/${s##*_}.cpp"
 else
-    DIL="others/${ARR[3]}"
-    FILE="others/${ARR[3]}/${s: -1}.cpp"
+    DIL="${directory_path}others/${ARR[3]}"
+    FILE="${directory_path}others/${ARR[3]}/${s##*_}.cpp"
 fi
 
 # ファイルが存在しない場合に作成
 if [ ! -e $FILE ]; then
     mkdir -p $DIL
     touch $FILE
-    cp template.cpp $FILE
+    cp ${directory_path}template.cpp $FILE
     # ファイルへの追記
     # https://www.delftstack.com/ja/howto/linux/how-to-append-text-to-a-file-using-bash/
-    sed -e "9a // 問題\n// ${pPATH}\n" template.cpp > $FILE
+    sed -e "9a // 問題\n// ${pPATH}\n" ${directory_path}template.cpp > $FILE
 fi
 
 
