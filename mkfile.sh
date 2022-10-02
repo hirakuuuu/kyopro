@@ -24,19 +24,19 @@ directory_path="/home/hiraku/kyopro/AtCoder/"
 # エイリアスの設定に合わせてどのディレクトリ下でも使えるように絶対パスに変更
 if [ ${s:0:3} = "abc" ]; then
     DIL="${directory_path}ABC/${s:3:3}"
-    FILE="${directory_path}ABC/${s:3:3}/${s##*_}.cpp"
+    FILE="${directory_path}ABC/${s:3:3}/${ARR[-1]}.cpp"
 elif [ ${s:0:3} = "arc" ]; then
     DIL="${directory_path}ARC/${s:3:3}"
-    FILE="${directory_path}ARC/${s:3:3}/${s##*_}.cpp"
+    FILE="${directory_path}ARC/${s:3:3}/${ARR[-1]}.cpp"
 elif [ ${s:0:3} = "agc" ]; then
     DIL="${directory_path}AGC/${s:3:3}"
-    FILE="${directory_path}AGC/${s:3:3}/${s##*_}.cpp"
+    FILE="${directory_path}AGC/${s:3:3}/${ARR[-1]}.cpp"
 elif [ ${s:0:3} = "ahc" ]; then
     DIL="${directory_path}AHC/${s:3:3}"
-    FILE="${directory_path}AHC/${s:3:3}/${s##*_}.cpp"
+    FILE="${directory_path}AHC/${s:3:3}/${ARR[-1]}.cpp"
 else
     DIL="${directory_path}others/${ARR[3]}"
-    FILE="${directory_path}others/${ARR[3]}/${s##*_}.cpp"
+    FILE="${directory_path}others/${ARR[3]}/${ARR[-1]}.cpp"
 fi
 
 # ファイルが存在しない場合に作成
