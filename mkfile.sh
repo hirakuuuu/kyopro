@@ -34,6 +34,9 @@ elif [ ${s:0:3} = "agc" ]; then
 elif [ ${s:0:3} = "ahc" ]; then
     DIL="${directory_path}AHC/${s:3:3}"
     FILE="${directory_path}AHC/${s:3:3}/${ARR[-1]}.cpp"
+elif [ ${s:0:3} = "dp_" ]; then
+    DIL="${directory_path}others/edpc"
+    FILE="${directory_path}others/edpc/${ARR[-1]}.cpp"
 else
     DIL="${directory_path}others/${ARR[3]}"
     FILE="${directory_path}others/${ARR[3]}/${ARR[-1]}.cpp"
