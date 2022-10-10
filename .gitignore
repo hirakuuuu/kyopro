@@ -5,6 +5,9 @@
 
 # 設定
 /personal/
+.vscode/*
+mkfile.sh
+.editorconfig
 
 # AHC関連
 /AHC/
