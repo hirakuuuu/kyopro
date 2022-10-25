@@ -7,9 +7,6 @@ using namespace std;
 const int MOD = 1000000007;
 const int mod = 998244353;
 
-// 問題
-// https://atcoder.jp/contests/typical90/tasks/typical90_ac
-
 struct LazySegTree {
     private:
         int n;
@@ -84,18 +81,6 @@ struct LazySegTree {
 
 
 int main(){
-    int w, n; cin >> w >> n;
-    vector<int> a(w);
-    LazySegTree height(a);
-    rep(i, 0, n){
-        int l, r; cin >> l >> r;
-        l--;
-        int mh = height.get_num(l, r);
-        cout << mh+1 << endl;
-
-        height.update(l, r, mh+1);
-    }
-
     
     return 0;
 }
