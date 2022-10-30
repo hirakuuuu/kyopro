@@ -8,12 +8,9 @@ const int MOD = 1000000007;
 const int mod = 998244353;
 
 // 問題
-// https://atcoder.jp/contests/abc246/tasks/abc246_b
+// https://atcoder.jp/contests/abc126/tasks/abc126_d
 
 int main(){
-    double a, b; cin >> a >> b;
-    double d = sqrt(a*a+b*b);
-    printf("%.10f %.10f\n", a/d, b/d);
     
     return 0;
 }
