@@ -7,32 +7,16 @@ using namespace std;
 const int MOD = 1000000007;
 const int mod = 998244353;
 
+// パスカルの三角形の要領で再帰的に求められる
+ll c[100][100];
 
-vector<ll> fac(100005), inv(100005), finv(100005);
-
-void init_fac(){
-    fac[0] = fac[1] = 1;
-    inv[1] = 1;
-    finv[0] = finv[1] = 1;
-    rep(i, 2, 100005){
-        fac[i] = fac[i-1]*i%mod;
-        inv[i] = mod-mod/i*inv[mod%i]%mod;
-        finv[i] = finv[i-1]*inv[i]%mod;
-    }
-}
-
-ll nCr(ll n, ll r){
-    if(n < 0 or n-r < 0 or r < 0) return 0;
-    return fac[n]*(finv[n-r]*finv[r]%mod)%mod;
-}
-
-ll nHr(ll n, ll r){
-    return nCr(n-r+1, r);
+ll combination(ll n, ll k){
+    if(c[n][k] > 0) return c[n][k];
+    if(k == 0 or n == k) return c[n][k] = 1;
+    return c[n][k] = combination(n-1, k)+combination(n-1, k-1);
 }
 
 int main(){
-    init_fac();
-    cout << nCr(3, 2) << endl;
 
     return 0;
 }
