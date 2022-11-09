@@ -15,132 +15,96 @@ const int TIME_LIMIT = 5900;
 
 const int n = 100;
 
-struct SumTable {
-    vector<vector<int>> cur;
-    vector<vector<int>> goal;
-    vector<vector<int>> queri;
-    int best_score;
-    int max_goal;
+int randint(int l, int r){
+    return rand()%(r-l+1)+l;
+}
 
-    SumTable(vector<vector<int>> a,  int max_a):goal(a), max_goal(max_a){
-        cur = get_init();
-        best_score = calc_score(cur);
+struct SumTable {
+    vector<vector<int>> a;
+    vector<vector<int>> b;
+    vector<int> x;
+    vector<int> y;
+    vector<int> h;
+    int best_score;
+
+    SumTable(vector<vector<int>> a_, vector<vector<int>> b_):a(a_), b(b_){
+        get_init();
+        best_score = calc_score();
     };
 
-    vector<vector<int>> get_init(){
-        vector<vector<int>> b_init(n, vector<int>(n));
-        rep(k, 0, 1000){
-            bool not_over = true;
-            vector<int> new_q = {rand()%n, rand()%n, rand()%n+1};
-            rep(i, 0, n){
-                rep(j, 0, n){
-                    int add_num = max(0, new_q[2]-abs(i-new_q[0])+abs(j-new_q[1]));
-                    not_over &= (b_init[i][j]+add_num <= goal[i][j]);
-                }
-            }
-
-            if(not_over){
-                queri.push_back(new_q);
-                rep(i, 0, n){
-                    rep(j, 0, n){
-                        int add_num = max(0, new_q[2]-abs(i-new_q[0])+abs(j-new_q[1]));
-                        b_init[i][j] += add_num;
-                    }
-                }
-            }
+    void get_init(){
+        rep(i, 0, 1000){
+            x.push_back(rand()%n);
+            y.push_back(rand()%n);
+            h.push_back(1);
+            b[y[i]][x[i]]++;
         }
-        return b_init;
     }
 
-    int calc_score(vector<vector<int>> b){
+    int calc_score(){
         int score = 0;
         rep(i, 0, n){
             rep(j, 0, n){
-                score += abs(goal[i][j]-b[i][j]);
+                score += abs(a[i][j]-b[i][j]);
             }
         }
         return 200000000-score;
     }
 
     void print_queri(){
-        printf("%d\n", (int)queri.size());
-        for(auto &q: queri){
-            printf("%d %d %d\n", q[0], q[1], q[2]);
+        printf("%d\n", 1000);
+        rep(i, 0, 1000){
+            printf("%d %d %d\n", x[i], y[i], h[i]);
         }
     }
 
-    void change_queri(){
-        int q_num = rand()%queri.size();
-        vector<int> cur_q = queri[q_num];
-        vector<int> new_q = {rand()%n, rand()%n, rand()%n+1};
-        int score_fluc = 0;
+    void change_queri(ll rest){
+        int t = rand()%1000;
+        int old_x = x[t];
+        int old_y = y[t];
+        int old_h = h[t];
+        int new_x = x[t]+randint(-1, 1);
+        int new_y = y[t]+randint(-1, 1);
+        int new_h = h[t]+randint(-14, 14);
+        if(new_x < 0 or n <= new_x) return;
+        if(new_y < 0 or n <= new_y) return;
+        if(new_h < 1 or n+1 <= new_h) return;
+        //printf("%d %d %d\n", new_x, new_y, new_h);
+
         rep(i, 0, n){
             rep(j, 0, n){
-                int cur_num = max(0, cur_q[2]-abs(i-cur_q[0])+abs(j-cur_q[1]));
-                int new_num = max(0, new_q[2]-abs(i-new_q[0])+abs(j-new_q[1]));
-                int add_num = new_num-cur_num;
-                if(goal[i][j] >= cur[i][j]){
-                    if(cur[i][j]+add_num <= goal[i][j]){
-                        score_fluc += add_num;
-                    }else{
-                        score_fluc += 2*goal[i][j]-2*cur[i][j]-add_num;
-                    }
-                }else{
-                    if(cur[i][j]+add_num <= goal[i][j]){
-                        score_fluc -= 2*goal[i][j]-2*cur[i][j]-add_num;
-                    }else{
-                        score_fluc -= add_num;
-                    }
-                }
+                int cur_num = max(0, old_h-abs(i-old_x)-abs(j-old_y));
+                int new_num = max(0, new_h-abs(i-new_x)-abs(j-new_y));
+                b[j][i] -= cur_num;
+                b[j][i] += new_num;
             }
         }
+        int cur_score = calc_score();
+        int score_fluc = cur_score-best_score;
+
+        // double T = 100.0-100.00*(double)rest/TIME_LIMIT;
+        // double probability = exp(min(0.0, (double)score_fluc/T));
+        // double criterion = 1.0*rand()/RAND_MAX;
 
         if(score_fluc > 0){
-            queri[q_num] = new_q;
+            best_score = cur_score;
+            x[t] = new_x;
+            y[t] = new_y;
+            h[t] = new_h;
+        }else{
             rep(i, 0, n){
                 rep(j, 0, n){
-                    int cur_num = max(0, cur_q[2]-abs(i-cur_q[0])+abs(j-cur_q[1]));
-                    int new_num = max(0, new_q[2]-abs(i-new_q[0])+abs(j-new_q[1]));
-                    cur[i][j] += new_num-cur_num;
-                }
-            }
-        }
-    }
-
-    void add_queri(){
-        if(queri.size() == 1000) return;
-
-        vector<int> new_q = {rand()%n, rand()%n, rand()%n+1};
-        int score_fluc = 0;
-        rep(i, 0, n){
-            rep(j, 0, n){
-                int add_num = max(0, new_q[2]-abs(i-new_q[0])+abs(j-new_q[1]));
-                if(goal[i][j] >= cur[i][j]){
-                    if(cur[i][j]+add_num <= goal[i][j]){
-                        score_fluc += add_num;
-                    }else{
-                        score_fluc += 2*goal[i][j]-2*cur[i][j]-add_num;
-                    }
-                }else{
-                    score_fluc -= add_num; 
-                }
-            }
-        }
-
-        if(score_fluc > 0){
-            queri.push_back(new_q);
-            rep(i, 0, n){
-                rep(j, 0, n){
-                    int add_num = max(0, new_q[2]-abs(i-new_q[0])+abs(j-new_q[1]));
-                    cur[i][j] += add_num;
+                    int cur_num = max(0, old_h-abs(i-old_x)-abs(j-old_y));
+                    int new_num = max(0, new_h-abs(i-new_x)-abs(j-new_y));
+                    b[j][i] += cur_num;
+                    b[j][i] -= new_num;
                 }
             }
         }
     }
   
   	void print_score(){
-      printf("initial score: %d\n", best_score);
-      printf("now score: %d\n", calc_score(cur));
+      printf("score: %d\n", calc_score());
     }
 };
 
@@ -149,27 +113,22 @@ int main(){
     auto start_time = chrono::duration_cast<chrono::milliseconds>(chrono::system_clock::now().time_since_epoch()).count();
 
     vector<vector<int>> a(n, vector<int>(n));
-    int max_a = 0;
+    vector<vector<int>> b(n, vector<int>(n));
     rep(i, 0, n){
         rep(j, 0, n){
             cin >> a[i][j];
-            max_a = max(max_a, a[i][j]);
         }
     }
 
-    SumTable st(a, max_a);
-    int cnt = 0;
+    SumTable st(a, b);
 
     while(true){
         // 時間いっぱい回す
         auto now_time = chrono::duration_cast<chrono::milliseconds>(chrono::system_clock::now().time_since_epoch()).count();
         if(now_time-start_time > TIME_LIMIT) break;
-        if(rand()%10 == 0) st.add_queri();
-        else st.change_queri();
-        cnt++;
+        st.change_queri(now_time-start_time);
     }
-  
-  	// st.print_score();
+  	//st.print_score();
     st.print_queri();
 
     
