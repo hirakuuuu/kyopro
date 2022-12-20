@@ -16,26 +16,38 @@ template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 int main(){
     int n; cin >> n;
     vector<pii> lr;
-    int i = 0, id=  0;
-    while(i <= n){
-        int l = 1, r = l+i;
-        while(l <= n){
-            lr.push_back({l, min(n, r)});
-            l += i;
-            r += i;
-            id++;
+    vector<vector<int>> l_id(30, vector<int>(n+1));
+    vector<vector<int>> r_id(30, vector<int>(n+1));
+    int wid = 1, id = 0, m = 0;
+    while(wid <= n){
+        int i = 1;
+        while(i+wid-1 <= n){
+            lr.push_back({i, i+wid-1});
+            m++;
+            l_id[id][i] = m;
+            r_id[id][i+wid-1] = m;
+            i++;
         }
+        id++;
+        wid *= 2;
     }
     cout << lr.size() << endl;
-    rep(i, 0, lr.size()){
-        cout << lr[i].first << ' ' << lr[i].second << endl;
+    for(const auto &p: lr){
+        cout << p.first << ' ' << p.second << endl;
     }
 
     int q; cin >> q;
     while(q--){
-        int L, R; cin >> L >> R;
-        
+        int l, r; cin >> l >> r;
+        int o = 0;
+        while(pow(2, o) <= r-l+1){
+            o++;
+        }
+        o--;
+        cout << l_id[o][l] << ' ' << r_id[o][r] << endl;
+
     }
+
     
     return 0;
 }
