@@ -7,44 +7,48 @@ using namespace std;
 const int MOD = 1000000007;
 const int mod = 998244353;
 
-/*
-https://atcoder.jp/contests/abc196/tasks/abc196_d
-h*w <= 16*16 より十分小さいので、愚直な全探索でいける
-半畳は無視して、1畳をおけるパターンを全部考えれば良い
-これはdfsでいける
-*/
+template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
+template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
-int H, W, A, B;
-vector<vector<int>> used(16, vector<int>(16));
+// 問題
+// https://atcoder.jp/contests/abc196/tasks/abc196_d
 
-int dfs(int x, int y, int a){
-    // 下まで到達したら、使い切った場合1足す
-    if(y == H) return a==0;
-    // 右まで到達したら、下にずれる
-    if(x == W) return dfs(0, y+1, a);
-    // すでに使われている場合、何もできないので次に進む
-    if(used[y][x]) return dfs(x+1, y, a);
+vector<vector<bool>> used(100, vector<bool>(100));
 
+bool check(int i, int j, int h, int w){
+    return (0 <= i and i < h and 0 <= j and j < w);
+}
+
+int dfs(int h, int w, int a, int d){
     int res = 0;
-
-    // 縦置き
-    if(y+1 < H and used[y+1][x] == 0 and 0 < a){
-        used[y][x] = used[y+1][x] = 1;
-        res += dfs(x+1, y, a-1);
-        used[y][x] = used[y+1][x] = 0;
+    if(d == a){
+        return 1;
     }
-    // 横置き
-    if(x+1 < W and used[y][x+1] == 0 and 0 < a){
-        used[y][x] = used[y][x+1] = 1;
-        res += dfs(x+1, y, a-1);
-        used[y][x] = used[y][x+1] = 0;
+    rep(i, 0, h){
+        rep(j, 0, w){
+            if(!used[i][j] and check(i+1, j, h, w) and !used[i+1][j]){
+                used[i][j] = used[i+1][j] = true;
+                res += dfs(h, w, a, d+1);
+                used[i][j] = used[i+1][j] = false;
+            }
+            
+            if(!used[i][j] and check(i, j+1, h, w) and !used[i][j+1]){
+                used[i][j] = used[i][j+1] = true;
+                res += dfs(h, w, a, d+1);
+                used[i][j] = used[i][j+1] = false;
+            }
+        }
     }
-    // 何もしない（半畳を置く）
-    res += dfs(x+1, y, a);
     return res;
 }
 
 int main(){
-    cin >> H >> W >> A >> B;
-    cout <<  dfs(0, 0, A) << endl;
+    int h, w, a, b; cin >> h >> w >> a >> b;
+    int f = 1;
+    rep(i, 1, a+1) f *= i;
+    cout << dfs(h, w, a, 0)/f << endl;
+
+
+    
+    return 0;
 }
