@@ -4,8 +4,8 @@ using namespace std;
 #define ll long long
 #define pii pair<int, int>
 #define pll pair<ll, ll>
-const int MOD = 1000000007;
-const int mod = 998244353;
+const int MOD_NUM = 1000000007;
+const int mod_num = 998244353;
 
 template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}

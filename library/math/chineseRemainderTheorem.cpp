@@ -10,8 +10,33 @@ const int mod_num = 998244353;
 template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
-// 問題
-// https://atcoder.jp/contests/abc286/tasks/abc286_f
+/*
+中国剰余定理 :
+    m1とm2を互いに素な正の整数とする。
+        x ≡ b1 (mod. m1)
+        x ≡ b2 (mod. m2)
+    を満たす整数 x が 0 以上 m1, m2 未満にただ1つ存在する。
+
+    特にそれをｒとすると
+        x ≡ b1 (mod. m1), x ≡ b2 (mod. m2)
+        ↔ x ≡ r (mod. m1m2)
+    が成立する。
+
+アルゴリズム : 
+二元の場合 : 
+    x ≡ b1 (mod. m1), x ≡ b2 (mod. m2) の場合を解く。
+    d = gcd(m1, m2) として、拡張ユークリッドの互除法によって
+    m1*p+m2*q = d を満たす (p, q) を求め、
+    x = b1+m1((b2-b1)/d)*p とすればよい。
+    ( 
+        b1 = b2 (mod. gcd(m1, m2)) より、b2-b1はdで割り切れる。
+        s = ((b2-b1)/d) とおくと、m1*p+m2*q = d より、 
+        s*m1*p+s*m2*q = b2-b1 
+        →　s*m1*p+b1 = -s*m2*q+b2     
+        x=b1+s*m1*p(=b2−s*m2*q) とおくと、
+        x ≡ b1 (mod. m1), x ≡ b2 (mod. m2) が成り立っていることが分かる。
+    )
+*/
 
 // 2元の場合
 // 負の数にも対応した mod 
@@ -48,40 +73,9 @@ pll chineseRem(const vector<ll> &b, const vector<ll> &m){
     return {mod(r, M), M};
 }
 
-vector<ll> p = {4, 5, 7, 9, 11, 13, 17, 19, 23};
-
 int main(){
-    const ll m = 108;
-    vector<ll> a(m);
-    ll id = 0;
-    for(const auto &pp: p){
-        ll s = id+1;
-        rep(i, 0, pp){
-            a[id] = s+(pp-(s-id))%pp;
-            id++;
-        }
-    }
-    cout << m << endl;
-
-    rep(i, 0, m){
-        cout << a[i] << ' ';
-    }
-    cout << endl;
-
-    vector<ll> r;
-    vector<ll> b(m);
-    rep(i, 0, m) cin >> b[i];
-    id = 0;
-    ll sm = 0;
-    for(const auto &pp: p){
-        sm += pp;
-        r.push_back((1+(sm-b[id]))%pp);
-        id += pp;
-    }
-
-
-    pll res = chineseRem(r, p);
-    cout << res.first << endl;
-
+    pll res = chineseRem({2, 3}, {3, 5});
+    cout << "x ≡ " << res.first << " (mod. "  << res.second << ")" << endl;
+    
     return 0;
 }
