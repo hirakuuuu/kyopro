@@ -1,4 +1,4 @@
-#include <bits/stdc++.h>
+#include <iostream>
 using namespace std;
 #define rep(i, a, n) for(int i = a; i < n; i++)
 #define ll long long
@@ -11,17 +11,8 @@ template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
 int main(){
-    rep(i, 0, 15){
-        cout << 0;
-    }
-    cout << endl;
-    rep(i, 0, 15){
-        rep(j, 0, 15){
-            if(i == j) cout << 1;
-            else cout << 0;
-        }
-        cout << endl;
-    }
+    int a, b; cin >> a >> b;
+    cout << a+b << endl;
     
     return 0;
 }

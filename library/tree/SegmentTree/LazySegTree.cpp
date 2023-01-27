@@ -15,7 +15,7 @@ struct LazySegTree {
     public:
         LazySegTree(vector<int> a){
             // 配列のサイズを取得
-            int sz = a.size();
+            int sz = (int) a.size();
             // nはszを超える最小の2のべき乗
             n = 1;
             while(n < sz) n *= 2;
