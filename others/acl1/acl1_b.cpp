@@ -1,42 +1,21 @@
 #include <bits/stdc++.h>
 using namespace std;
 #define rep(i, a, n) for(int i = a; i < n; i++)
+#define rrep(i, a, n) for(int i = a; i >= n; i--)
 #define ll long long
 #define pii pair<int, int>
 #define pll pair<ll, ll>
 const int MOD_NUM = 1000000007;
 const int mod_num = 998244353;
+const int iinf = 1001001001;
 
 template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
-/*
-中国剰余定理 :
-    m1とm2を互いに素な正の整数とする。
-        x ≡ b1 (mod. m1)
-        x ≡ b2 (mod. m2)
-    を満たす整数 x が 0 以上 m1, m2 未満にただ1つ存在する。
+// 問題
+// https://atcoder.jp/contests/acl1/tasks/acl1_b
 
-    特にそれをｒとすると
-        x ≡ b1 (mod. m1), x ≡ b2 (mod. m2)
-        ↔ x ≡ r (mod. m1m2)
-    が成立する。
 
-アルゴリズム : 
-二元の場合 : 
-    x ≡ b1 (mod. m1), x ≡ b2 (mod. m2) の場合を解く。
-    d = gcd(m1, m2) として、拡張ユークリッドの互除法によって
-    m1*p+m2*q = d を満たす (p, q) を求め、
-    x = b1+m1((b2-b1)/d)*p とすればよい。
-    ( 
-        b1 = b2 (mod. gcd(m1, m2)) より、b2-b1はdで割り切れる。
-        s = ((b2-b1)/d) とおくと、m1*p+m2*q = d より、 
-        s*m1*p+s*m2*q = b2-b1 
-        →　s*m1*p+b1 = -s*m2*q+b2     
-        x=b1+s*m1*p(=b2−s*m2*q) とおくと、
-        x ≡ b1 (mod. m1), x ≡ b2 (mod. m2) が成り立っていることが分かる。
-    )
-*/
 
 // 2元の場合
 // 負の数にも対応した mod 
@@ -81,9 +60,29 @@ pll chineseRem(const vector<ll> &b, const vector<ll> &m){
     return {mod(r, M), M};
 }
 
+
 int main(){
-    pll res = chineseRem({2, 3}, {3, 5});
-    cout << "x ≡ " << res.first << " (mod. "  << res.second << ")" << endl;
+    ll n; cin >> n;
+
+    vector<ll> yakusu;
+    for(ll i = 1; i*i <= 2*n; i++){
+        if(2*n%i == 0){
+            yakusu.push_back(i);
+            if(2*n/i != i) yakusu.push_back(2*n/i);
+        }
+    }
+
+    sort(yakusu.begin(), yakusu.end());
+
+    ll ans = 1LL<<60;
+
+    for(const auto &x: yakusu){
+        ll y = 2*n/x;
+        auto [r, m] = chineseRem({0, y-1}, {x, y});
+        if(r > 0) chmin(ans, r);
+    }
+
+    cout << ans << endl;
     
     return 0;
 }

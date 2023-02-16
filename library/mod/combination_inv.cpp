@@ -27,7 +27,7 @@ ll nCr(ll n, ll r){
 }
 
 ll nHr(ll n, ll r){
-    return nCr(n-r+1, r);
+    return nCr(n+r-1, r);
 }
 
 int main(){
