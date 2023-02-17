@@ -8,7 +8,6 @@ const int MOD = 1000000007;
 const int mod = 998244353;
 
 // 繰り返し二乗法
-
 ll power(ll a, ll b, ll m=mod){
     ll res = 1;
     while(b > 0){
