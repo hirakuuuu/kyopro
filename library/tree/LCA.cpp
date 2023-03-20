@@ -7,7 +7,7 @@ using namespace std;
 #define pll pair<ll, ll>
 const int MOD_NUM = 1000000007;
 const int mod_num = 998244353;
-const int iinf = 1001001001;
+const ll INF = (1LL<<60);
 
 template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
@@ -48,8 +48,54 @@ LCAを求めるには、オイラーツアーで通りかかった順番に頂�
 */
 
 // ここから
+// 頂点番号は0インデックスだよ
+class EularTour {
+    vector<vector<ll>> graph;  //グラフの隣接リスト
+    vector<ll> eular_tour;     // オイラーツアーの頂点配列
+    vector<ll> depth;          // オイラーツアーの各頂点の深さ
+    vector<ll> ind;            // 各頂点がオイラーツアー配列の何番目に最初に訪れるか
 
-// 頂点番号と深さを格納した配列から、LCAを取得
+    public:
+        // コンストラクタ
+        EularTour(ll n_, vector<vector<ll>> g): depth(n_, 0), ind(n_, 0){
+            graph = g;
+            dfs();
+        }
+
+        // DFS（オイラーツアー構築）
+        void dfs(ll now=0, ll par=-1, ll d=0){//今の頂点、親の頂点、今の頂点の深さ
+            ind[now] = eular_tour.size();
+            depth[now] = d;
+            eular_tour.push_back(now);
+            for(auto child: graph[now]){
+                if(child != par){
+                    dfs(child, now, d+1);
+                    eular_tour.push_back(now);
+                }
+            }
+        }
+
+        // 深さを取得
+        ll get_depth(ll n){
+            return depth[n];
+        }
+
+        // オイラーツアー配列の何番目に最初に訪れるかを取得
+        ll get_ind(ll n){
+            return ind[n];
+        }
+
+        // 深さと頂点番号のpairを格納した配列を取得
+        vector<pll> get_pair_list(){
+            vector<pll> res;
+            for(auto enode: eular_tour){
+                res.push_back(make_pair(depth[enode], enode));
+            }
+            return res;
+        }
+};
+
+// 深さと頂点番号を格納した配列から、区間のうち深さが最小の頂点を求める
 class MinSegTree {
     ll n;
     vector<pll> node;
@@ -62,7 +108,7 @@ class MinSegTree {
             n = 1LL;
             while(n < sz) n *= 2;
             // ノードの個数は2n-1
-            node.resize(2*n-1, {(1LL<<60), (1LL<<60)});
+            node.resize(2*n-1, {INF, INF});
 
             // 再下段にaの値を格納
             rep(i, 0, sz) node[i+n-1] = a_[i];
@@ -84,83 +130,47 @@ class MinSegTree {
 
         // 取得処理
         pll get_min(ll a, ll b, ll k=0, ll l=0, ll r=-1){
-            if(r < 0) r = n;
-            if(r <= a or b <= l) return {(1LL<<60), (1LL<<60)};
+            // 最初は右端をnにする
+            if(r < 0){
+                r = n;
+                b++;
+            }
+            // 区間が範囲に収まっていなければINFを返す
+            if(r <= a or b <= l) return {INF, INF};
+            // 区間が完全に収まっているならば、最小値を返す
             if(a <= l and r <= b) return node[k];
 
+            // 区間を２つに分けて最小値を求め、小さい方を返す
             pll v1 = get_min(a, b, 2*k+1, l, (l+r)/2);
             pll v2 = get_min(a, b, 2*k+2, (l+r)/2, r);
             return min(v1, v2);
         }
 };
 
-// 頂点番号は0インデックスで
-class EularTour {
-    vector<vector<ll>> graph;  //グラフの隣接リスト
-    vector<ll> eular_tour;     // オイラーツアーの頂点配列
-    vector<ll> depth;          // オイラーツアーの各頂点の深さ
-    vector<ll> ind;            // 各頂点がオイラーツアー配列の何番目に最初に訪れるか
-
-public:
-    // コンストラクタ
-    EularTour(ll n_, vector<vector<ll>> g): depth(n_, 0), ind(n_, 0){
-        graph = g;
-        dfs();
-    }
-
-    // DFS（オイラーツアー構築）
-    void dfs(ll now=0, ll par=-1, ll d=0){//今の頂点、親の頂点、今の頂点の深さ
-        ind[now] = eular_tour.size();
-        depth[now] = d;
-        eular_tour.push_back(now);
-        for(auto child: graph[now]){
-            if(child != par){
-                dfs(child, now, d+1);
-                eular_tour.push_back(now);
-            }
-        }
-    }
-
-    // 深さを取得
-    ll get_depth(ll n){
-        return depth[n];
-    }
-
-    // オイラーツアー配列の何番目に最初に訪れるかを取得
-    ll get_ind(ll n){
-        return ind[n];
-    }
-
-    // 頂点番号と深さのpairを格納した配列を取得
-    vector<pll> get_pair_list(){
-        vector<pll> res;
-        for(auto enode: eular_tour){
-            res.push_back(make_pair(depth[enode], enode));
-        }
-        return res;
-    }
-
-};
-
 class LCA {
     vector<vector<ll>> graph;  //グラフの隣接リスト
     EularTour eular_tour;      // オイラーツアー
-    MinSegTree mst;
+    MinSegTree min_seg_tree;   // 区間minセグ木
 
-public:
-    // コンストラクタ
-    LCA(ll n_, vector<vector<ll>> g_): 
-    eular_tour(n_, g_), 
-    mst(eular_tour.get_pair_list()){};
+    public:
+        // コンストラクタ
+        LCA(ll n_, vector<vector<ll>> g_): 
+        eular_tour(n_, g_), 
+        min_seg_tree(eular_tour.get_pair_list()){};
 
-    // 頂点aと頂点bのlcaを求める
-    ll get_lca(ll a, ll b){
-        ll pa = eular_tour.get_ind(a);
-        ll pb = eular_tour.get_ind(b);
-        if(pa > pb) swap(pa, pb);
-        return mst.get_min(pa, pb+1).second;
-    }
+        // 頂点aと頂点bのlcaを求める
+        ll get_lca(ll a, ll b){
+            // a, bがオイラーツアーで最初に現れる位置を取得
+            ll pa = eular_tour.get_ind(a);
+            ll pb = eular_tour.get_ind(b);
+            // pa < pb にする
+            if(pa > pb) swap(pa, pb);
+            // 区間における深さが最小の点がlca
+            return min_seg_tree.get_min(pa, pb).second;
+        }
 };
+
+// ここまで
 
 int main(){
     ll n; cin >> n;
