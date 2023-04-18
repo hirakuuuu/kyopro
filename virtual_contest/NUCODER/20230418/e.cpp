@@ -13,6 +13,8 @@ template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
 int main(){
+    ll a, b; cin >> a >> b;
+    cout << a*b/gcd(a, b) << endl;
     
     return 0;
 }

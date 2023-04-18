@@ -13,6 +13,9 @@ template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
 int main(){
+    char c; cin >> c;
+    if(islower(c)) cout << 'a' << endl;
+    else cout << 'A' << endl;
     
     return 0;
 }

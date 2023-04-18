@@ -13,6 +13,13 @@ template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
 int main(){
+    int n; cin >> n;
+    string s, t; cin >> s >> t;
+    rep(i, 0, 2*n){
+        if(i%2 == 0) cout << s[i/2];
+        else cout << t[i/2];
+    }
+    cout << endl;
     
     return 0;
 }
