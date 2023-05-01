@@ -23,12 +23,12 @@ int main(){
     vector<vector<int>> pos(m+1);
     rep(i, 1, n+1) pos[a[i]].push_back(i);
 
-    vector<pii> right(m);
+    vector<pii> right(m+1);
     rep(i, 1, m+1){
         right[i-1] = {pos[i].back(), i};
     }
     sort(right.begin(), right.end());
-    // rep(i, 0, m){
+    // rep(i, 1, m+1){
     //     cout << right[i].first << ' ' << right[i].second << endl;
     // }
 
@@ -36,20 +36,26 @@ int main(){
     vector<bool> used(m+1);
     vector<int> ans;
     priority_queue<pii, vector<pii>, greater<pii>> que;
-    rep(i, 0, m){
-        if(used[right[i].second]) continue;
-        rep(j, l, right[i].first+1){
-            que.push({a[j], j});
-        }
-        int r = l-1;
-        while(!que.empty()){
+    rep(i, 1, right[1].first+1){
+        que.push({a[i], i});
+    }
+    int id = 1, r = 0;
+    while(ans.size() < m and !que.empty()){
+        bool ok = false;
+        while(!ok and !que.empty()){
             pii q = que.top(); que.pop();
             if(used[q.first] or q.second < r) continue;
             used[q.first] = true;
             r = q.second;
             ans.push_back(q.first);
+            ok = true;
         }
-        l = right[i].first+1;
+        while(id <= m and used[right[id].second]){
+            id++;
+            rep(j, right[id-1].first+1, right[id].first+1){
+                que.push({a[j], j});
+            }
+        }
     }
 
     rep(i, 0, m) cout << ans[i] << ' ';
