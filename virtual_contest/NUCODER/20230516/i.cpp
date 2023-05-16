@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
-#define rep(i, a, n) for(ll i = a; i < n; i++)
-#define rrep(i, a, n) for(ll i = a; i >= n; i--)
+#define rep(i, a, n) for(int i = a; i < n; i++)
+#define rrep(i, a, n) for(int i = a; i >= n; i--)
 #define ll long long
 #define pii pair<int, int>
 #define pll pair<ll, ll>

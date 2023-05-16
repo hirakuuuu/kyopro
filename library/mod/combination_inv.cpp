@@ -8,13 +8,13 @@ const int MOD = 1000000007;
 const int mod = 998244353;
 
 
-vector<ll> fac(100005), inv(100005), finv(100005);
+vector<ll> fac(200005), inv(200005), finv(200005);
 
 void init_fac(){
     fac[0] = fac[1] = 1;
     inv[1] = 1;
     finv[0] = finv[1] = 1;
-    rep(i, 2, 100005){
+    rep(i, 2, 200005){
         fac[i] = fac[i-1]*i%mod;
         inv[i] = mod-mod/i*inv[mod%i]%mod;
         finv[i] = finv[i-1]*inv[i]%mod;
