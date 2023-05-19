@@ -11,21 +11,21 @@ vector<ll> a(100005);
 vector<vector<pll>> g(100005);
 
 // sを始点とする各頂点への距離の最小値を格納した配列を返す
+// 負の辺に対応するために、一つ前の要素を記録しておく
 vector<ll> dijk(int s){
-    priority_queue<pll, vector<pll>, greater<pll>> que;
+    priority_queue<vector<ll>, vector<vector<ll>>, greater<vector<ll>>> que;
     vector<ll> dist(100005, (1LL<<60));
-    que.push(make_pair(0, s));
+    que.push({0, s, -1});
     dist[s] = 0;
     while(!que.empty()){
-        pll q = que.top(); que.pop();
-        ll d = q.first, u = q.second;
+        vector<ll> q = que.top(); que.pop();
+        ll d = q[0], u = q[1], p = q[2];
         if(dist[u] < d) continue;
         for(auto nq: g[u]){
             ll v = nq.first, cost = nq.second;
-            if(dist[v] > d+cost){
-                dist[v] = d+cost;
-                que.push({dist[v], v});
-            }
+            if(v == p || dist[v] <= d+cost) continue;
+            dist[v] = d+cost;
+            que.push({dist[v], v, u});
         }
     }
     return dist;
