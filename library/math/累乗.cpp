@@ -13,7 +13,7 @@ template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 // 整数の累乗をやってくれるpow関数がほしい
 // ただし、オーバーフローはエラーでる（そこは自己判断）
 
-ll pow_int(ll n, ll x){
+ll integer_pow(ll n, ll x){
     ll res = 1LL;
     while(true){
         if(x%2 == 1) res = res*n;
@@ -26,6 +26,6 @@ ll pow_int(ll n, ll x){
 
 int main(){
     int n, x; cin >> n >> x;
-    cout << pow_int(n, x) << endl;
+    cout << integer_pow(n, x) << endl;
     return 0;
 }
