@@ -80,7 +80,7 @@ public:
 
     // 逆元
     static modint<MOD> inv(modint<MOD> num){
-        return modpow(num, MOD-2); // 衝突を避ける
+        return modpow(num, MOD-2);
     }
 
     // 階乗
