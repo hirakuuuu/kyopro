@@ -18,72 +18,36 @@ template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
 int main(){
     int n; cin >> n;
-    vector<int> a(n);
+    vector<int> a(n), b(n);
     rep(i, 0, n){
         cin >> a[i];
+        b[i] = a[i];
     }
-
+    sort(b.begin(), b.end());
     vector<vector<int>> cnt(5, vector<int>(5));
-    vector<int> pos(5);
-    rep(i, 0, n) pos[a[i]]++;
-    rep(i, 0, 4) pos[i+1] += pos[i];
-
-    rep(i, 1, 5){
-        rep(j, pos[i-1], pos[i]){
-            cnt[i][a[j]]++;
-        }
-    }
-    int ans = 0;
+    rep(i, 0, n) cnt[a[i]][b[i]]++;
+    int ans = 0, tmp = 0;
     rep(i, 1, 4){
         rep(j, i+1, 5){
-            if(cnt[i][j] <= cnt[j][i]){
-                ans += cnt[i][j];
-                cnt[i][i] += cnt[i][j];
-                cnt[j][j] += cnt[i][j];
-                cnt[j][i] -= cnt[i][j];
-                cnt[i][j] = 0;
-            }else{
-                ans += cnt[j][i];
-                cnt[i][i] += cnt[j][i];
-                cnt[j][j] += cnt[j][i];
-                cnt[i][j] -= cnt[j][i];
-                cnt[j][i] = 0;  
-            }
+            tmp = min(cnt[i][j], cnt[j][i]);
+            ans += tmp;
+            cnt[i][i] += tmp;
+            cnt[j][j] += tmp;
+            cnt[j][i] -= tmp;
+            cnt[i][j] -= tmp;
         }
         rep(j, i+1, 5){
-            if(cnt[j][i] > 0){
-                rep(k, i+1, 5){
-                    if(cnt[i][k] > 0){
-                        if(cnt[i][k] <= cnt[j][i]){
-                            ans += cnt[i][k];
-                            cnt[i][i] += cnt[i][k];
-                            cnt[j][k] += cnt[i][k];
-                            cnt[j][i] -= cnt[i][k];
-                            cnt[i][k] = 0;
-                        }else{
-                            ans += cnt[j][i];
-                            cnt[i][i] += cnt[j][i];
-                            cnt[j][k] += cnt[j][i];
-                            cnt[i][k] -= cnt[j][i];
-                            cnt[j][i] = 0;  
-                        }
-                    }
-                }
+            rep(k, i+1, 5){
+                tmp = min(cnt[i][k], cnt[j][i]);
+                ans += tmp;
+                cnt[i][i] += tmp;
+                cnt[j][k] += tmp;
+                cnt[j][i] -= tmp;
+                cnt[i][k] -= tmp;
             }
         }
-        // rep(j, 1, 5){
-        //     rep(k, 1, 5){
-        //         cout << cnt[j][k] << ' ';
-        //     }
-        //     cout << endl;
-        // }
-        // cout << endl;
     }
     cout << ans << endl;
 
-
-
-
-    
     return 0;
 }
