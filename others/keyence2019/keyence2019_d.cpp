@@ -127,29 +127,17 @@ int main(){
     }
 
     // 上限値を取得
-    vector<int> upper_limit_list, upper_limit_cnt(n*m+1);
+    vector<int> upper_limit_cnt(n*m+1);
     rep(i, 0, n){
         rep(j, 0, m){
             int upper_limit = min(a[i], b[j]);
-            upper_limit_list.push_back(upper_limit);
             upper_limit_cnt[upper_limit]++;
-        }
-    }
-
-    // 上限値を超えないと書き込めない場合はアウト
-    sort(upper_limit_list.begin(), upper_limit_list.end());
-    rep(i, 0, n*m){
-        if(i+1 > upper_limit_list[i]){
-            cout << 0 << endl;
-            return 0;
         }
     }
 
     // 書き込み方を数える
     mint ans = 1;
     ll rest = 0;
-
-
     rrep(i, n*m, 1){
         if(upper_limit_cnt[i] > 0){
             // 上限値を書き込む位置を決める
