@@ -20,11 +20,10 @@ int main(){
     int n, m; cin >> n >> m;
     vector<pii> h(n);
     vector<int> a(m);
-    priority_queue<pii, vector<pii>, greater<pii>> que;
+
     rep(i, 0, n){
         int x, y; cin >> x >> y;
         h[i] = {x, y};
-        que.push(h[i]);
     }
     rep(i, 0, m) cin >> a[i];
 
@@ -35,9 +34,9 @@ int main(){
     int pos_h = 0;
     int ans = 0;
     priority_queue<pii, vector<pii>, greater<pii>> que_y;
-    rep(i, 0, n){
-        // a[i]が入れる部屋があるかどうかを考える
-        while(pos_h < m && h[pos_h].first <= a[i]){
+    rep(i, 0, m){
+        // a[i]を使える人がいるかどうかを考える
+        while(pos_h < n && h[pos_h].first <= a[i]){
             que_y.push({h[pos_h].second, h[pos_h].first});
             pos_h++;
         }
