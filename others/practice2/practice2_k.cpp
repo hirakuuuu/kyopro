@@ -1,16 +1,22 @@
 #include <bits/stdc++.h>
 using namespace std;
 #define rep(i, a, n) for(int i = a; i < n; i++)
+#define rrep(i, a, n) for(int i = a; i >= n; i--)
 #define ll long long
 #define pii pair<int, int>
 #define pll pair<ll, ll>
-const int MOD = 1000000007;
-const int mod = 998244353;
+// constexpr ll MOD = 1000000007;
+constexpr ll MOD = 998244353;
+constexpr int IINF = 1001001001;
+constexpr ll INF = 1LL<<60;
+
+template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
+template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
 // 問題
-// https://atcoder.jp/contests/typical90/tasks/typical90_ac
+// https://atcoder.jp/contests/practice2/tasks/practice2_k
 
-template <class T, T (*op)(T, T), T (*e)(), class F, T (*mapping)(F, T), F (*composition)(F, F), F (*id)()> 
+template <class T, T (*op)(T, T), T (*e)(), class F, T (*mapping)(F, T), F (*composition)(F, F), F (*id)> 
 class LazySegmentTree {
     int _n, size, log;
     vector<T> d;
@@ -20,7 +26,7 @@ class LazySegmentTree {
 
     void all_apply(int k, F f){
         d[k] = mapping(f, d[k]);
-        if (k < size) lz[k] = composition(f, lz[k]);
+        if (k < size) lz[k] = compositon(f, lz[k]);
     }
 
     void push(int k){
@@ -31,7 +37,7 @@ class LazySegmentTree {
 
 public:
     LazySegmentTree() : LazySegmentTree(0) {}
-    explicit LazySegmentTree(int n) : LazySegmentTree(vector<T>(n, e())) {} // explicit で明示的に型を指定する
+    explicit LazySegmentTree(int n) : SegmentTree(vector<T>(n, e())) {} // explicit で明示的に型を指定する
     explicit LazySegmentTree(const vector<T> &v) : _n(int(v.size())) {
         // sizeは_nを超える最小の2のべき乗
         size = 1;
@@ -108,7 +114,7 @@ public:
 
         for(int i = log; i >= 1; i--){
             if(((l >> i) << i) != l) push(l >> i);
-            if(((r >> i) << i) != r) push((r-1) >> i);
+            if(((r >> i) << i) != r) push((r-1) >> i);/
         }
 
         {
@@ -130,23 +136,22 @@ public:
     }
 
     // f(op(a[l], a[l + 1], ..., a[r - 1])) = trueとなる最大のｒ
-    template <bool (*g)(T)> int max_right(int l) {
-        return max_right(l, [](T x) { return g(x); });
+    template <bool (*f)(T)> int max_right(int l) {
+        return max_right(l, [](T x) { return f(x); });
     }
-    template <class G> int max_right(int l, G g) {
+    template <class F> int max_right(int l, F f) {
         assert(0 <= l && l <= _n);
-        assert(g(e()));
+        assert(f(e()));
         if (l == _n) return _n;
         l += size;
-        for (int i = log; i >= 1; i--) push(l >> i);
+        for(int i = log; i >= 1; i--) push(l >> i);
         T sm = e();
         do {
             while (l % 2 == 0) l >>= 1;
-            if (!g(op(sm, d[l]))) {
+            if (!f(op(sm, d[l]))) {
                 while (l < size) {
-                    push(l);
                     l = (2 * l);
-                    if (g(op(sm, d[l]))) {
+                    if (f(op(sm, d[l]))) {
                         sm = op(sm, d[l]);
                         l++;
                     }
@@ -159,24 +164,24 @@ public:
         return _n;
     }
 
-    template <bool (*g)(T)> int min_left(int r) {
-        return min_left(r, [](T x) { return g(x); });
+    // f(op(a[l], a[l + 1], ..., a[r - 1])) = true となる最小の l
+    template <bool (*f)(T)> int min_left(int r) {
+        return min_left(r, [](T x) { return f(x); });
     }
-    template <class G> int min_left(int r, G g) {
+    template <class F> int min_left(int r, F f) {
         assert(0 <= r && r <= _n);
-        assert(g(e()));
+        assert(f(e()));
         if (r == 0) return 0;
         r += size;
-        for (int i = log; i >= 1; i--) push((r - 1) >> i);
+        for(int i = log; i >= 1; i--) push((r-1) >> i);
         T sm = e();
         do {
             r--;
             while (r > 1 && (r % 2)) r >>= 1;
-            if (!g(op(d[r], sm))) {
+            if (!f(op(d[r], sm))) {
                 while (r < size) {
-                    push(r);
                     r = (2 * r + 1);
-                    if (g(op(d[r], sm))) {
+                    if (f(op(d[r], sm))) {
                         sm = op(d[r], sm);
                         r--;
                     }
@@ -189,27 +194,32 @@ public:
     }
 };
 
-// 遅延セグメント木の準備
-ll op(ll a, ll b) { return max(a, b); }
-ll e() { return 0; }
-// 一次関数 a x + b によって恒等写像と代入を表現
-ll mapping(pair<ll, ll> a, ll x) { return a.first * x + a.second; }
-pair<ll, ll> composition(pair<ll, ll> a, pair<ll, ll> b) { return {a.first * b.first, a.first * b.second + a.second}; }
-pair<ll, ll> id() { return {1, 0}; }
+struct S {
+    int a;
+    int size;
+};
 
+struct F {
+    int a, b;
+};
 
+S op(S l, S r) { return S{l.a + r.a, l.size + r.size}; }
+
+S e() { return S{0, 0}; }
+
+S mapping(F l, S r) { return S{r.a * l.a + r.size * l.b, r.size}; }
+
+F composition(F l, F r) { return F{r.a * l.a, r.b * l.a + l.b}; }
+
+F id() { return F{1, 0}; }
 
 int main(){
-    int w, n; cin >> w >> n;
-    vector<ll> a(w+1);
-    LazySegmentTree<ll, op, e, pair<ll, ll>, mapping, composition, id> lst(a);
 
-    rep(i, 0, n){
-        ll l, r; cin >> l >> r;
-        ll h = lst.prod(l, r+1);
-        lst.apply(l, r+1, {0, h+1});
-        cout << h+1 << endl;
-    }
+    return 0;
+}
+
+int main(){
+    int
     
     return 0;
 }

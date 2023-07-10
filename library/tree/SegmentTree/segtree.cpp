@@ -11,6 +11,7 @@ struct SegmentTree {
     private:
         int n;
         vector<int> node;
+        
     
     public:
         SegmentTree(vector<int> a){

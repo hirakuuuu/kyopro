@@ -1,15 +1,20 @@
 #include <bits/stdc++.h>
 using namespace std;
 #define rep(i, a, n) for(int i = a; i < n; i++)
+#define rrep(i, a, n) for(int i = a; i >= n; i--)
 #define ll long long
-// constexpr ll MOD = 1000000007;
+#define pii pair<int, int>
+#define pll pair<ll, ll>
 constexpr ll MOD = 998244353;
+constexpr int IINF = 1001001001;
+constexpr ll INF = 1LL<<60;
 
 template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
+// 問題
+// https://atcoder.jp/contests/arc164/tasks/arc164_d
 
-// ここから
 template <ll MOD> class modint {
     ll val;
     static vector<modint<MOD>> factorial_vec;
@@ -103,17 +108,31 @@ public:
 
 using mint = modint<MOD>;
 template <ll MOD> vector<modint<MOD>> modint<MOD>::factorial_vec;
-// ここまで
-
-
 
 int main(){
-    mint a = 1000000000;
-    cout << a << endl;
-    
-    mint b = 0;
-    rep(i, 0, 6){
-        b += mint::combination(5, i);
-        cout << b << endl;
+    int n; cin >> n;
+    string t; cin >> t;
+
+    vector<vector<mint>> dp(2*n+1, vector<mint>(2*n+1));
+    dp[0][n] = 1;
+    vector<vector<mint>> dp2(2*n+1, vector<mint>(2*n+1));
+    rep(i, 0, 2*n){
+        rep(j, 0, 2*n+1){
+            if((t[i] == '+' || t[i] == '?') && j < 2*n){
+                dp[i+1][j+1] += dp[i][j];
+                if(j >= n) dp2[i+1][j+1] += dp2[i][j]-dp[i][j]*i;
+                else dp2[i+1][j+1] += dp2[i][j]+dp[i][j]*i;
+            }
+            if((t[i] == '-' || t[i] == '?') && j > 0){
+                dp[i+1][j-1] += dp[i][j];
+                if(j <= n) dp2[i+1][j-1] += dp2[i][j]-dp[i][j]*i;
+                else dp2[i+1][j-1] += dp2[i][j]+dp[i][j]*i;
+            }
+        }
     }
+
+
+    cout << dp2[2*n][n] << endl;
+    
+    return 0;
 }
