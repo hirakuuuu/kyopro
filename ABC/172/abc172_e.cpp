@@ -5,8 +5,7 @@ using namespace std;
 #define ll long long
 #define pii pair<int, int>
 #define pll pair<ll, ll>
-// constexpr ll MOD = 1000000007;
-constexpr ll MOD = 998244353;
+constexpr ll MOD = 1000000007;
 constexpr int IINF = 1001001001;
 constexpr ll INF = 1LL<<60;
 
@@ -14,7 +13,7 @@ template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
 // 問題
-// https://atcoder.jp/contests/abc263/tasks/abc263_e
+// https://atcoder.jp/contests/abc172/tasks/abc172_e
 
 template <ll MOD> class modint {
     ll val;
@@ -105,25 +104,32 @@ public:
         return factorial(n) / factorial(r) / factorial(n-r);
     }
 
+    static modint<MOD> permutation(ll n, ll r){
+        return factorial(n) / factorial(n-r);
+    }
+
 };
 
 using mint = modint<MOD>;
 template <ll MOD> vector<modint<MOD>> modint<MOD>::factorial_vec;
 
+
 int main(){
-    int n; cin >> n;
-    vector<int> a(n+1);
-    rep(i, 1, n) cin >> a[i];
+    ll n, m; cin >> n >> m;
 
-    vector<mint> dp(n+2);
-    vector<mint> dp_(n+2);
-    rrep(i, n-1, 1){
-        mint q = a[i];
-        dp[i] = (dp_[i+1]-dp_[a[i]+i+1])/q+mint::inv(q)+1;
-        dp_[i] = dp[i] + dp_[i+1];
+    mint ans = 0;
+    rep(i, 0, n+1){
+        mint cnt = mint::combination(n, i)*mint::permutation(m, i)*mint::permutation(m-i, n-i)*mint::permutation(m-i, n-i);
+        if(i%2 == 0){
+            ans += cnt;
+        }else{
+            ans -= cnt;
+        }
     }
-    cout << dp[1] << endl;
 
+    cout << ans << endl;
     
+
+
     return 0;
 }
