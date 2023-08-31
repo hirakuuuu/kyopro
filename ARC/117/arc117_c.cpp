@@ -15,7 +15,6 @@ template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 // 問題
 // https://atcoder.jp/contests/arc117/tasks/arc117_c
 
-
 vector<ll> bf(400005), bg(400005);
 
 void init(){
@@ -32,7 +31,7 @@ void init(){
     rep(i, 1, 400005) bg[i] = (bg[i]*bg[i-1])%3;
 }
 
-ll nCr(ll n, ll r){
+ll nCr_mod3(ll n, ll r){
     if(bf[n] - bf[n-r] - bf[r] > 0) return 0;
     else{
         if(bg[n] == (bg[n-r]*bg[r])%3) return 1;
@@ -40,35 +39,30 @@ ll nCr(ll n, ll r){
     }
 }
 
-int main(){
-    int n; cin >> n;
-    string s; cin >> s;
-    init();
 
-    string c = "BWR";
-    vector<int> tmp(n);
+int main() {
+    int n; cin >> n;
+    string c; cin >> c;
+    string color = "BWR";
+    init();
+    if(n == 1){
+        cout << c << endl;
+        return 0;
+    }
+
+    ll ans = 0;
     rep(i, 0, n){
         rep(j, 0, 3){
-            if(s[i] == c[j]){
-                tmp[i] = j;
+            if(c[i] == color[j]){
+                ans += j*nCr_mod3(n-1, i);
+                ans %= 3;
             }
         }
     }
 
-    int ans = 0;
-    if(n%2 == 0){
-        rep(i, 0, n){
-            ans += 3-(tmp[i]*nCr(n-1, i))%3;
-            ans %= 3;
-        }
-    }else{
-        rep(i, 0, n){
-            ans += (tmp[i]*nCr(n-1, i))%3;
-            ans %= 3;
-        }
-    }
-
-    cout << c[ans] << endl;
+    if(n%2 == 0) ans = (3-ans)%3;
     
+    cout << color[ans] << endl;
     return 0;
+
 }
