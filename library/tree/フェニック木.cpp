@@ -31,6 +31,7 @@ public:
         }
     }
 
+    // [l, r)
     T sum(int l, int r) {
         assert(0 <= l && l <= r && r <= _n);
         return sum(r) - sum(l);
