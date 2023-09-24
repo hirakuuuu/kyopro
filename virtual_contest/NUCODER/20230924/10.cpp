@@ -13,9 +13,6 @@ constexpr ll INF = 1LL<<60;
 template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
-// 問題
-// https://atcoder.jp/contests/abc310/tasks/abc310_f
-
 template <ll MOD> class modint {
     ll val;
     static vector<modint<MOD>> factorial_vec;
@@ -110,38 +107,18 @@ public:
 using mint = modint<MOD>;
 template <ll MOD> vector<modint<MOD>> modint<MOD>::factorial_vec;
 
+
 int main(){
-    int n; cin >> n;
-    vector<int> a(n);
-    rep(i, 0, n) cin >> a[i];
-    vector<mint> dp(1<<11);
-    dp[1] = 1;
-
-    rep(i, 0, n){
-        vector<mint> dp_(1<<11);
-        rep(j, 1, min(10, a[i])+1){
-            rep(k, 1, 1<<11){
-                int tmp = k;
-                rep(l, 0, 11){
-                    if(l+j <= 10 && (k&(1<<l)) > 0) tmp |= (1<<(l+j));
-                }
-                dp_[tmp] += dp[k]*mint::inv(a[i]);
-            }
-        }
-        if(a[i] > 10){
-            rep(k, 1, 1<<11){
-                dp_[k] += dp[k]*mint(a[i]-10)*mint::inv(a[i]);
-            }
-        }
-        dp = dp_;
-    }
-
+    ll n;
+    mint m;
+    ll k; 
+    cin >> n >> m >> k;
     mint ans = 0;
-    rep(i, 1<<10, 1<<11){
-        ans += dp[i];
+    rep(i, 0, k+1){
+        ans += m*mint::combination(n-1, n-1-i)*mint::modpow(m-1, n-1-i);
     }
     cout << ans << endl;
 
-    
+
     return 0;
 }

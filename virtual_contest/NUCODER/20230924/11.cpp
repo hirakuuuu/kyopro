@@ -13,9 +13,8 @@ constexpr ll INF = 1LL<<60;
 template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
-// 問題
-// https://atcoder.jp/contests/abc310/tasks/abc310_f
 
+// ここから
 template <ll MOD> class modint {
     ll val;
     static vector<modint<MOD>> factorial_vec;
@@ -112,36 +111,26 @@ template <ll MOD> vector<modint<MOD>> modint<MOD>::factorial_vec;
 
 int main(){
     int n; cin >> n;
-    vector<int> a(n);
-    rep(i, 0, n) cin >> a[i];
-    vector<mint> dp(1<<11);
-    dp[1] = 1;
+    vector<int> a(n+1);
+    rep(i, 1, n+1) cin >> a[i];
 
-    rep(i, 0, n){
-        vector<mint> dp_(1<<11);
+    mint total = 1;
+    rep(i, 1, n+1) total *= a[i];
+    vector<vector<mint>> dp(n+1, vector<mint>(20));
+    dp[0][0] = 1;
+    rep(i, 1, n+1){
         rep(j, 1, min(10, a[i])+1){
-            rep(k, 1, 1<<11){
-                int tmp = k;
-                rep(l, 0, 11){
-                    if(l+j <= 10 && (k&(1<<l)) > 0) tmp |= (1<<(l+j));
-                }
-                dp_[tmp] += dp[k]*mint::inv(a[i]);
+            rep(k, 0, 10){
+                if(j+k <= 10) dp[i][j+k] += dp[i-1][k];
             }
         }
-        if(a[i] > 10){
-            rep(k, 1, 1<<11){
-                dp_[k] += dp[k]*mint(a[i]-10)*mint::inv(a[i]);
-            }
+
+        rep(j, 0, 11){
+            cout << dp[i][j] << ' ';
         }
-        dp = dp_;
+        cout << endl;
     }
 
-    mint ans = 0;
-    rep(i, 1<<10, 1<<11){
-        ans += dp[i];
-    }
-    cout << ans << endl;
-
-    
+    cout << dp[n][10]/total << endl;
     return 0;
 }
