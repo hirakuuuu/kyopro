@@ -12,30 +12,6 @@ constexpr ll INF = 1LL<<60;
 template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
-ll ans;
-vector<vector<pair<ll, ll>>> g(200005);
-
-vector<ll> dfs(ll pos, ll pre, ll o){
-    vector<vector<ll>> ress;
-    vector<ll> res(2);
-    res[0] = 1;
-    for(auto node: g[pos]){
-        auto [npos, cost] = node;
-        if(npos == pre) continue;
-        
-        vector<ll> ch = dfs(npos, pos, o);
-        if((cost&(1LL<<o)) > 0) swap(ch[0], ch[1]);
-        rep(i, 0, 2) res[i] += ch[i];
-        ress.push_back(ch);
-    }
-    ans += res[1]*((1LL<<o)%MOD);
-    ans %= MOD;
-    for(auto rr: ress){
-        ans += (rr[0]*(res[1]-rr[1])+rr[1]*(res[0]-rr[0]))*((1LL<<o)%MOD);
-        ans %= MOD;
-    }
-    return res;
-}
 
 ll power(ll a, ll b, ll m=MOD){
     ll res = 1;
@@ -49,23 +25,41 @@ ll power(ll a, ll b, ll m=MOD){
 
 int main(){
     int n; cin >> n;
-    
+    vector<vector<pair<ll, ll>>> g(n);
     rep(i, 0, n-1){
         ll u, v, w; cin >> u >> v >> w;
         u--, v--;
         g[u].emplace_back(v, w);
         g[v].emplace_back(u, w);
     }
-    
-    ll sum = 0;
-    rep(i, 0, 60){
-        ans = 0;
-        auto _ = dfs(0, -1, i);
-        sum += ans;
-        sum %= MOD;
+
+    vector<ll> dist(n);
+    vector<bool> seen(n);
+    dist[0] = 0;
+    seen[0] = true;
+    queue<ll> que;
+    que.push(0);
+    while(!que.empty()){
+        ll q = que.front(); que.pop();
+        for(auto gg: g[q]){
+            auto [nq, cost] = gg;
+            if(seen[nq]) continue;
+            seen[nq] = true;
+            dist[nq] = dist[q]^cost;
+            que.push(nq);
+        }
     }
 
-    cout << (sum*power(2, MOD-2))%MOD << endl;
+    ll ans = 0;
+    rep(i, 0, 60){
+        vector<ll> cnt(2);
+        rep(j, 0, n){
+            cnt[(dist[j]&(1LL<<i)) > 0]++;
+        }
+        ans += ((cnt[0]*cnt[1])%MOD)*((1LL<<i)%MOD);
+        ans %= MOD;
+    }
+    cout << ans << endl;
     
     return 0;
 }
