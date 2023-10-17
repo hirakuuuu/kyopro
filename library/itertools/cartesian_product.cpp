@@ -60,6 +60,10 @@ int main(){
     itertools iter;
     vector<vector<ll>> out=iter.product(a,20);
   	cout << out.size() << endl;
+    for(auto oo: out[0]){
+        cout << oo << ' ';
+    }
+    cout << endl;
     //print(out);
 
     return 0;
