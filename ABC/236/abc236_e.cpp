@@ -18,38 +18,50 @@ template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
 int main(){
     int n; cin >> n;
-    vector<ll> a(n);
+    vector<int> a(n);
     rep(i, 0, n) cin >> a[i];
 
-    vector<double> dp(n+1), dp_(n+1);
-    double l = 1.0, r = 1e9+1;
-    while(r-l > 1e-6){
-        double mid = (r+l)/2.0;
+    double l = 0.0, r = 1e9;
+    while(r-l > 1e-5){
+        double m = (r+l)/2.0;
+        vector<double> b(n);
+        rep(i, 0, n) b[i] = (double)a[i]-m;
+        vector<vector<double>> dp(n+1, vector<double>(2));
         rep(i, 0, n){
-            dp[i+1] = max(dp[i], dp_[i])+(double)a[i]-mid;
-            dp_[i+1] = dp[i];
+            dp[i+1][0] = dp[i][1];
+            dp[i+1][1] = max(dp[i][0], dp[i][1])+b[i];
         }
-
-        if(max(dp[n], dp_[n]) >= 0.0) l = mid;
-        else r = mid;
+        double tmp = max(dp[n][0], dp[n][1]);
+        if(tmp >= 0.0) l = m;
+        else r = m;
     }
-
     printf("%.10f\n", l);
 
-    int L = 1, R = 1e9+1;
-    while(R-L > 1){
-        int mid = (R+L)/2;
-        rep(i, 0, n){
-            if(a[i] >= mid) dp[i+1] = max(dp[i], dp_[i])+1;
-            else dp[i+1] = max(dp[i], dp_[i])-1;
-            dp_[i+1] = dp[i];
-        }
+    set<int> s, t;
+    s.insert(0);
+    s.insert(n+1);
+    t.insert(0);
+    t.insert(-n-1);
+    vector<int> ind(n);
+    iota(ind.begin(), ind.end(), 1);
+    sort(ind.begin(), ind.end(), [&](int i, int j){
+        return a[i-1] > a[j-1];
+    });
 
-        if(max(dp[n], dp_[n]) > 0) L = mid;
-        else R = mid;
+    int rest = n/2;
+    rep(j, 0, n){
+        int i = ind[j];
+        int li = -(*t.lower_bound(-i));
+        int ri = *s.lower_bound(i);
+
+        rest -= (ri-li-1)/2;
+        rest += (i-li-1)/2;
+        rest += (ri-i-1)/2;
+        s.insert(i);
+        t.insert(-i);
+        if(j < rest) continue;
+        cout << a[i-1] << endl;
+        break;
     }
-
-    cout << L << endl;
-    
     return 0;
 }
