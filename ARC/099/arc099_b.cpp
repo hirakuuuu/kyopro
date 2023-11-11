@@ -16,25 +16,54 @@ template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 // 問題
 // https://atcoder.jp/contests/abc101/tasks/arc099_b
 
-ll digit_sum(ll n){
-    ll sum = 0;
-    while(n){
-        sum += n%10;
-        n /= 10;
+ll s(ll n){
+    ll m = n, res = 0;
+    while(m){
+        res += m%10;
+        m /= 10;
     }
-    return sum;
+    return res;
 }
+
 
 int main(){
     ll k; cin >> k;
-    ll tmp = 1, inc = 1;
-    while(k--){
-        cout << tmp << endl;
-        if((tmp+1)%(inc*10) == 0 && digit_sum(tmp+inc) * inc <= tmp + inc){
-            inc *= 10;
+    vector<ll> p;
+    rep(i, 1, 1000){
+        string s = to_string(i);
+        rep(j, 0, 16){
+            if(s.size() > 15) break;
+            p.push_back(stoll(s));
+            s += '9';
         }
-        tmp += inc;
     }
+    sort(p.rbegin(), p.rend());
+    p.erase(unique(p.begin(), p.end()), p.end());
+
+    vector<ll> ans;
+    ll tmp = 1000000000000000, S = 0;
+    for(auto pp: p){
+        if(tmp*s(pp) >= pp*S){
+            ans.push_back(pp);
+            tmp = pp;
+            S = s(pp);
+        }
+    }
+
+    sort(ans.begin(), ans.end());
+    rep(i, 0, k){
+        cout << ans[i] << endl;
+    }
+
+    
+
+
+   
+
+
+
+
+
     
     return 0;
 }
