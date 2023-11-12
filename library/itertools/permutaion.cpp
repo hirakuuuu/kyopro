@@ -19,36 +19,75 @@ https://qiita.com/KyleKatarn/items/4e64249abfc151d8e82b
 計算量：O(n*n!)
 */
 
-void print (vector<vector<ll>> a){
-    for (auto b: a){
-        for(auto c: b){
-            cout << c << ' ';
-        }
-        cout << endl;
+template <class T>
+void dfs_combination(vector<T> &arr, int idx, int r, vector<T> &pattern, vector<vector<T>> &result){
+    // r個に達したのでresultに格納
+    if(r == 0){
+        result.push_back(pattern);
+        return;
     }
+
+    // r個列挙できない場合はreturn
+    if((idx+r) > (int)arr.size()) {
+        return;
+    }
+
+    // idx番目の要素を選ぶ場合
+    pattern.push_back(arr[idx]);
+    dfs_combination(arr, idx+1, r-1, pattern, result);
+    pattern.pop_back();
+
+    // 選ばない場合
+    dfs_combination(arr, idx+1, r, pattern, result);
+
 }
 
-vector<vector<ll>> permutations(vector<ll> lis){
-    vector<ll> range(lis.size()), tmp(lis.size());
-    iota(range.begin(), range.end(), 0);
-    vector<vector<ll>> ans;
+template <class T>
+vector<vector<T>> combination(vector<T> &arr, int r) {
+    if ((int)arr.size() < r) {
+        printf("combination ERROR: r is larger than arr.size()\n");
+        exit(1);
+    }
 
-    // next_permutationで[0, n)の順列を昇順に列挙
-    do{
-        for(ll i = 0; i < (ll)lis.size(); i++){
-            tmp[range[i]] = lis[i];
-        }
-        ans.push_back(tmp);
-    }while(next_permutation(range.begin(), range.end()));
+    vector<T> pattern;
+    vector<vector<T>> result;
+    dfs_combination(arr, 0, r, pattern, result);
+    return result;
+}
 
-    return ans;
+template <class T>
+vector<vector<T>> permutation(vector<T> &arr, int r) {
+    if ((int)arr.size() < r) {
+        printf("combination ERROR: r is larger than arr.size()\n");
+        exit(1);
+    }
+
+    vector<T> pattern;
+    vector<vector<T>> result_comb;
+    dfs_combination(arr, 0, r, pattern, result_comb);
+
+    vector<vector<T>> result;
+
+    for(auto res: result_comb){
+        do{
+            result.push_back(res);
+        }while(next_permutation(res.begin(), res.end()));
+    }
+    sort(result.begin(), result.end());
+    return result;
 }
 
 
 int main(){
-    vector<long long> a={1,3,6};
-    vector<vector<long long>> out=permutations(a);
-    print(out);
+    vector<int> a(10);
+    iota(a.begin(), a.end(), 0);
+    vector<vector<int>> out=permutation(a, 3);
+    for(auto o: out){
+        for(auto oo: o){
+            cout << oo << ' ';
+        }
+        cout << endl;
+    }
     
     return 0;
 }
