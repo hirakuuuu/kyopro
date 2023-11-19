@@ -14,7 +14,7 @@ template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
 // 問題
-// https://atcoder.jp/contests/arc126/tasks/arc126_b
+// https://atcoder.jp/contests/abc329/tasks/abc329_d
 
 template <class T, T (*op)(T, T), T (*e)()> 
 class SegmentTree {
@@ -127,47 +127,35 @@ public:
     }
 };
 
-int op(int a, int b) {
+using S =  pair<int, int>;
+S op(S a, S b) {
     return max(a, b);
 }
 
-int e() {
-    return 0;
+S e() {
+    return make_pair(0, -IINF);
 }
+
+
 int main(){
     int n, m; cin >> n >> m;
-    vector<vector<int>> c(n);
+    vector<int> a(m);
     rep(i, 0, m){
-        int a, b; cin >> a >> b;
-        a--, b--;
-        c[a].push_back(b);
+        cin >> a[i];
+        a[i]--;
     }
+    vector<pair<int, int>> t(n);
     rep(i, 0, n){
-        sort(c[i].begin(), c[i].end());
+        t[i].second = -i;
     }
 
-    SegmentTree<int, op, e> st(n);
-    int ans = 0;
-    rep(i, 0, n){
-        for(auto b: c[i]){
-            chmax(ans, st.prod(0, b)+1);
-        }
-        vector<pair<int, int>> upd;
-        for(auto b: c[i]){
-            int high = st.prod(0, b)+1, tmp = st.get(b);
-            if(high > tmp){
-                upd.push_back({b, high});
-            }
-        }
-
-        for(auto u: upd){
-            st.set(u.first, u.second);
-        }
+    SegmentTree<pair<int, int>, op, e> st(t);
+    rep(i, 0, m){
+        pair<int, int> tmp = st.get(a[i]);
+        st.set(a[i], {tmp.first+1, tmp.second});
+        cout << (-st.all_prod().second)+1 << endl;
     }
 
-    set;
-
-    cout << ans << endl;
     
     return 0;
 }

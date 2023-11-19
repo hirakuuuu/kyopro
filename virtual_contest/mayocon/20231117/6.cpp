@@ -1,20 +1,20 @@
 #include <bits/stdc++.h>
 using namespace std;
+#define rep(i, a, n) for(int i = a; i < n; i++)
+#define rrep(i, a, n) for(int i = a; i >= n; i--)
+#define ll long long
+#define pii pair<int, int>
+#define pll pair<ll, ll>
+// constexpr ll MOD = 1000000007;
+constexpr ll MOD = 998244353;
+constexpr int IINF = 1001001001;
+constexpr ll INF = 1LL<<60;
 
-/*
-藻のアルゴリズム
-以下の3つを満たしている問題を解くのに使える
-- 配列の要素が不変
-- クエリを先読みできる
-- 区間の結果から、区間を1つずらした結果をO(1)で求められる
+template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
+template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
-流れ
-区間を sqrt(Q) 個のブロックに分割する.
-全てのクエリを, それぞれのクエリの左端のブロックで昇順ソート. 左端のブロックが同じもの同士では, 右端の値でソートする. （左端のブロックの位置の偶奇で昇順ソート, 降順ソートに分けると定数倍がよくなる）
-クエリごとに左端と右端を尺取りのように移動させて, 区間を伸縮させる.
-
-計算量は O(N*sqrt(Q)).
-*/
+// 問題
+// 
 
 class Mo
 {
@@ -58,32 +58,36 @@ public:
     }
 };
 
+ll f(ll n){
+    return n*(n-1)*(n-2)/6;
+}
+
 int main(){
-    int N;
-    cin >> N;
-    vector< int > A(N);
-    for(auto &a: A) cin >> a;
-    int Q;
-    cin >> Q;
-    Mo mo(N);
-    for(int i = 0; i < Q; i++) {
-        int a, b;
-        cin >> a >> b;
-        mo.add(a - 1, b);
+    int n, q; cin >> n >> q;
+    vector<int> a(n);
+    rep(i, 0, n) cin >> a[i];
+
+    Mo mo(n);
+    rep(i, 0, q){
+        int l, r; cin >> l >> r;
+        mo.add(l - 1, r);
     }
-    vector< int > cnt(1000001), ans(Q);
-    int sum = 0;
+    vector<ll> cnt(200005), ans(q);
+    ll sum = 0;
     auto add = [&](int i) {
-        if(cnt[A[i]]++ == 0) ++sum;
+        sum -= f(cnt[a[i]]);
+        cnt[a[i]]++;
+        sum += f(cnt[a[i]]);
     };
     auto erase = [&](int i) {
-        if(--cnt[A[i]] == 0) --sum;
+        sum -= f(cnt[a[i]]);
+        cnt[a[i]]--;
+        sum += f(cnt[a[i]]);
     };
     auto out = [&](int q) {
         ans[q] = sum;
     };
     mo.build(add, erase, out);
     for(auto &p: ans) cout << p << "\n";
-
     return 0;
 }

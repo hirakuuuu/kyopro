@@ -16,79 +16,49 @@ template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 // https://atcoder.jp/contests/abc189/tasks/abc189_e
 
 int main(){
-    ll n; cin >> n;
-    vector<ll> x(n+1), y(n+1);
-    rep(i, 1, n+1) cin >> x[i] >> y[i];
-
-    ll m; cin >> m;
-    vector<vector<ll>> op(m);
-    rep(i, 0, m){
-        ll t, p; cin >> t;
-        if(t >= 3) cin >> p;
-        op[i] = {i+1, t, p};
-    }
-
-    ll q; cin >> q;
-    vector<ll> a(q), b(q);
-    rep(i, 0, q) cin >> a[i] >> b[i];
-    vector<vector<ll>> queri(m+q);
-    rep(i, 0, m) queri[i] = op[i];
-    rep(i, m, m+q) queri[i] = {a[i-m], 5, b[i-m], i-m};
-
-    sort(queri.begin(), queri.end());
-
-    vector<pll> ans(q);
-
-    ll rotate = 0;
-    ll cnt_x = 0, cnt_y = 0;
-    ll offset_x = 0, offset_y = 0;
-    rep(i, 0, m+q){
-        ll t = queri[i][1], p = queri[i][2];
+    int n; cin >> n;
+    vector<ll> x(n), y(n);
+    rep(i, 0, n) cin >> x[i] >> y[i];
+    int m; cin >> m;
+    vector<int> rotate(m+1), mv_x(m+1), mv_y(m+1);
+    vector<pair<ll, ll>> pos(m+1);
+    rep(i, 1, m+1){
+        int t; cin >> t;
+        rotate[i] = rotate[i-1];
+        mv_x[i] = mv_x[i-1];
+        mv_y[i] = mv_y[i-1];
         if(t == 1){
-            rotate++;
-            rotate %= 4;
+            rotate[i] = (rotate[i-1]+1)%4;
+            pos[i] = {pos[i-1].second, -pos[i-1].first};
+            swap(mv_x[i], mv_y[i]);
         }else if(t == 2){
-            rotate--;
-            if(rotate < 0) rotate += 4;
-        }else if(t == 3){
-            if(rotate == 0){
-                offset_x = 2*p-offset_x;
-                cnt_x = 1-cnt_x;
-            }else if(rotate == 1){
-                offset_y = 2*p-offset_y;
-                cnt_y = 1-cnt_y;
-            }else if(rotate == 2){
-                offset_x = -2*p-offset_x;
-                cnt_x = 1-cnt_x;
-            }else{
-                offset_y = -2*p-offset_y;
-                cnt_y = 1-cnt_y; 
-            }
-        }else if(t == 4){
-            if(rotate == 0){
-                offset_y = 2*p-offset_y;
-                cnt_y = 1-cnt_y;
-            }else if(rotate == 1){
-                offset_x = -2*p-offset_x;
-                cnt_x = 1-cnt_x;
-            }else if(rotate == 2){
-                offset_y = -2*p-offset_y;
-                cnt_y = 1-cnt_y; 
-            }else{
-                offset_x = 2*p-offset_x;
-                cnt_x = 1-cnt_x;
-            }
+            rotate[i] = (rotate[i-1]+3)%4;
+            pos[i] = {-pos[i-1].second, pos[i-1].first};
+            swap(mv_x[i], mv_y[i]);
         }else{
-            ll tmp_x = offset_x+(cnt_x ? -1LL : 1LL)*x[p], tmp_y = offset_y+(cnt_y ? -1LL : 1LL)*y[p];
-            rep(j, 0, rotate){
-                swap(tmp_x, tmp_y);
-                tmp_y *= -1;
+            ll p; cin >> p;
+            if(t == 3){
+                pos[i] = {2*p-pos[i-1].first, pos[i-1].second};
+                mv_x[i] = 1-mv_x[i-1];
+            }else if(t == 4){
+                pos[i] = {pos[i-1].first, 2*p-pos[i-1].second};
+                mv_y[i] = 1-mv_y[i-1];
             }
-            ans[queri[i][3]] = {tmp_x, tmp_y};
         }
     }
-
-    rep(i, 0, q) cout << ans[i].first << ' ' << ans[i].second << "\n";
-    
+    int q; cin >> q;
+    while(q--){
+        int a, b; cin >> a >> b;
+        b--;
+        if(rotate[a] == 0){
+            cout << pos[a].first+(mv_x[a] ? -1 : 1)*x[b] << ' ' << pos[a].second+(mv_y[a] ? -1 : 1)*y[b] << endl;
+        }else if(rotate[a] == 1){
+            cout << pos[a].first+(mv_x[a] ? -1 : 1)*y[b] << ' ' << pos[a].second-(mv_y[a] ? -1 : 1)*x[b] << endl;
+        }else if(rotate[a] == 2){
+            cout << pos[a].first-(mv_x[a] ? -1 : 1)*x[b] << ' ' << pos[a].second-(mv_y[a] ? -1 : 1)*y[b] << endl;
+        }else if(rotate[a] == 3){
+            cout << pos[a].first-(mv_x[a] ? -1 : 1)*y[b] << ' ' << pos[a].second+(mv_y[a] ? -1 : 1)*x[b] << endl;
+        }
+    }
     return 0;
 }
