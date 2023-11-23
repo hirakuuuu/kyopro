@@ -1,15 +1,77 @@
 #include <bits/stdc++.h>
 using namespace std;
 #define rep(i, a, n) for(int i = a; i < n; i++)
+#define rrep(i, a, n) for(int i = a; i >= n; i--)
 #define ll long long
+#define pii pair<int, int>
+#define pll pair<ll, ll>
 // constexpr ll MOD = 1000000007;
 constexpr ll MOD = 998244353;
+constexpr int IINF = 1001001001;
+constexpr ll INF = 1LL<<60;
 
 template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
+// 問題
+// 
 
-// ここから
+class UnionFind {
+    vector<ll> parent, maxi, mini;
+    inline ll root(ll n){
+        return (parent[n] < 0? n:parent[n] = root(parent[n]));
+    }
+public:
+    UnionFind(ll n_ = 1): parent(n_, -1), maxi(n_), mini(n_){
+        iota(maxi.begin(), maxi.end(), 0);
+        iota(mini.begin(), mini.end(), 0);
+    }
+
+    inline bool same(ll x, ll y){
+        return root(x) == root(y);
+    }
+
+    inline void unite(ll x, ll y){
+        ll rx = root(x);
+        ll ry = root(y);
+        if(rx == ry) return;
+        if(parent[rx] > parent[ry]) swap(rx, ry);
+        parent[rx] += parent[ry];
+        parent[ry] = rx;
+        maxi[x] = std::max(maxi[x],maxi[y]);
+        mini[x] = std::min(mini[x],mini[y]);
+    }
+
+    inline ll min(ll x){
+        return mini[root(x)];
+    }
+
+    inline ll max(int x){
+        return mini[root(x)];
+    }
+
+    inline ll size(ll x){
+        return (-parent[root(x)]);
+    }
+
+    inline ll operator[](ll x){
+        return root(x);
+    }
+
+    inline void print(){
+        rep(i, 0, (ll)parent.size()) cout << root(i) << " ";
+        cout << endl;
+    }
+
+    void clear(){
+        rep(i, 0, (ll)parent.size()){
+            parent[i] = -1;
+        }
+        iota(maxi.begin(), maxi.end(), 0);
+        iota(mini.begin(), mini.end(), 0);
+    }
+};
+
 template <ll MOD> class modint {
     ll val;
     static vector<modint<MOD>> factorial_vec;
@@ -128,17 +190,51 @@ mint binom(int a,int b){
 mint catalan(int n){
 	return binom(n,n)-(n-1>=0?binom(n-1,n+1):0);
 }
-// ここまで
-
-
 
 int main(){
-    mint a = 1000000000;
-    cout << a << endl;
-    
-    mint b = 0;
-    rep(i, 0, 6){
-        b += mint::combination(5, i);
-        cout << b << endl;
+    int n; cin >> n;
+    vector<int> p(n), q(n);
+    rep(i, 0, n){
+        cin >> p[i];
+        p[i]--;
     }
+    rep(i, 0, n){
+        cin >> q[i];
+        q[i]--;
+    }
+
+    UnionFind uf(n);
+    rep(i, 0, n) uf.unite(p[i], q[i]);
+
+    vector<int> seen(n), g;
+    rep(i, 0, n){
+        if(seen[uf[i]]) continue;
+        seen[uf[i]] = 1;
+        g.push_back(uf.size(i));
+    }
+
+    vector<vector<mint>> dp(n+1, vector<mint>(2));
+    vector<vector<mint>> dp_(n+1, vector<mint>(2));
+    dp[1][0] = dp_[1][1] = 1;
+    rep(i, 2, n+1){
+        dp[i][0] = dp[i-1][1];
+        dp[i][1] = dp[i-1][0]+dp[i-1][1];
+        dp_[i][0] = dp_[i-1][1];
+        dp_[i][1] = dp_[i-1][0]+dp_[i-1][1];
+    }
+    vector<mint> cnt(n+1);
+    rep(i, 1, n+1){
+        cnt[i] = dp[i][1]+dp_[i][0]+dp_[i][1];
+    }
+
+    mint ans = 1;
+    for(auto gg: g){
+        ans *= cnt[gg];
+    }
+    cout << ans << endl;
+
+
+    
+    
+    return 0;
 }

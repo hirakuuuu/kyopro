@@ -1,15 +1,21 @@
 #include <bits/stdc++.h>
 using namespace std;
 #define rep(i, a, n) for(int i = a; i < n; i++)
+#define rrep(i, a, n) for(int i = a; i >= n; i--)
 #define ll long long
+#define pii pair<int, int>
+#define pll pair<ll, ll>
 // constexpr ll MOD = 1000000007;
 constexpr ll MOD = 998244353;
+constexpr int IINF = 1001001001;
+constexpr ll INF = 1LL<<60;
 
 template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
+// 問題
+// https://atcoder.jp/contests/arc168/tasks/arc168_c
 
-// ここから
 template <ll MOD> class modint {
     ll val;
     static vector<modint<MOD>> factorial_vec;
@@ -120,7 +126,7 @@ void initfact(){
 	}
 }
 mint choose(int n,int k){
-	return n-k >= 0?fact[n]*finv[n-k]*finv[k]:0;
+	return inc(0,k,n)?fact[n]*finv[n-k]*finv[k]:0;
 }
 mint binom(int a,int b){
 	return 0<=a&&0<=b?fact[a+b]*finv[a]*finv[b]:0;
@@ -128,17 +134,35 @@ mint binom(int a,int b){
 mint catalan(int n){
 	return binom(n,n)-(n-1>=0?binom(n-1,n+1):0);
 }
-// ここまで
 
 
+mint sub(ll n, ll ab, ll c){
+    if(n-ab-c < 0) return 0;
+    return fact[n]*finv[ab]*finv[c]*finv[n-ab-c];
+}
 
 int main(){
-    mint a = 1000000000;
-    cout << a << endl;
-    
-    mint b = 0;
-    rep(i, 0, 6){
-        b += mint::combination(5, i);
-        cout << b << endl;
+    int n, k; cin >> n >> k;
+    string s; cin >> s;
+    vector<ll> cnt(3);
+    rep(i, 0, n) cnt[s[i]-'A']++;
+
+    initfact();
+
+    mint ans = 0;
+    for(int d = 0; 2*d <= k; d++){
+        for(int a = 0; 2*d+a <= k; a++){
+            for(int b = 0; 2*d+a+b <= k; b++){
+                for(int c = 0; 2*d+a+b+c <= k; c++){
+                    mint tmp = sub(cnt[0], d+a, b)*sub(cnt[1], d+b, c)*sub(cnt[2], d+c, a);
+                    if(d) tmp *= 2;
+                    ans += tmp;
+                }
+            }
+        }
     }
+    cout << ans << endl;
+
+    
+    return 0;
 }
