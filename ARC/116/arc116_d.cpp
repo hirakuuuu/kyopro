@@ -5,7 +5,8 @@ using namespace std;
 #define ll long long
 #define pii pair<int, int>
 #define pll pair<ll, ll>
-constexpr ll MOD = 1000000007;
+// constexpr ll MOD = 1000000007;
+constexpr ll MOD = 998244353;
 constexpr int IINF = 1001001001;
 constexpr ll INF = 1LL<<60;
 
@@ -13,7 +14,7 @@ template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
 // 問題
-// https://atcoder.jp/contests/arc108/tasks/arc108_d
+// https://atcoder.jp/contests/arc116/tasks/arc116_d
 
 template <ll MOD> class modint {
     ll val;
@@ -135,35 +136,24 @@ mint catalan(int n){
 }
 
 int main(){
-    int n; cin >> n;
-    vector<int> c(4);
-    rep(i, 0, 4){
-        char ab; cin >> ab;
-        if(ab == 'A') c[i] = 0;
-        else c[i] = 1;
-    }
-
-    vector<vector<mint>> dp(4, vector<mint>(n+1));
-    // rep(i, 0, 4) dp[i][2] = 1;
-    rep(j, 0, 4){
-        int l = (j&2)+c[j], r = c[j]*2+(j&1);
-        dp[l][2] = dp[r][2] = 1;
-    }
-    rep(i, 3, n+1){
-        rep(j, 0, 4){
-            int l = (j&2)+c[j], r = c[j]*2+(j&1);
-            rep(k, 2, i){
-                dp[j][i] += dp[l][k]*dp[r][i-k+1];
+    int n, m; cin >> n >> m;
+    int tmp = 1;
+    vector<mint> dp(m+1);
+    dp[0] = 1;
+    initfact();
+    rep(i, 0, 12){
+        vector<mint> dp_ = dp;
+        for(int j = 2; j <= m/tmp; j += 2){
+            rep(k, 0, m+1){
+                if(k+j*tmp <= m) dp[k+j*tmp] += dp_[k]*choose(n, j);
             }
-            cout << l << ' ' << r << ' ';
-            cout << dp[j][i] << ' ';
         }
-        cout << endl;
+        tmp *= 2;
     }
+    
 
-    cout << dp[1][n] << endl;
+    cout << dp[m] << endl;
 
-
-
+    
     return 0;
 }

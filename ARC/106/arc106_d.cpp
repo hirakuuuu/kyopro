@@ -5,7 +5,8 @@ using namespace std;
 #define ll long long
 #define pii pair<int, int>
 #define pll pair<ll, ll>
-constexpr ll MOD = 1000000007;
+// constexpr ll MOD = 1000000007;
+constexpr ll MOD = 998244353;
 constexpr int IINF = 1001001001;
 constexpr ll INF = 1LL<<60;
 
@@ -13,7 +14,7 @@ template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
 // 問題
-// https://atcoder.jp/contests/arc108/tasks/arc108_d
+// https://atcoder.jp/contests/arc106/tasks/arc106_d
 
 template <ll MOD> class modint {
     ll val;
@@ -135,34 +136,30 @@ mint catalan(int n){
 }
 
 int main(){
-    int n; cin >> n;
-    vector<int> c(4);
-    rep(i, 0, 4){
-        char ab; cin >> ab;
-        if(ab == 'A') c[i] = 0;
-        else c[i] = 1;
-    }
-
-    vector<vector<mint>> dp(4, vector<mint>(n+1));
-    // rep(i, 0, 4) dp[i][2] = 1;
-    rep(j, 0, 4){
-        int l = (j&2)+c[j], r = c[j]*2+(j&1);
-        dp[l][2] = dp[r][2] = 1;
-    }
-    rep(i, 3, n+1){
-        rep(j, 0, 4){
-            int l = (j&2)+c[j], r = c[j]*2+(j&1);
-            rep(k, 2, i){
-                dp[j][i] += dp[l][k]*dp[r][i-k+1];
-            }
-            cout << l << ' ' << r << ' ';
-            cout << dp[j][i] << ' ';
+    int n, k; cin >> n >> k;
+    vector<mint> a(n);
+    rep(i, 0, n) cin >> a[i];
+    vector<mint> sum(k+1);
+    vector<mint> b(n, 1);
+    rep(i, 0, k+1){
+        rep(j, 0, n){
+            sum[i] += b[j];
+            b[j] *= a[j];
         }
-        cout << endl;
     }
 
-    cout << dp[1][n] << endl;
-
+    initfact();
+    rep(i, 1, k+1){
+        mint ans = 0;
+        rep(j, 0, i+1){
+            mint S = sum[j]*sum[i-j];
+            S -= sum[i];
+            S /= 2;
+            S *= choose(i, j);
+            ans += S;
+        }
+        cout << ans << endl;
+    }
 
 
     return 0;
