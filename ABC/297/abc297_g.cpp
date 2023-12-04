@@ -20,21 +20,26 @@ int main(){
     vector<ll> a(n);
     rep(i, 0, n) cin >> a[i];
 
-    vector<ll> b(n);
-    ll cnt = 0, sum = 0;
-    rep(i, 0, n){
-        b[i] = a[i]%(l+r);
-        if(b[i] >= l){
-            if(b[i] == l){
-                cnt++;
-            }else{
-
-            }
-        }
+    if(l == r){
+        ll cnt = 0;
+        rep(i, 0, n) cnt += a[i]/l;
+        if(cnt%2) cout << "First" << endl;
+        else cout << "Second" << endl; 
+    }else if(l == 1){
+        ll xora = 0;
+        rep(i, 0, n) xora ^= a[i]%(r+1);
+        if(xora) cout << "First" << endl;
+        else cout << "Second" << endl;
+    }else{
+        rep(i, 0, n) a[i] %= (l+r);
+        ll cnt = 0;
+        rep(i, 0, n) cnt ^= a[i]/l;
+        if(cnt) cout << "First" << endl;
+        else cout << "Second" << endl;
     }
 
-    if(cnt == 1 or (cnt+sum)%2) cout << "First" << endl;
-    else cout << "Second" << endl;
+
+
     
     return 0;
 }
