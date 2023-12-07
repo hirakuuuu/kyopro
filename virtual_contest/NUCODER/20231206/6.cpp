@@ -13,15 +13,15 @@ constexpr ll INF = 1LL<<60;
 template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
-// https://zenn.dev/reputeless/books/standard-cpp-for-competitive-programming/viewer/bellman-ford
-
+// 問題
+// 
 
 // 辺
 struct Edge
 {
-	int from;
-	int to;
-	int cost;
+	ll from;
+	ll to;
+	ll cost;
 };
 
 // ベルマンフォード法 (基本実装)
@@ -58,6 +58,25 @@ void BellmanFord(vector<Edge> &edges, vector<ll> &dist, int start){
 }
 
 int main(){
-    
+    ll n, m, p; cin >> n >> m >> p;
+    vector<Edge> edges(m);
+    rep(i, 0, m){
+        ll a, b, c; cin >> a >> b >> c;
+        a--, b--;
+        edges[i].from = a;
+        edges[i].to = b;
+        edges[i].cost = -(c-p);
+    }
+    vector<ll> dist(n, INF);
+    BellmanFord(edges, dist, 0);
+
+    if(dist[n-1] == -INF){
+        cout << -1 << endl;
+    }else{
+        cout << max(0LL, -dist[n-1]) << endl;
+    }
+
+
+
     return 0;
 }
