@@ -5,8 +5,7 @@ using namespace std;
 #define ll long long
 #define pii pair<int, int>
 #define pll pair<ll, ll>
-// constexpr ll MOD = 1000000007;
-constexpr ll MOD = 998244353;
+constexpr ll MOD = 1000000007;
 constexpr int IINF = 1001001001;
 constexpr ll INF = 1LL<<60;
 
@@ -14,7 +13,7 @@ template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
 // 問題
-// https://atcoder.jp/contests/abc297/tasks/abc297_f
+// https://atcoder.jp/contests/m-solutions2019/tasks/m_solutions2019_c
 
 template <ll MOD> class modint {
     ll val;
@@ -110,7 +109,7 @@ public:
 using mint = modint<MOD>;
 template <ll MOD> vector<modint<MOD>> modint<MOD>::factorial_vec;
 
-const int vmax = 1000005;
+const int vmax = 250005;
 mint fact[vmax],finv[vmax],invs[vmax];
 void initfact(){
 	fact[0]=1;
@@ -136,20 +135,27 @@ mint catalan(int n){
 }
 
 int main(){
-    ll h, w, k; cin >> h >> w >> k;
-    mint ans = 0;
+    int n; 
+    mint a, b, c; cin >> n >> a >> b >> c;
     initfact();
-    rep(i, 1, h+1){
-        rep(j, 1, w+1){
-            mint score = choose(h*w, k)-(choose((i-1)*w, k)+choose((h-i)*w, k)+choose(h*(j-1), k)+choose(h*(w-j), k));
-            score += choose((i-1)*(j-1), k);
-            score += choose((h-i)*(j-1), k);
-            score += choose((i-1)*(w-j), k);
-            score += choose((h-i)*(w-j), k);
-            ans += score;
+    mint taka = a/100, aoki = b/100, draw = c/100;
+    mint ans = 0;
+    
+    if(c == 0){
+        rep(i, n, 2*n){
+            ans += (choose(i-1, n-1)*mint::modpow(taka, n)*mint::modpow(aoki, i-n))*i;
+            ans += (choose(i-1, n-1)*mint::modpow(taka, i-n)*mint::modpow(aoki, n))*i;
         }
+        cout << ans << endl;
+    }else{
+        mint d = mint::inv(mint(1)-draw);
+        taka = a/(a+b), aoki = b/(a+b);
+        rep(i, n, 2*n){
+            ans += (choose(i-1, n-1)*mint::modpow(taka, n)*mint::modpow(aoki, i-n))*d*i;
+            ans += (choose(i-1, n-1)*mint::modpow(taka, i-n)*mint::modpow(aoki, n))*d*i;
+        }
+        cout << ans << endl;
     }
-    cout << ans*mint::inv(choose(h*w, k)) << endl;
     
     return 0;
 }

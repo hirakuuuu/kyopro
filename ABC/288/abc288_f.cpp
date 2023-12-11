@@ -14,7 +14,7 @@ template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
 // 問題
-// https://atcoder.jp/contests/abc297/tasks/abc297_f
+// https://atcoder.jp/contests/abc288/tasks/abc288_f
 
 template <ll MOD> class modint {
     ll val;
@@ -110,7 +110,7 @@ public:
 using mint = modint<MOD>;
 template <ll MOD> vector<modint<MOD>> modint<MOD>::factorial_vec;
 
-const int vmax = 1000005;
+const int vmax = 250005;
 mint fact[vmax],finv[vmax],invs[vmax];
 void initfact(){
 	fact[0]=1;
@@ -136,20 +136,17 @@ mint catalan(int n){
 }
 
 int main(){
-    ll h, w, k; cin >> h >> w >> k;
-    mint ans = 0;
-    initfact();
-    rep(i, 1, h+1){
-        rep(j, 1, w+1){
-            mint score = choose(h*w, k)-(choose((i-1)*w, k)+choose((h-i)*w, k)+choose(h*(j-1), k)+choose(h*(w-j), k));
-            score += choose((i-1)*(j-1), k);
-            score += choose((h-i)*(j-1), k);
-            score += choose((i-1)*(w-j), k);
-            score += choose((h-i)*(w-j), k);
-            ans += score;
-        }
+    int n; cin >> n;
+    string s; cin >> s;
+    mint ans = s[0]-'0';
+    mint sum = ans;
+    rep(i, 1, n){
+        mint tmp = s[i]-'0';
+        ans = ans*10+tmp+sum*tmp;
+        sum += ans;
     }
-    cout << ans*mint::inv(choose(h*w, k)) << endl;
+    cout << ans << endl;
+
     
     return 0;
 }

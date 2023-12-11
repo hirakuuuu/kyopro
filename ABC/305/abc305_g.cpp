@@ -19,41 +19,40 @@ int main(){
     ll n, m; cin >> n >> m;
     vector<string> s(m);
     rep(i, 0, m) cin >> s[i];
-
     vector<string> all_s;
     rep(i, 0, 6){
-        rep(j, 0, (1<<i)){
-            string t; 
+        rep(j, 0, 1<<i){
+            string t;
             rep(k, 0, i){
-                t += 'a'+(j>>k&1);
+                if((j>>k)&1) t += 'b';
+                else t += 'a';
             }
             all_s.push_back(t);
         }
     }
 
-    ll cnt = all_s.size();
-    vector<vector<ll>> next(cnt, vector<ll>(2));
-    vector<vector<bool>> ok(cnt, vector<bool>(2, true));
-
-    rep(i, 0, cnt){
+    ll total = all_s.size();
+    vector<vector<ll>> next(total, vector<ll>(2));
+    vector<vector<ll>> ok(total, vector<ll>(2, true));
+    vector<vector<ll>> a(total, vector<ll>(total));
+    rep(i, 0, total){
         rep(j, 0, 2){
-            string t = all_s[i];
-            t += 'a'+j;
-
+            string tmp = all_s[i];
+            tmp += (char)'a'+j;
             rep(k, 0, m){
-                if(t.size() >= s[k].size()){
-                    if(t.substr(t.size()-s[k].size()) == s[k]){
+                if(tmp.size() >= s[k].size()){
+                    if(tmp.substr(tmp.size()-s[k].size()) == s[k]){
                         ok[i][j] = false;
                     }
                 }
             }
 
             if(ok[i][j]){
-                if (t.size() == 6){
-                    t.erase(t.begin());
+                if(tmp.size() == 6){
+                    tmp.erase(tmp.begin());
                 }
-                rep(k, 0, cnt){
-                    if(t == all_s[k]){
+                rep(k, 0, total){
+                    if(tmp == all_s[k]){
                         next[i][j] = k;
                     }
                 }
@@ -61,30 +60,30 @@ int main(){
         }
     }
 
-    vector<vector<ll>> mat(cnt, vector<ll>(cnt));
-    rep(i, 0, cnt){
+    rep(i, 0, total){
         rep(j, 0, 2){
             if(ok[i][j]){
-                mat[i][next[i][j]] = 1;
+                a[i][next[i][j]] = 1LL;
             }
         }
     }
+
     auto matmal = [&](vector<vector<ll>> &A, vector<vector<ll>> &B){
-        vector<vector<ll>> C(cnt, vector<ll>(cnt));
-        rep(i, 0, cnt){
-            rep(j, 0, cnt){
-                rep(k, 0, cnt){
-                    C[i][k] += A[i][j]*B[j][k];
-                    C[i][k] %= MOD;
+        vector<vector<ll>> C(A.size(), vector<ll>(B[0].size()));
+        rep(i, 0, A.size()){
+            rep(j, 0, B.size()){
+                rep(l, 0, B[0].size()){
+                    C[i][l] += A[i][j]*B[j][l];
+                    C[i][l] %= MOD;
                 }
             }
         }
         return C;
     };
 
-    auto matpow = [&](vector<vector<ll>> &A, ll &N){
-        vector<vector<ll>> C(cnt, vector<ll>(cnt));
-        rep(i, 0, cnt){
+    auto matpow = [&](vector<vector<ll>> &A, ll N){
+        vector<vector<ll>> C(A.size(), vector<ll>(A[0].size()));
+        rep(i, 0, A.size()){
             C[i][i] = 1;
         }
 
@@ -98,17 +97,13 @@ int main(){
         return C;
     };
 
-    vector<vector<ll>> result = matpow(mat, n);
+    vector<vector<ll>> result = matpow(a, n);
     ll ans = 0;
-    rep(i, 0, cnt){
+    rep(i, 0, total){
         ans += result[0][i];
         ans %= MOD;
     }
-
     cout << ans << endl;
 
-
-
-    
     return 0;
 }

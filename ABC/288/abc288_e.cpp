@@ -7,41 +7,48 @@ using namespace std;
 const int MOD_NUM = 1000000007;
 const int mod_num = 998244353;
 const int iinf = 1001001001;
+const ll INF = (ll)9e18;
 
 template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 // 問題
 // https://atcoder.jp/contests/abc288/tasks/abc288_e
 
-
 int main(){
-    int n, m; cin >> n >> m;
-    vector<ll> a(n), c(n), x(m), p(n);
-    rep(i, 0, n) cin >> a[i];
-    rep(i, 0, n) cin >> c[i];
+    ll n, m; cin >> n >> m;
+    vector<ll> a(n+1), c(n+1);
+    vector<bool> x(n+1);
+    rep(i, 1, n+1) cin >> a[i];
+    rep(i, 1, n+1) cin >> c[i];
     rep(i, 0, m){
-        cin >> x[i];
-        x[i]--;
-        p[x[i]] = 1;
+        int X; cin >> X;
+        x[X] = true;
     }
 
-    vector<vector<ll>> dp(n+1, vector<ll>(n+1, 9e18));
-    dp[0][0] = 0;
-    rep(i, 0, n){
-        ll cur_c = c[i];
-        rep(j, 0, i+1){
-            chmin(dp[i+1][j+1], dp[i][j]+a[i]+cur_c);
-            if(!p[i]){
-                chmin(dp[i+1][j], dp[i][j]);
+    vector<ll> dp(n+1, INF);
+    dp[0] = 0;
+    int cnt = 0;
+    rep(i, 1, n+1){
+        ll mi = INF;
+        vector<ll> dp_ = dp;
+        if(x[i]){
+            rep(j, 1, i+1){
+                chmin(mi, c[i-j+1]);
+                if(j > cnt) dp[j] = dp_[j-1]+a[i]+mi;
             }
-            if(j < i){
-                chmin(cur_c, c[i-j-1]);
+            dp[cnt] = INF;
+            cnt++;
+        }else{
+            rep(j, 1, i+1){
+                chmin(mi, c[i-j+1]);
+                chmin(dp[j], dp_[j-1]+a[i]+mi);
             }
         }
     }
 
-    ll ans = 9e18;
-    rep(i, 0, n+1) chmin(ans, dp[n][i]);
+    ll ans = INF;
+    rep(i, 0, n+1) chmin(ans, dp[i]);
     cout << ans << endl;
+
     return 0;
 }

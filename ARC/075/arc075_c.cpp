@@ -47,7 +47,37 @@ public:
     ll sum(ll l, ll r){
         return sum_sub(r)-sum_sub(l-1);
     }
+
+    // a[0]+a[1]+...+a[i] >= x となる最小のiを求める（任意のkでa[k]>=0が必要）
+    ll lower_bound(ll x){
+        if(x <= 0){
+            return 0;
+        }else{
+            ll i = 0, len = 1;
+
+            //最大としてありうる区間の長さを取得する
+            //n以下の最小の二乗のべき(BITで管理する数列の区間で最大のもの)を求める
+            while(len < n) len *= 2;
+
+            //区間の長さは調べるごとに半分になる
+            while(0 < len){
+                //その区間を採用する場合
+                if(i+len < n and a[i+len] < x){
+                    x -= a[i+len];
+                    i += len;
+                }
+            }
+            return i;
+        }
+    }
+
 };
+// 座標圧縮
+void comp(vector<ll>&a, map<ll, int> &d){
+  set<ll>s(a.begin(),a.end());
+  int cnt=0;
+  for(auto x:s)d[x]=cnt++;
+}
 
 
 int main(){
@@ -57,26 +87,23 @@ int main(){
         cin >> a[i];
         a[i] -= k;
     }
-
-    vector<ll> b(n+1);
-    rrep(i, n-1, 0){
-        b[i] = b[i+1]+a[i];
+    vector<ll> sum_a(n+1);
+    rep(i, 0, n){
+        sum_a[i+1] = sum_a[i]+a[i];
     }
 
-    vector<ll> c = b;
-    sort(c.begin(), c.end());
-    c.erase(unique(c.begin(), c.end()), c.end());
-
-    map<ll, int> m;
-    rep(i, 0, c.size()) m[c[i]] = i;
+    map<ll, int> d;
+    comp(sum_a, d);
+    BIT bit(n+1);
+    bit.add(d[0], 1);
 
     ll ans = 0;
-    BIT ft(n+1);
     rep(i, 0, n){
-        ft.add(m[b[i]], 1);
-        ans += ft.sum(m[b[i+1]], n);
+        ans += bit.sum(0, d[sum_a[i+1]]);
+        bit.add(d[sum_a[i+1]], 1);
     }
     cout << ans << endl;
-    
+
+
     return 0;
 }
