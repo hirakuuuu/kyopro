@@ -1,16 +1,17 @@
 #include <bits/stdc++.h>
 using namespace std;
 #define rep(i, a, n) for(int i = a; i < n; i++)
+#define rrep(i, a, n) for(int i = a; i >= n; i--)
 #define ll long long
 #define pii pair<int, int>
 #define pll pair<ll, ll>
-const int MOD = 1000000007;
-const int mod = 998244353;
+// constexpr ll MOD = 1000000007;
+constexpr ll MOD = 998244353;
+constexpr int IINF = 1001001001;
+constexpr ll INF = 1LL<<60;
 
-/*
-最大二部マッチング→最大フロー
-*/
-
+template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
+template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
 // 最大フロー問題を解くためのアルゴリズム
 struct Edge {
@@ -86,8 +87,22 @@ public:
     }
 };
 
-
 int main(){
-    
+    int n, m; cin >> n >> m;
+    vector<ll> a(n+1), b(m+1);
+    rep(i, 1, n+1) cin >> a[i];
+    rep(i, 1, m+1) cin >> b[i];
+
+    MaximumFlow MF(n+m+2);
+    rep(i, 1, n+1) MF.add_edge(0, i, a[i]);
+    rep(i, 1, n+1){
+        rep(j, 1, m+1){
+            MF.add_edge(i, n+j, (i*j)*(i*j));
+        }
+    }
+    rep(i, 1, m+1) MF.add_edge(n+i, n+m+1, b[i]);
+
+    cout << MF.max_flow(0, n+m+1) << endl;
+
     return 0;
 }

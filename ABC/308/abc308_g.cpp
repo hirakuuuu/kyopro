@@ -16,36 +16,61 @@ template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 // 問題
 // https://atcoder.jp/contests/abc308/tasks/abc308_g
 
-multiset<ll> X, XOR;
 
 int main(){
-    int Q; cin >> Q;
-    while(Q--){
-        int op; cin >> op;
+    int q; cin >> q;
+    multiset<int> X, XOR;
 
-        if(op == 1){
-            ll x; cin >> x;
-            auto itr = X.lower_bound(x);
-
-            if(itr != X.begin() && itr != X.end()) XOR.erase(XOR.find(*prev(itr)^*itr));
-            if(itr != X.begin()) XOR.insert(*prev(itr)^x);
-            if(itr != X.end()) XOR.insert(x^*itr);
-
+    while(q--){
+        int t; cin >> t;
+        if(t == 1){
+            int x; cin >> x;
+            if(X.size() > 0){
+                int l, r;
+                auto itr = X.lower_bound(x);
+                if(itr == X.end()){
+                    itr--;
+                    l = *itr;
+                    XOR.insert(l^x);
+                }else if(itr == X.begin()){
+                    r = *itr;
+                    XOR.insert(r^x);
+                }else{
+                    r = *itr;
+                    itr--;
+                    l = *itr;
+                    XOR.erase(XOR.find(l^r));
+                    XOR.insert(l^x);
+                    XOR.insert(r^x);
+                }
+            }
             X.insert(x);
-        }else if(op == 2){
+        }else if(t == 2){
             int x; cin >> x;
             X.erase(X.find(x));
-            auto itr = X.lower_bound(x);
-
-            if(itr != X.begin() && itr != X.end()) XOR.insert(*prev(itr)^*itr);
-            if(itr != X.begin()) XOR.erase(XOR.find(*prev(itr)^x));
-            if(itr != X.end()) XOR.erase(XOR.find(x^*itr));
-
-        }else{
-            cout << *XOR.begin() << '\n';
+            if(X.size() > 0){
+                int l, r;
+                auto itr = X.lower_bound(x);
+                if(itr == X.end()){
+                    itr--;
+                    l = *itr;
+                    XOR.erase(XOR.find(l^x));
+                }else if(itr == X.begin()){
+                    r = *itr;
+                    XOR.erase(XOR.find(r^x));
+                }else{
+                    r = *itr;
+                    itr--;
+                    l = *itr;
+                    XOR.erase(XOR.find(l^x));
+                    XOR.erase(XOR.find(r^x));
+                    XOR.insert(l^r);
+                }
+            }
+        }else if(t == 3){
+            cout << *XOR.begin() << endl;
         }
     }
-
     
     return 0;
 }

@@ -79,7 +79,10 @@ public:
                 return -1;
             }
             // ポテンシャルの更新
-            rep(i, 0, n) h[i] += dist[i];
+            rep(i, 0, n){
+                // ポテンシャルを除いた最短路に更新する
+                h[i] = dist[i]+h[i]-h[s];
+            }
             // s-t間最短路に沿って目一杯流す
             ll d = f;
             for(ll v = t; v != s; v = prevv[v]){
@@ -97,63 +100,55 @@ public:
     }
 };
 
+
 int main(){
-    ll n, m; cin >> n >> m;
-    vector<vector<char>> s(n+2, vector<char>(m+2, '#'));
-    rep(i, 1, n+1){
-        rep(j, 1, m+1){
-            cin >> s[i][j];
-        }
+    int n, m; cin >> n >> m;
+    MinCostFlow mcf(n*m+105);
+    vector<string> s(n+1);
+    rep(i, 0, n){
+        cin >> s[i];
+        s[i] += '#';
     }
+    rep(j, 0, m) s[n] += '#';
 
-
-    vector<pii> piece;
-    rep(i, 1, n+1){
-        rep(j, 1, m+1){
+    int o = 0;
+    rep(i, 0, n){
+        rep(j, 0, m){
             if(s[i][j] == 'o'){
-                piece.push_back({i, j});
+                queue<pair<int, int>> que;
+                que.push({i, j});
+                vector<vector<int>> dist(n, vector<int>(m, -1));
+                dist[i][j] = 0;
+                while(!que.empty()){
+                    auto [px, py] = que.front(); que.pop();
+                    if(s[px+1][py] != '#' && dist[px+1][py] == -1){
+                        dist[px+1][py] = dist[px][py]+1;
+                        que.push({px+1, py});
+                    }
+                    if(s[px][py+1] != '#' && dist[px][py+1] == -1){
+                        dist[px][py+1] = dist[px][py]+1;
+                        que.push({px, py+1});
+                    }
+                }
+                rep(k, 0, n){
+                    rep(l, 0, m){
+                        if(dist[k][l] != -1){
+                            mcf.add_edge(o, k*m+l+100, 1, -dist[k][l]);
+                        }
+                    }
+                }
+                o++;
             }
         }
     }
-    ll k = piece.size();
-    map<pii, ll> num;
-    ll id = k+1;
-    rep(i, 1, n+1){
-        rep(j, 1, m+1){
-            num[{i, j}] = id;
-            id++;
-        }
+
+    rep(i, 0, o) mcf.add_edge(n*m+100, i, 1, 0);
+    rep(i, 0, n){
+        rep(j, 0, m) mcf.add_edge(i*m+j+100, n*m+101, 1, 0);
     }
 
-    MinCostFlow mcf(k+n*m+2);
 
-    rep(i, 0, k){
-        pii p = piece[i];
-        vector<vector<ll>> dist(n+1, vector<ll>(m+1, -1));
-        dist[p.first][p.second] = 0;
-        mcf.add_edge(i+1, num[p], 1, 0);
-        queue<pii> que;
-        que.push(p); 
-        while(!que.empty()){
-            pii q = que.front(); que.pop();
-            rep(j, 0, 2){
-                ll nh = q.first+(j+1)%2, nw = q.second+(j+2)%2;
-                if(s[nh][nw] == '#' || dist[nh][nw] >= 0) continue;
-                dist[nh][nw] = dist[q.first][q.second]+1;
-                que.push({nh, nw});
-                mcf.add_edge(i+1, num[{nh, nw}], 1, 0);
-            }
-        }
-        mcf.add_edge(0, i+1, 1, piece[i].first+piece[i].second);
-    }
-
-    rep(i, 1, n+1){
-        rep(j, 1, m+1){
-            if(s[i][j] != '#') mcf.add_edge(num[{i, j}], k+n*m+1, 1, IINF-(i+j));
-        }
-    }
-
-    cout << IINF*k-mcf.min_cost_flow(0, k+n*m+1, k) << endl;
+    cout << -mcf.min_cost_flow(n*m+100, n*m+101, o) << endl;
     
     return 0;
 }

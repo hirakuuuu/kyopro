@@ -74,51 +74,26 @@ public:
 
 int main(){
     int n, k, l; cin >> n >> k >> l;
-    vector<int> p(k), q(k), s(l), r(l);
-    rep(i, 0, k) cin >> p[i] >> q[i];
-    rep(i, 0, l) cin >> s[i] >> r[i];
-
-    UnionFind road(n+1), train(n+1);
-    rep(i, 0, k) road.unite(p[i], q[i]);
-    rep(i, 0, l) train.unite(s[i], r[i]);
-
-    vector<vector<int>> road_component(n+1), train_component(n+1);
-
-    rep(i, 1, n+1){
-        road_component[road[i]].push_back(i);
-        train_component[train[i]].push_back(i);
+    UnionFind uf(n), uf2(n);
+    rep(i, 0, k){
+        int p, q; cin >> p >> q;
+        p--, q--;
+        uf.unite(p, q);
     }
-
-    vector<int> ans(n+1);
-    map<pii, int> memo;
-    rep(i, 1, n+1){
-        int rrep = road[i], trep = train[i];
-        if(memo[{rrep, trep}] > 0){
-            ans[i] = memo[{rrep, trep}];
-        }else{
-            if(road_component[rrep].size() < train_component[trep].size()){
-                for(auto rc: road_component[rrep]){
-                    if(rc == *lower_bound(train_component[trep].begin(), train_component[trep].end(), rc)){
-                        ans[i]++;
-                    }
-                }
-            }else{
-                for(auto tc: train_component[trep]){
-                    if(tc == *lower_bound(road_component[rrep].begin(), road_component[rrep].end(), tc)){
-                        ans[i]++;
-                    }
-                }  
-            }
-            memo[{rrep, trep}] = ans[i];
-        }
+    rep(i, 0, l){
+        int r, s; cin >> r >> s;
+        r--, s--;
+        uf2.unite(r, s);
     }
+    vector<pair<int, int>> t(n);
+    rep(i, 0, n) t[i] = {uf[i], uf2[i]};
+    
+    map<pair<int, int>, int> cnt;
+    rep(i, 0, n) cnt[t[i]]++;
 
-    rep(i, 1, n+1) cout << ans[i] << ' ';
+    rep(i, 0, n) cout << cnt[t[i]] << ' ';
+    
     cout << endl;
 
-
-
-    
-    
     return 0;
 }

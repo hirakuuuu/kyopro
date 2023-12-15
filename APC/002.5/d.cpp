@@ -1,20 +1,17 @@
 #include <bits/stdc++.h>
 using namespace std;
+#define rep(i, a, n) for(int i = a; i < n; i++)
+#define rrep(i, a, n) for(int i = a; i >= n; i--)
 #define ll long long
+#define pii pair<int, int>
+#define pll pair<ll, ll>
+// constexpr ll MOD = 1000000007;
+constexpr ll MOD = 998244353;
+constexpr int IINF = 1001001001;
+constexpr ll INF = 1LL<<60;
 
-/*
-Wavelet Matrix
-- 長さｎの静的な配列ｖに対して色々な区間クエリを高速で解く(O(log max(v))) データ構造
-  - 例えば、区間[l, r) でk番目に小さい値
-  - 区間[l, r) でu未満の値の個数
-  - この2つの応用で色々できる
-- 元々データの持ち方が木であったが、行列にした方が実装楽じゃねとなったらしい
-
-参考
-https://acompany-ac.notion.site/231205_Wavelet-Matrix-cb5503e9cbf440b59424ad5967f510f1
-*/
-
-
+template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
+template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
 // i桁目のビットが1かどうか
 bool has_bit(ll x, int i){
@@ -45,13 +42,13 @@ public:
     void build(){
         for(const auto &b: block){
             // popcount : 2進数表記で1の数を数える
-            sum.push_back(sum.back()+popcount(b));
+            sum.push_back(sum.back()+__builtin_popcountll(b));
         }
     }
 
     // [0, r) 桁までの1の個数
     int rank1(int r) const {
-        return sum[r/w] + popcount(block[r/w] & ((1LL<<(r%w))-1));
+        return sum[r/w] + __builtin_popcountll(block[r/w] & ((1LL<<(r%w))-1));
     }
 
     // [0, r) 桁まででの0の個数
@@ -67,9 +64,9 @@ class WaveletMatrix {
     vector<BitCumulativeSum> bv;
 
 public:
-    WaveletMatrix(vector<int> v) : n((int)v.size()){
+    WaveletMatrix(vector<ll> v) : n((int)v.size()){
         // sigmaを決定する
-        int mx = 0;
+        ll mx = 0;
         for(auto &x: v){
             assert(x >= 0);
             mx = max(mx, x);
@@ -79,7 +76,7 @@ public:
 
         // 行列の構築
         bv.assign(sigma, n);
-        vector<int> nxt_v(n);
+        vector<ll> nxt_v(n);
         // 上位の桁から構築していく
         for(int h = sigma-1; h >= 0; h--){
             auto &B = bv[h]; // h桁目に対応するビットの累積和（ただし0の個数を数える）
@@ -134,12 +131,11 @@ public:
     // [l, r) でk番目に小さい数（0-indexed）
     int kth_largest(int l, int r, int k) const {
         assert(0 <= r-l-k+1 && r-l-k+1 < n);
-        return kth_smallest(l, r, r-l-k+1);
-        
+        return kth_smallest(l, r, r-l-k+1);   
     }
 
     // [0, r) でu未満の値の個数
-    int range_freq(int r, int u){
+    ll range_freq(int r, ll u){
         assert(u >= 0);
         if(u >= (1LL<<sigma)) return r;
 
@@ -162,19 +158,32 @@ public:
     }
 
     // [l, r) でu未満の値の個数
-    int range_freq(int l, int r, int u){
+    ll range_freq(int l, int r, ll u){
         assert(u >= 0);
         return range_freq(r, u) - range_freq(l, u);
     }
 
     // [l, r) でd以上u未満の値の個数
-    int range_freq(int l, int r, int d, int u){
+    ll range_freq(int l, int r, ll d, ll u){
         assert(d >= 0 && u >= 0);
         return range_freq(l, r, u) - range_freq(l, r, d);
     }
 };
 
 int main(){
+    std::ios::sync_with_stdio(false);
+    std::cin.tie(nullptr);
+    int n, q; cin >> n >> q;
+    vector<ll> u(n), d(n);
+    rep(i, 0, n) cin >> u[i] >> d[i];
+
+    WaveletMatrix wm_u(u);
+    WaveletMatrix wm_d(d);
+    rep(i, 0, q){
+        int l, r, t; cin >> l >> r >> t;
+        l--;
+        cout << wm_u.range_freq(l, r, t+1)-wm_d.range_freq(l, r, t) << '\n';
+    }
 
     return 0;
 }

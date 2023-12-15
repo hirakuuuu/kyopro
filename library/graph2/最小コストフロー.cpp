@@ -14,6 +14,12 @@ template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
 
+
+/*
+重み付き最大二部マッチング→最小コストフロー
+*/
+
+
 struct Edge {
     ll to, cap, cost, rev;
 };
