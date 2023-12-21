@@ -14,7 +14,7 @@ template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
 // 問題
-// https://atcoder.jp/contests/abc237/tasks/abc237_f
+// https://atcoder.jp/contests/abc333/tasks/abc333_f
 
 template <ll MOD> class modint {
     ll val;
@@ -135,46 +135,28 @@ mint catalan(int n){
 	return binom(n,n)-(n-1>=0?binom(n-1,n+1):0);
 }
 
-mint dp[1005][15][15][15];
-
 int main(){
-    int n, m; cin >> n >> m;
-    rep(i, 0, n+1){
-        rep(j, 0, m+1){
-            rep(k, 0, m+1){
-                rep(l, 0, m+1){
-                    dp[i][j][k][l] = 0;
-                }
-            }
+    initfact();
+    int n; cin >> n;
+    vector<mint> dp(n+1);
+    mint inv2 = mint::inv(2);
+    dp[1] = 1;
+    rep(i, 2, n+1){
+        rep(j, 1, i){
+            dp[i] += choose(i-1, j)*mint::modpow(inv2, i-1)*dp[i-j];
         }
+        dp[i] *= mint::modpow(2, i-1)/(mint::modpow(2, i)-1);
     }
 
-    dp[0][m+1][m+1][m+1] = 1;
     rep(i, 1, n+1){
-        rep(j, 1, m+2){
-            rep(k, j, m+2){
-                rep(l, k, m+2){
-                    rep(a, 1, m+1){
-                        if(a <= j) dp[i][a][k][l] += dp[i-1][j][k][l];
-                        else if(a <= k) dp[i][j][a][l] += dp[i-1][j][k][l];
-                        else if(a <= l) dp[i][j][k][a] += dp[i-1][j][k][l];
-                    }
-                }
-            }
+        mint ans = 0;
+        rep(j, 0, i){
+            ans += choose(i-1, j)*mint::modpow(inv2, i-1)*dp[n-j];
         }
+        cout << ans << ' ';
     }
+    cout << endl;
 
-    mint ans = 0;
-    rep(j, 1, m+1){
-        rep(k, j+1, m+1){
-            rep(l, k+1, m+1){
-                // cout << j << ' ' << k << ' ' << l << ' ' << dp[n][j][k][l] << endl;
-                ans += dp[n][j][k][l];
-            }
-        }
-    }
-    cout << ans << endl;
-    
     
     return 0;
 }

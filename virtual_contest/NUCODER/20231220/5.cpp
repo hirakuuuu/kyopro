@@ -1,6 +1,6 @@
 #include <bits/stdc++.h>
 using namespace std;
-#define rep(i, a, n) for(int i = a; i < n; i++)
+#define rep(i, a, n) for(ll i = a; i < n; i++)
 #define rrep(i, a, n) for(int i = a; i >= n; i--)
 #define ll long long
 #define pii pair<int, int>
@@ -14,7 +14,7 @@ template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
 // 問題
-// https://atcoder.jp/contests/abc237/tasks/abc237_f
+// 
 
 template <ll MOD> class modint {
     ll val;
@@ -135,46 +135,40 @@ mint catalan(int n){
 	return binom(n,n)-(n-1>=0?binom(n-1,n+1):0);
 }
 
-mint dp[1005][15][15][15];
-
 int main(){
-    int n, m; cin >> n >> m;
-    rep(i, 0, n+1){
-        rep(j, 0, m+1){
-            rep(k, 0, m+1){
-                rep(l, 0, m+1){
-                    dp[i][j][k][l] = 0;
-                }
-            }
-        }
+    ll n, m; cin >> n >> m;
+    ll a, b, c, d, e, f; cin >> a >> b >> c >> d >> e >> f;
+
+    map<pair<ll, ll>, bool> obs;
+    rep(i, 0, m){
+        ll x, y; cin >> x >> y;
+        obs[{x, y}] = true;
     }
 
-    dp[0][m+1][m+1][m+1] = 1;
-    rep(i, 1, n+1){
-        rep(j, 1, m+2){
-            rep(k, j, m+2){
-                rep(l, k, m+2){
-                    rep(a, 1, m+1){
-                        if(a <= j) dp[i][a][k][l] += dp[i-1][j][k][l];
-                        else if(a <= k) dp[i][j][a][l] += dp[i-1][j][k][l];
-                        else if(a <= l) dp[i][j][k][a] += dp[i-1][j][k][l];
-                    }
-                }
+    vector<vector<vector<mint>>> dp(n+1, vector<vector<mint>>(n+1, vector<mint>(n+1)));
+    dp[0][0][0] = 1;
+    rep(i, 0, n+1){
+        rep(j, 0, n+1){
+            if(i+j > n) break;
+            rep(k, 0, n+1){
+                if(i+j+k > n) break;
+                if(obs[{a*i+c*j+e*k, b*i+d*j+f*k}]) continue;
+                if(i > 0) dp[i][j][k] += dp[i-1][j][k];
+                if(j > 0) dp[i][j][k] += dp[i][j-1][k];
+                if(k > 0) dp[i][j][k] += dp[i][j][k-1];
             }
         }
     }
 
     mint ans = 0;
-    rep(j, 1, m+1){
-        rep(k, j+1, m+1){
-            rep(l, k+1, m+1){
-                // cout << j << ' ' << k << ' ' << l << ' ' << dp[n][j][k][l] << endl;
-                ans += dp[n][j][k][l];
-            }
+    rep(i, 0, n+1){
+        rep(j, 0, n+1){
+            if(i+j > n) break;
+            ans += dp[i][j][n-i-j];
         }
     }
     cout << ans << endl;
-    
+
     
     return 0;
 }

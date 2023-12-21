@@ -196,66 +196,56 @@ public:
 };
 
 // 遅延セグメント木の準備
-using S = pair<int, int>;
+using S =  pair<int, int>;
 S op(S a, S b) { return {a.first+b.first, a.second+b.second}; }
-S e() { return {0, 0}; }
-
+S e() { return {0, 1}; }
+// 一次関数 a x + b によって恒等写像と代入を表現
 using F = int;
-S mapping(F f, S s) {
-	if (f >= 0) return { s.first, f*(s.first) };
-	else return s;
+S mapping(F a, S x) {
+    if(a == -1) return x;
+    return {a*x.second, x.second}; 
 }
-F composition(F l, F r) {
-	if (l >= 0)return l;
-	else return r;
+// a(b(x)) という包含関係
+F composition(F a, F b) {
+    if(a == -1) return b;
+    return a; 
 }
 F id() { return -1; }
+
 
 int main(){
     int n, q, x; cin >> n >> q >> x;
     vector<int> p(n);
+    rep(i, 0, n) cin >> p[i];
+    
+    int pos = -1;
+    vector<pair<int, int>> a(n, {0, 1});
     rep(i, 0, n){
-        cin >> p[i];
+        if(p[i] <= x) a[i] = {1, 1};
+        if(p[i] == x) pos = i;
     }
+    LazySegmentTree<pair<int, int>, op, e, int, mapping, composition, id> lst(a);
 
-    vector<S> initial_a(n), initial_b(n);
-    rep(i, 0, n){
-        if(p[i] > x) initial_a[i] = {1, 1};
-        else initial_a[i] = {1, 0};
-        if(p[i] >= x) initial_b[i] = {1, 1};
-        else initial_b[i] = {1, 0};
-    }
-
-    LazySegmentTree<S, op, e, F, mapping, composition, id> lsta(initial_a);
-    LazySegmentTree<S, op, e, F, mapping, composition, id> lstb(initial_b);
     while(q--){
         int c, l, r; cin >> c >> l >> r;
         l--;
         if(c == 1){
-            int a = lsta.prod(l, r).second;
-            int b = lstb.prod(l, r).second;
-            lsta.apply(l, r-a, 0);
-            lsta.apply(r-a, r, 1);
-            lstb.apply(l, r-b, 0);
-            lstb.apply(r-b, r, 1);
-        }else{
-            int a = lsta.prod(l, r).second;
-            int b = lstb.prod(l, r).second;
-            lsta.apply(l, l+a, 1);
-            lsta.apply(l+a, r, 0);
-            lstb.apply(l, l+b, 1);
-            lstb.apply(l+b, r, 0);
+            auto [sum, sz] = lst.prod(l, r);
+            lst.apply(l, l+sum, 1);
+            lst.apply(l+sum, r, 0);
+            if(l <= pos && pos < r) pos = l+sum-1;
+        }else if(c == 2){
+            auto [sum, sz] = lst.prod(l, r);
+            lst.apply(l, r-sum, 0);
+            lst.apply(r-sum, r, 1);
+            if(l <= pos && pos < r) pos = r-sum;
         }
+        // rep(i, 0, n){
+        //     cout << lst.get(i) << ' ';
+        // }
+        // cout << endl;
     }
-    rep(i, 0, n){
-        if(lsta.get(i) != lstb.get(i)){
-            cout << i+1 << endl;
-            break;
-        }
-    }
-
-
-
+    cout << pos+1 << endl;
     
     return 0;
 }

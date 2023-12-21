@@ -14,7 +14,7 @@ template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
 // 問題
-// https://atcoder.jp/contests/abc237/tasks/abc237_f
+// 
 
 template <ll MOD> class modint {
     ll val;
@@ -135,46 +135,30 @@ mint catalan(int n){
 	return binom(n,n)-(n-1>=0?binom(n-1,n+1):0);
 }
 
-mint dp[1005][15][15][15];
-
 int main(){
-    int n, m; cin >> n >> m;
-    rep(i, 0, n+1){
-        rep(j, 0, m+1){
-            rep(k, 0, m+1){
-                rep(l, 0, m+1){
-                    dp[i][j][k][l] = 0;
-                }
+    int n, m, k, s, t, x; cin >> n >> m >> k >> s >> t >> x;
+    s--, t--, x--;
+    vector<vector<int>> g(n);
+    rep(i, 0, m){
+        int u, v; cin >> u >> v;
+        u--, v--;
+        g[u].push_back(v);
+        g[v].push_back(u);
+    }
+    vector<vector<mint>> dp(n, vector<mint>(2));
+    dp[s][0] = 1;
+    rep(i, 1, k+1){
+        vector<vector<mint>> dp_(n, vector<mint>(2));
+        rep(j, 0, n){
+            rep(l, 0, 2){
+                for(auto nj: g[j]){
+                    if(nj == x) dp_[nj][1-l] += dp[j][l];
+                    else dp_[nj][l] += dp[j][l];
+                }    
             }
         }
+        swap(dp, dp_);
     }
-
-    dp[0][m+1][m+1][m+1] = 1;
-    rep(i, 1, n+1){
-        rep(j, 1, m+2){
-            rep(k, j, m+2){
-                rep(l, k, m+2){
-                    rep(a, 1, m+1){
-                        if(a <= j) dp[i][a][k][l] += dp[i-1][j][k][l];
-                        else if(a <= k) dp[i][j][a][l] += dp[i-1][j][k][l];
-                        else if(a <= l) dp[i][j][k][a] += dp[i-1][j][k][l];
-                    }
-                }
-            }
-        }
-    }
-
-    mint ans = 0;
-    rep(j, 1, m+1){
-        rep(k, j+1, m+1){
-            rep(l, k+1, m+1){
-                // cout << j << ' ' << k << ' ' << l << ' ' << dp[n][j][k][l] << endl;
-                ans += dp[n][j][k][l];
-            }
-        }
-    }
-    cout << ans << endl;
-    
-    
+    cout << dp[t][0] << endl;
     return 0;
 }
