@@ -1,21 +1,16 @@
 #include <bits/stdc++.h>
 using namespace std;
-#define rep(i, a, n) for(int i = a; i < n; i++)
-#define rrep(i, a, n) for(int i = a; i >= n; i--)
-#define ll long long
-#define pii pair<int, int>
-#define pll pair<ll, ll>
-// constexpr ll MOD = 1000000007;
-constexpr ll MOD = 998244353;
-constexpr int IINF = 1001001001;
-constexpr ll INF = 1LL<<60;
 
-template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
-template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
-// 問題
-// https://atcoder.jp/contests/abc289/tasks/abc289_f
+/*
+dinic法
+- フォードファルカーソンよりも高速な最大流アルゴリズム
+- 最悪計算量はO(n^2m) だが、平均だとO(n+m)？くらいらしい
+- DFSをやる前にBFSで最短パスを求めておいて、最短かつ増加パスがなくなるまでDFSをするイメージ
+*/
 
+
+// 最大フロー問題を解くためのアルゴリズム
 template <class T> 
 struct Dinic{
 private:
@@ -106,19 +101,13 @@ public:
 
 
 int main(){
-    int n, g, e; cin >> n >> g >> e;
-    Dinic<int> mf(n+1);
-    rep(i, 0, g){
-        int p; cin >> p;
-        mf.add_edge(p, n, 1);
+    int n, m; cin >> n >> m;
+    Dinic<long long> mf(n);
+    for(int i = 0; i < m; i++){
+        int u, v, c; cin >> u >> v >> c;
+        mf.add_edge(u, v, c);
     }
-    rep(i, 0, e){
-        int a, b; cin >> a >> b;
-        if(a > b) swap(a, b);
-        mf.add_edge(a, b, 1);
-        mf.add_edge(b, a, 1);
-    }
-
-    cout << mf.max_flow(0, n) << endl;
+    cout << mf.max_flow(0, n-1) << endl;
+    
     return 0;
 }
