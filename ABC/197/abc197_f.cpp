@@ -16,45 +16,64 @@ template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 // 問題
 // https://atcoder.jp/contests/abc197/tasks/abc197_f
 
+vector<vector<bool>> edge(1005, vector<bool>(1005));
+vector<vector<bool>> seen(1005, vector<bool>(1005));
+vector<vector<vector<int>>> g(26, vector<vector<int>>(1005));
+vector<vector<vector<pair<int, int>>>> nxt(1005, vector<vector<pair<int, int>>>(1005));
+
+
 int main(){
     int n, m; cin >> n >> m;
-    vector<int> a(m), b(m);
-    vector<char> c(m);
-    vector<vector<int>> g(n*n);
     rep(i, 0, m){
-        cin >> a[i] >> b[i] >> c[i];
-        a[i]--, b[i]--;
+        int a, b;
+        char c; cin >> a >> b >> c;
+        a--, b--;
+        g[c-'a'][a].push_back(b);
+        g[c-'a'][b].push_back(a);
+        edge[a][b] = edge[b][a] = true;
     }
 
-    rep(i, 0, m){
-        rep(j, 0, m){
-            if(c[i] == c[j]){
-                g[a[i]*n+a[j]].push_back(b[i]*n+b[j]);
-                g[b[i]*n+b[j]].push_back(a[i]*n+a[j]);
-                g[a[i]*n+b[j]].push_back(b[i]*n+a[j]);
-                g[b[i]*n+a[j]].push_back(a[i]*n+b[j]);
+    rep(i, 0, n){
+        rep(j, i+1, n){
+            rep(k, 0, 26){
+                for(auto gi: g[k][i]){
+                    for(auto gj: g[k][j]){
+                        nxt[i][j].push_back({min(gi, gj), max(gi, gj)});
+                    }
+                }
             }
         }
     }
 
-    queue<int> que;
-    que.push(n-1);
-    vector<ll> dist(n*n, 9e18);
-    dist[n-1] = 0;
+    queue<pair<int, int>> que;
+    que.push({0, n-1});
+    seen[0][n-1] = true;
+    vector<vector<int>> len(n, vector<int>(n, -1));
+    len[0][n-1] = 0;
+    int ans = 1001001001;
     while(!que.empty()){
-        int q = que.front(); que.pop();
-        for(auto nq: g[q]){
-            if(dist[nq] != 9e18) continue;
-            dist[nq] = dist[q]+2;
-            que.push(nq);
+        auto [l, r] = que.front(); que.pop();
+        for(auto [nl, nr]: nxt[l][r]){
+            if(nl == nr){
+                len[nl][nr] = len[l][r]+2;
+                chmin(ans, len[nl][nr]);
+            }else if(l == nl && r == nr && edge[nl][nr]){
+                len[nl][nr] = len[l][r]+1;
+                chmin(ans, len[nl][nr]);
+            }else{
+                if(seen[nl][nr]) continue;
+                seen[nl][nr] = true;
+                len[nl][nr] = len[l][r]+2;
+                que.push({nl, nr});
+            }
         }
     }
 
-    ll ans = 9e18;
-    rep(i, 0, n) chmin(ans, dist[i*n+i]);
-    rep(i, 0, m) chmin(ans, min(dist[a[i]*n+b[i]], dist[b[i]*n+a[i]])+1);
-    if(ans != 9e18) cout << ans << endl;
-    else cout << -1 << endl;
-    
+
+    if(ans == 1001001001) cout << -1 << endl;
+    else cout << ans << endl;
+
+
+
     return 0;
 }
