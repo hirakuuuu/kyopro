@@ -1,16 +1,21 @@
 #include <bits/stdc++.h>
 using namespace std;
+#define rep(i, a, n) for(int i = a; i < n; i++)
+#define rrep(i, a, n) for(int i = a; i >= n; i--)
+#define ll long long
+#define pii pair<int, int>
+#define pll pair<ll, ll>
+// constexpr ll MOD = 1000000007;
+constexpr ll MOD = 998244353;
+constexpr int IINF = 1001001001;
+constexpr ll INF = 1LL<<60;
 
+template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
+template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
-/*
-dinic法
-- フォードファルカーソンをちょっと変えた最大流アルゴリズム
-- 最悪計算量はO(n^2m) だが、平均だとO(n+m)？くらいらしい
-- DFSをやる前にBFSで最短パスを求めておいて、最短かつ増加パスがなくなるまでDFSをするイメージ
-*/
+// 問題
+// https://atcoder.jp/contests/arc074/tasks/arc074_d
 
-
-// 最大フロー問題を解くためのアルゴリズム
 template <class T> 
 struct Dinic{
 private:
@@ -27,7 +32,7 @@ private:
     vector<vector<Edge>> graph; // 残余グラフの隣接表現リスト
     vector<int> level; // ｓからの距離（BFSで求める）
     vector<int> iter; // どこまで探索済みか
-    T inf = 1e9;
+    T inf = 1e18;
 
 public:
     Dinic(int n_) : n(n_) {
@@ -99,15 +104,45 @@ public:
     }
 };
 
-
 int main(){
-    int n, m; cin >> n >> m;
-    Dinic<long long> mf(n);
-    for(int i = 0; i < m; i++){
-        int u, v, c; cin >> u >> v >> c;
-        mf.add_edge(u, v, c);
+    int h, w; cin >> h >> w;
+    vector<string> a(h);
+    // auto id = [&](int i, int j, int k){
+    //     return (i*w+j)*2+k;
+    // };
+    int si, sj, ti, tj;
+    rep(i, 0, h){
+        cin >> a[i];
+        rep(j, 0, w){
+            if(a[i][j] == 'S'){
+                si = i+1, sj = j+1;
+            }
+            if(a[i][j] == 'T'){
+                ti = i+1, tj = j+1;
+            }
+        }
     }
-    cout << mf.max_flow(0, n-1) << endl;
+
+    if(si == ti || sj == tj){
+        cout << -1 << endl;
+        return 0;
+    }
+
+    Dinic<ll> mf(h+w+2);
+    mf.add_edge(0, si, IINF);
+    mf.add_edge(0, h+sj, IINF);
+    mf.add_edge(ti, h+w+1, IINF);
+    mf.add_edge(h+tj, h+w+1, IINF);
+    rep(i, 0, h){
+        rep(j, 0, w){
+            if(a[i][j] == 'o'){
+                mf.add_edge(i+1, h+j+1, 1);
+                mf.add_edge(h+j+1, i+1, 1);
+            }
+        }
+    }
+
+    cout << mf.max_flow(0, h+w+1) << endl;
     
     return 0;
 }

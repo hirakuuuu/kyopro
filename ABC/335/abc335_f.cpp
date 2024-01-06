@@ -5,14 +5,16 @@ using namespace std;
 #define ll long long
 #define pii pair<int, int>
 #define pll pair<ll, ll>
-const int MOD = 998244353;
-const int iinf = 1001001001;
+// constexpr ll MOD = 1000000007;
+constexpr ll MOD = 998244353;
+constexpr int IINF = 1001001001;
+constexpr ll INF = 1LL<<60;
 
 template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
 // 問題
-// https://atcoder.jp/contests/abc290/tasks/abc290_f
+// https://atcoder.jp/contests/abc335/tasks/abc335_f
 
 template <ll MOD> class modint {
     ll val;
@@ -108,7 +110,7 @@ public:
 using mint = modint<MOD>;
 template <ll MOD> vector<modint<MOD>> modint<MOD>::factorial_vec;
 
-const int vmax = 2005005;
+const int vmax = 250005;
 mint fact[vmax],finv[vmax],invs[vmax];
 void initfact(){
 	fact[0]=1;
@@ -133,18 +135,29 @@ mint catalan(int n){
 	return binom(n,n)-(n-1>=0?binom(n-1,n+1):0);
 }
 
-mint homogeneous(int n, int k){
-    return choose(n+k-1, k);
-}
-
 int main(){
-    int t; cin >> t;
-    initfact();
-    while(t--){
-        int n; cin >> n;
-        if(n == 2) cout << 1 << endl;
-        else cout << homogeneous(n, n-2)+homogeneous(n, n-3)*n << endl;
+    int n; cin >> n;
+    vector<int> a(n);
+    rep(i, 0, n) cin >> a[i];
+    vector<mint> dp(n);
+    vector<vector<mint>> dp2(501, vector<mint>(501));
+    dp[0] = 1;
+    rep(i, 0, n){
+        rep(j, 1, 501){
+            dp[i] += dp2[j][i%j];
+        }
+        if(a[i] <= 500){
+            dp2[a[i]][i%a[i]] += dp[i];
+        }else{
+            for(int j = i+a[i]; j < n; j += a[i]){
+                dp[j] += dp[i];
+            }
+        }
     }
+
+    mint ans = 0;
+    rep(i, 0, n) ans += dp[i];
+    cout << ans << endl;
     
     return 0;
 }
