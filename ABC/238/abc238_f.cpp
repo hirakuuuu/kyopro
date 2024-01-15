@@ -1,15 +1,21 @@
 #include <bits/stdc++.h>
 using namespace std;
 #define rep(i, a, n) for(int i = a; i < n; i++)
+#define rrep(i, a, n) for(int i = a; i >= n; i--)
 #define ll long long
+#define pii pair<int, int>
+#define pll pair<ll, ll>
 // constexpr ll MOD = 1000000007;
 constexpr ll MOD = 998244353;
+constexpr int IINF = 1001001001;
+constexpr ll INF = 1LL<<60;
 
 template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
+// 問題
+// https://atcoder.jp/contests/abc238/tasks/abc238_f
 
-// ここから
 template <ll MOD> class modint {
     ll val;
     static vector<modint<MOD>> factorial_vec;
@@ -130,45 +136,34 @@ mint catalan(int n){
 }
 
 
-// ここまで
-
-
-
 int main(){
-    mint a = 1000000000;
-    cout << a << endl;
-    
-    mint b = 0;
-    rep(i, 0, 6){
-        b += mint::combination(5, i);
-        cout << b << endl;
-    }
+    initfact();
+    int n, k; cin >> n >> k;
+    vector<pair<int, int>> pq(n);
+    rep(i, 0, n) cin >> pq[i].first;
+    rep(i, 0, n) cin >> pq[i].second;
+    sort(pq.begin(), pq.end());
 
-    auto matmal = [&](vector<vector<mint>> A, vector<vector<mint>> B){
-        vector<vector<mint>> C(A.size(), vector<mint>(B[0].size()));
-        rep(i, 0, A.size()){
-            rep(j, 0, B.size()){
-                rep(l, 0, B[0].size()){
-                    C[i][l] += A[i][j]*B[j][l];
+    vector<vector<mint>> dp(k+1, vector<mint>(n+2));
+    dp[0][n+1] = 1;
+    rep(i, 0, n){
+        auto [_, q] = pq[i];
+        vector<vector<mint>> ndp(k+1, vector<mint>(n+2));
+        rep(j, 0, min(i+1, k)+1){
+            rep(l, 1, n+2){
+                if(j < k && q < l){
+                    ndp[j+1][l] += dp[j][l];
                 }
+                ndp[j][min(q, l)] += dp[j][l];
             }
         }
-        return C;
-    };
+        swap(dp, ndp);
+    }
 
-    auto matpow = [&](vector<vector<mint>> A, ll N){
-        vector<vector<mint>> C(A.size(), vector<mint>(A[0].size()));
-        rep(i, 0, A.size()){
-            C[i][i] = 1;
-        }
+    mint ans = 0;
+    rep(i, 1, n+2) ans += dp[k][i];
+    cout << ans << endl;
 
-        ll tmp = N;
-        while(tmp){
-            if(tmp&1) C = matmal(C, A);
-            A = matmal(A, A);
-            tmp >>= 1;
-        }
 
-        return C;
-    };
+    return 0;
 }

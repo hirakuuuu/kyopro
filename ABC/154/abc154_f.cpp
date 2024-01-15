@@ -1,15 +1,29 @@
 #include <bits/stdc++.h>
 using namespace std;
 #define rep(i, a, n) for(int i = a; i < n; i++)
+#define rrep(i, a, n) for(int i = a; i >= n; i--)
 #define ll long long
-// constexpr ll MOD = 1000000007;
-constexpr ll MOD = 998244353;
+#define pii pair<int, int>
+#define pll pair<ll, ll>
+constexpr ll MOD = 1000000007;
+constexpr int IINF = 1001001001;
+constexpr ll INF = 1LL<<60;
 
 template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
+// 問題
+// https://atcoder.jp/contests/abc154/tasks/abc154_f
 
-// ここから
+/*
+二項係数の2次元累積和
+f(r, c) = r+cCc とする
+g(r, c) = f(0, 0), ... , f(r, c) の和とすると
+g(r, c) = f(r+1, c+1)-1となる
+
+https://www.youtube.com/watch?v=JQmQjJd-sLA&ab_channel=AtCoderLive
+*/
+
 template <ll MOD> class modint {
     ll val;
     static vector<modint<MOD>> factorial_vec;
@@ -104,7 +118,7 @@ public:
 using mint = modint<MOD>;
 template <ll MOD> vector<modint<MOD>> modint<MOD>::factorial_vec;
 
-const int vmax = 250005;
+const int vmax = 2005005;
 mint fact[vmax],finv[vmax],invs[vmax];
 void initfact(){
 	fact[0]=1;
@@ -129,46 +143,14 @@ mint catalan(int n){
 	return binom(n,n)-(n-1>=0?binom(n-1,n+1):0);
 }
 
-
-// ここまで
-
-
+mint g(int n, int k){
+    return choose(n+k, k);
+}
 
 int main(){
-    mint a = 1000000000;
-    cout << a << endl;
+    int r1, c1, r2, c2; cin >> r1 >> c1 >> r2 >> c2;
+    initfact();
+    cout << g(r2+1, c2+1)-g(r1, c2+1)-g(r2+1, c1)+g(r1, c1) << endl;
     
-    mint b = 0;
-    rep(i, 0, 6){
-        b += mint::combination(5, i);
-        cout << b << endl;
-    }
-
-    auto matmal = [&](vector<vector<mint>> A, vector<vector<mint>> B){
-        vector<vector<mint>> C(A.size(), vector<mint>(B[0].size()));
-        rep(i, 0, A.size()){
-            rep(j, 0, B.size()){
-                rep(l, 0, B[0].size()){
-                    C[i][l] += A[i][j]*B[j][l];
-                }
-            }
-        }
-        return C;
-    };
-
-    auto matpow = [&](vector<vector<mint>> A, ll N){
-        vector<vector<mint>> C(A.size(), vector<mint>(A[0].size()));
-        rep(i, 0, A.size()){
-            C[i][i] = 1;
-        }
-
-        ll tmp = N;
-        while(tmp){
-            if(tmp&1) C = matmal(C, A);
-            A = matmal(A, A);
-            tmp >>= 1;
-        }
-
-        return C;
-    };
+    return 0;
 }
