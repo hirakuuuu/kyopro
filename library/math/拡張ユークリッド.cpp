@@ -18,6 +18,7 @@ template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
 // 返り値: a と b の最大公約数
 // ax+by=gcd(a, b) を満たす (x, y) が格納される
+// 返り値の絶対値が欲しいときは必ずabsをつけましょう
 
 ll extGCD(ll a, ll b, ll &x, ll &y){
     if (b == 0) {
