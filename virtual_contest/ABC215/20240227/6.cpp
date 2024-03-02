@@ -1,6 +1,20 @@
 #include <bits/stdc++.h>
 using namespace std;
+#define rep(i, a, n) for(int i = a; i < n; i++)
+#define rrep(i, a, n) for(int i = a; i >= n; i--)
 #define ll long long
+#define pii pair<int, int>
+#define pll pair<ll, ll>
+// constexpr ll MOD = 1000000007;
+constexpr ll MOD = 998244353;
+constexpr int IINF = 1001001001;
+constexpr ll INF = 1LL<<60;
+
+template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
+template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
+
+// 問題
+// 
 
 template <class T, T (*op)(T, T), T (*e)()> 
 class SegmentTree {
@@ -113,22 +127,68 @@ public:
     }
 };
 
-using S = pair<int, int>;
-S op(S a, S b) {
+int op(int a, int b) {
+    return max(a, b);
+}
+
+int e() {
+    return -1;
+}
+
+int op_mi(int a, int b) {
     return min(a, b);
 }
 
-S e() {
-    return {IINF, IINF};
-}
-
-int target;
-
-bool f(int v){
-    return v < target;
+int e_mi() {
+    return IINF;
 }
 
 int main(){
+    int n; cin >> n;
+    vector<int> x(n), y(n), sx(n);
+    vector<pair<int, int>> xy(n);
+    rep(i, 0, n){
+        cin >> x[i] >> y[i];
+        sx[i] = x[i];
+        xy[i] = {x[i], y[i]};
+    }
+    sort(sx.begin(), sx.end());
+    sx.erase(unique(sx.begin(), sx.end()), sx.end());
+    sort(xy.begin(), xy.end());
+    map<int,int>d;
+    int cnt=0;
+    for(auto xx:sx)d[xx]=cnt++;
+    SegmentTree<int, op, e> mx(cnt);
+    SegmentTree<int, op_mi, e_mi> mi(cnt);
+    rep(i, 0, n){
+        int tmp = mx.get(d[x[i]]);
+        mx.set(d[x[i]], max(tmp, y[i]));
+        tmp = mi.get(d[x[i]]);
+        mi.set(d[x[i]], min(tmp, y[i]));
+    }
 
+    int ok = 0, ng = 2e9;
+    while(ng-ok > 1){
+        int mid = (ok+ng)/2;
+        bool f = false;
+        rep(i, 0, n){
+            int pos = lower_bound(sx.begin(), sx.end(), x[i]+mid)-sx.begin();
+            if(pos < sx.size() && mx.prod(d[sx[pos]], cnt) >= y[i]+mid) f = true;
+            if(pos < sx.size() && mi.prod(d[sx[pos]], cnt) <= y[i]-mid) f = true;
+            pos = upper_bound(sx.begin(), sx.end(), x[i]-mid)-sx.begin();
+            if(pos > 0 && mx.prod(0, d[sx[pos-1]]+1) >= y[i]+mid) f = true;
+            if(pos > 0 && mi.prod(0, d[sx[pos-1]]+1) <= y[i]-mid) f = true;
+        }
+        if(f) ok = mid;
+        else ng = mid;
+    }
+    cout << ok << endl;
+
+
+
+
+
+
+    
     return 0;
 }

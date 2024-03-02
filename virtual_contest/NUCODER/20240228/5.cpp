@@ -1,6 +1,20 @@
 #include <bits/stdc++.h>
 using namespace std;
+#define rep(i, a, n) for(int i = a; i < n; i++)
+#define rrep(i, a, n) for(int i = a; i >= n; i--)
 #define ll long long
+#define pii pair<int, int>
+#define pll pair<ll, ll>
+// constexpr ll MOD = 1000000007;
+constexpr ll MOD = 998244353;
+constexpr int IINF = 1001001001;
+constexpr ll INF = 1LL<<60;
+
+template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
+template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
+
+// 問題
+// 
 
 template <class T, T (*op)(T, T), T (*e)()> 
 class SegmentTree {
@@ -113,6 +127,7 @@ public:
     }
 };
 
+
 using S = pair<int, int>;
 S op(S a, S b) {
     return min(a, b);
@@ -122,13 +137,37 @@ S e() {
     return {IINF, IINF};
 }
 
-int target;
-
-bool f(int v){
-    return v < target;
-}
-
 int main(){
+    int n, m; cin >> n >> m;
+    string s; cin >> s;
+    vector<pair<int, int>> dp(n+1, {IINF, IINF});
+    dp[0] = {0, 0};
+    SegmentTree<S, op, e> st(n+1);
+    st.set(0, {0, 0});
+    rep(i, 1, n+1){
+        if(s[i] == '1') continue;
+        pair<int, int> mi = st.prod(max(0, i-m), i);
+        if(mi == make_pair(IINF, IINF)) continue;
+        dp[i] = {mi.first+1, mi.second};
+        st.set(i, {mi.first+1, i});
+    }
+    if(dp[n] == make_pair(IINF, IINF)){
+        cout << -1 << endl;
+    }else{
+        vector<ll> ans;
+        ans.push_back(n);
+        int pos = n;
+        while(pos != 0){
+            ans.push_back(dp[pos].second);
+            pos = dp[pos].second;
+        }
+        reverse(ans.begin(), ans.end());
+        rep(i, 1, ans.size()){
+            cout << ans[i]-ans[i-1] << ' ';
+        }
+        cout << endl;
+    }
+
 
     return 0;
 }
