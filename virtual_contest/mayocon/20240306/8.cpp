@@ -1,16 +1,21 @@
 #include <bits/stdc++.h>
 using namespace std;
+#define rep(i, a, n) for(int i = a; i < n; i++)
+#define rrep(i, a, n) for(int i = a; i >= n; i--)
+#define ll long long
+#define pii pair<int, int>
+#define pll pair<ll, ll>
+// constexpr ll MOD = 1000000007;
+constexpr ll MOD = 998244353;
+constexpr int IINF = 1001001001;
+constexpr ll INF = 1LL<<60;
 
+template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
+template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
-/*
-dinic法
-- フォードファルカーソンをちょっと変えた最大流アルゴリズム
-- 最悪計算量はO(n^2m) だが、平均だとO(n+m)？くらいらしい
-- DFSをやる前にBFSで最短パスを求めておいて、最短かつ増加パスがなくなるまでDFSをするイメージ
-*/
+// 問題
+// 
 
-
-// 最大フロー問題を解くためのアルゴリズム
 template <class Cap> 
 class Dinic {
     int _n;
@@ -148,13 +153,35 @@ public:
 };
 
 int main(){
-    int n, m; cin >> n >> m;
-    Dinic<long long> mf(n);
-    for(int i = 0; i < m; i++){
-        int u, v, c; cin >> u >> v >> c;
-        mf.add_edge(u, v, c);
+    int n; cin >> n;
+    vector<string> c(n);
+    rep(i, 0, n){
+        cin >> c[i];
+        rep(j, 0, n){
+            if((i+j)%2 == 0 && c[i][j] != '?'){
+                if(c[i][j] == 'B') c[i][j] = 'W';
+                else c[i][j] = 'B';
+            }
+        }
     }
-    cout << mf.flow(0, n-1) << endl;
-    
+
+    Dinic<int> mf(n*n+2);
+    rep(i, 0, n){
+        rep(j, 0, n){
+            if(c[i][j] == 'B') mf.add_edge(n*n, i*n+j, 4);
+            if(c[i][j] == 'W') mf.add_edge(i*n+j, n*n+1, 4);
+        }
+    }
+    rep(i, 0, n){
+        rep(j, 0, n){
+            rep(k, 0, 4){
+                int ni = i+(k-1)%2, nj = j+(k-2)%2;
+                if(ni < 0 || n <= ni || nj < 0 || n <= nj) continue;
+                mf.add_edge(i*n+j, ni*n+nj, 1); 
+            }
+        }
+    }
+    cout << 2*n*(n-1)-mf.flow(n*n, n*n+1) << endl;
+
     return 0;
 }

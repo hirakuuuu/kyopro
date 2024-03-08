@@ -1,16 +1,21 @@
 #include <bits/stdc++.h>
 using namespace std;
+#define rep(i, a, n) for(int i = a; i < n; i++)
+#define rrep(i, a, n) for(int i = a; i >= n; i--)
+#define ll long long
+#define pii pair<int, int>
+#define pll pair<ll, ll>
+// constexpr ll MOD = 1000000007;
+constexpr ll MOD = 998244353;
+constexpr int IINF = 1001001001;
+constexpr ll INF = 1LL<<60;
 
+template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
+template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
-/*
-dinic法
-- フォードファルカーソンをちょっと変えた最大流アルゴリズム
-- 最悪計算量はO(n^2m) だが、平均だとO(n+m)？くらいらしい
-- DFSをやる前にBFSで最短パスを求めておいて、最短かつ増加パスがなくなるまでDFSをするイメージ
-*/
+// 問題
+// https://atcoder.jp/contests/practice2/tasks/practice2_d
 
-
-// 最大フロー問題を解くためのアルゴリズム
 template <class Cap> 
 class Dinic {
     int _n;
@@ -149,12 +154,41 @@ public:
 
 int main(){
     int n, m; cin >> n >> m;
-    Dinic<long long> mf(n);
-    for(int i = 0; i < m; i++){
-        int u, v, c; cin >> u >> v >> c;
-        mf.add_edge(u, v, c);
+    vector<string> s(n);
+    rep(i, 0, n) cin >> s[i];
+    Dinic<int> mf(n*m+2);
+    rep(i, 0, n){
+        rep(j, 0, m){
+            if(s[i][j] == '#') continue;
+            if((i+j)%2 == 0){
+                mf.add_edge(n*m, i*m+j, 1);
+                if(j < m-1 && s[i][j+1] != '#') mf.add_edge(i*m+j, i*m+j+1, 1);
+                if(0 < j   && s[i][j-1] != '#') mf.add_edge(i*m+j, i*m+j-1, 1);
+                if(i < n-1 && s[i+1][j] != '#') mf.add_edge(i*m+j, (i+1)*m+j, 1);
+                if(0 < i   && s[i-1][j] != '#') mf.add_edge(i*m+j, (i-1)*m+j, 1);
+            }else{
+                mf.add_edge(i*m+j, n*m+1, 1);
+            }
+        }
     }
-    cout << mf.flow(0, n-1) << endl;
-    
+    cout << mf.flow(n*m, n*m+1) << endl;
+    const auto &edges = mf.edges();
+    vector<string> ans = s;
+    for(auto edge: edges){
+        if(edge.from == n*m || edge.to == n*m+1 || edge.flow == 0) continue;
+        int ifrom = edge.from/m, jfrom = edge.from%m;
+        int ito = edge.to/m, jto = edge.to%m;
+        if(ifrom == ito){
+            if(jfrom > jto) swap(jfrom, jto);
+            ans[ifrom][jfrom] = '>';
+            ans[ito][jto] = '<';
+        }else{
+            if(ifrom > ito) swap(ifrom, ito);
+            ans[ifrom][jfrom] = 'v';
+            ans[ito][jto] = '^';
+        }
+    }
+    rep(i, 0, n) cout << ans[i] << endl;
+
     return 0;
 }

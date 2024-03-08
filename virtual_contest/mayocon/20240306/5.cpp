@@ -1,14 +1,20 @@
 #include <bits/stdc++.h>
 using namespace std;
 #define rep(i, a, n) for(int i = a; i < n; i++)
+#define rrep(i, a, n) for(int i = a; i >= n; i--)
 #define ll long long
 #define pii pair<int, int>
 #define pll pair<ll, ll>
-const int MOD = 1000000007;
-const int mod = 998244353;
+// constexpr ll MOD = 1000000007;
+constexpr ll MOD = 998244353;
+constexpr int IINF = 1001001001;
+constexpr ll INF = 1LL<<60;
+
+template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
+template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
 // 問題
-// https://atcoder.jp/contests/typical90/tasks/typical90_e
+// 
 
 template <ll MOD> class modint {
     ll val;
@@ -129,62 +135,24 @@ mint catalan(int n){
 	return binom(n,n)-(n-1>=0?binom(n-1,n+1):0);
 }
 
-
 int main(){
-    ll n, b, k; cin >> n >> b >> k;
-    vector<int> c(k);
-    rep(i, 0, k) cin >> c[i];
-    vector<vector<mint>> a(b, vector<mint>(b));
-    rep(i, 0, b){
-        rep(j, 0, k){
-            int tmp = (10*i+c[j])%b;
-            a[i][tmp] += 1;
-        }
-    }
-    auto matmal = [&](vector<vector<mint>> A, vector<vector<mint>> B){
-        vector<vector<mint>> C(A.size(), vector<mint>(B[0].size()));
-        rep(i, 0, A.size()){
-            rep(j, 0, B.size()){
-                rep(l, 0, B[0].size()){
-                    C[i][l] += A[i][j]*B[j][l];
-                }
+    int n, m, k; cin >> n >> m >> k;
+    mint mm = m;
+    vector<mint> dp(n+1);
+    dp[0] = 1;
+    mint ans = 0;
+    rep(i, 0, k){
+        vector<mint> dp_(n+1);
+        rep(j, 0, n){
+            rep(l, 1, m+1){
+                if(j+l <= n) dp_[j+l] += dp[j]/mm;
+                else dp_[2*n-(j+l)] += dp[j]/mm;
             }
         }
-        return C;
-    };
-
-    auto matpow = [&](vector<vector<mint>> A, ll N){
-        vector<vector<mint>> C(A.size(), vector<mint>(A[0].size()));
-        rep(i, 0, A.size()){
-            C[i][i] = 1;
-        }
-
-        ll tmp = N;
-        while(tmp){
-            if(tmp&1) C = matmal(C, A);
-            A = matmal(A, A);
-            tmp >>= 1;
-        }
-
-        return C;
-    };
-    vector<vector<mint>> d = matpow(a, n);
-    // rep(i, 0, b){
-    //     rep(j, 0, b){
-    //         cout << d[i][j] << ' ';
-    //     }
-    //     cout << endl;
-    // }
-    vector<mint> init(b);
-    init[0] += 1;
-    vector<mint> ans(b);
-    rep(i, 0, b){
-        rep(j, 0, b){
-            ans[i] += init[j]*d[j][i];
-        }
+        swap(dp, dp_);
+        ans += dp[n];
     }
-    cout << ans[0] << endl;
-
-
+    cout << ans << endl;
+    
     return 0;
 }
