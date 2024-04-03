@@ -17,6 +17,7 @@ template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 // https://atcoder.jp/contests/abc345/tasks/abc345_e
 
 int main(){
+<<<<<<< HEAD
     int n, k; cin >> n >> k;
     vector<ll> c(n+1), v(n+1);
     rep(i, 1, n+1){
@@ -43,6 +44,8 @@ int main(){
     if(ans != -INF) cout << ans << endl;
     else cout << -1 << endl;
 
+=======
+>>>>>>> 478e5faf6d335dc5fcc07a937a798404ad74ad56
     
     return 0;
 }

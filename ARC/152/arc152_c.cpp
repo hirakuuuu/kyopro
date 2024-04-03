@@ -18,6 +18,7 @@ template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
 int main(){
     int n; cin >> n;
+<<<<<<< HEAD
     vector<int> a(n);
     rep(i, 0, n) cin >> a[i];
     int d = a[n-1]-a[0];
@@ -25,5 +26,33 @@ int main(){
     rep(i, 0, n) g = gcd(g, 2*(a[i]-a[0]));
     cout << a[0]%g+d << endl;
     
+=======
+    vector<ll> a(n);
+    rep(i, 0, n) cin >> a[i];
+    while(true){
+        ll mi = 0;
+        rep(i, 0, n){
+            if(2*a[i] < a[n-1]) continue;
+            auto itr = upper_bound(a.begin(), a.end(), (2*a[i]+a[0])/2);
+            if(itr == a.begin()) continue;
+            --itr;
+            if(2*(a[i]-*itr) == 0) continue;
+            if(mi == 0){
+                mi = 2*(a[i]-*itr);
+            }
+        }
+        if(mi < 0){
+            ll tmp = (a[0]+mi)/(3*(-mi))+1;
+            rep(i, 0, n) a[i] += mi*tmp;
+        }else break;
+    }
+
+    ll ans = a[n-1];
+    rep(i, 0, n){
+        if(2*a[i] < a[n-1]) continue;
+        chmin(ans, 2*a[i]-a[0]);
+    }
+    cout << ans << endl;
+>>>>>>> 478e5faf6d335dc5fcc07a937a798404ad74ad56
     return 0;
 }

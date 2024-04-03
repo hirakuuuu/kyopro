@@ -8,6 +8,7 @@
 .vscode/*
 mkfile.sh
 mkvc.sh
+mkac.sh
 .editorconfig
 
 # AHC関連
