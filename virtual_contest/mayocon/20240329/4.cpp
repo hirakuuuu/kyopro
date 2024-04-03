@@ -1,6 +1,20 @@
 #include <bits/stdc++.h>
 using namespace std;
+#define rep(i, a, n) for(int i = a; i < n; i++)
+#define rrep(i, a, n) for(int i = a; i >= n; i--)
 #define ll long long
+#define pii pair<int, int>
+#define pll pair<ll, ll>
+// constexpr ll MOD = 1000000007;
+constexpr ll MOD = 998244353;
+constexpr int IINF = 1001001001;
+constexpr ll INF = 1LL<<60;
+
+template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
+template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
+
+// 問題
+// 
 
 template <class T, T (*op)(T, T), T (*e)()> 
 class SegmentTree {
@@ -113,17 +127,30 @@ public:
     }
 };
 
-using S = int;
-S op(S a, S b) {
-    return max(a, b);
+int op(int a, int b) {
+    return a^b;
 }
 
-S e() {
-    return -1;
+int e() {
+    return 0;
 }
 
 
 int main(){
-
+    int n, q; cin >> n >> q;
+    vector<int> a(n);
+    rep(i, 0, n) cin >> a[i];
+    SegmentTree<int, op, e> st(a);
+    while(q--){
+        int t, x, y; cin >> t >> x >> y;
+        x--;
+        if(t == 1){
+            int tmp = st.get(x);
+            st.set(x, tmp^y);
+        }else{
+            cout << st.prod(x, y) << endl;
+        }
+    }
+    
     return 0;
 }
