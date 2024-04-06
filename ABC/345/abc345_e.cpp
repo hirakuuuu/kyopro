@@ -17,6 +17,35 @@ template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 // https://atcoder.jp/contests/abc345/tasks/abc345_e
 
 int main(){
+<<<<<<< HEAD
+    int n, k; cin >> n >> k;
+    vector<ll> c(n+1), v(n+1);
+    rep(i, 1, n+1){
+        cin >> c[i] >> v[i];
+    }
+    vector<vector<ll>> dp(n+1, vector<ll>(k+1, -INF));
+    vector<ll> mx(k+1, -INF);
+    mx[0] = 0;
+    dp[0][0] = 0;
+    rep(i, 1, n+1){
+        rep(j, max(0, i-k-1), i){
+            if(c[j] == c[i]) continue;
+            rep(l, i-j-1, k+1){
+                chmax(dp[i][l], dp[j][l-(i-j-1)]+v[i]);
+            }
+        }
+    }
+    ll ans = -INF;
+    rep(i, 1, n+1){
+        rep(j, 0, k+1){
+            if(n-i == k-j) chmax(ans, dp[i][j]);
+        }
+    }
+    if(ans != -INF) cout << ans << endl;
+    else cout << -1 << endl;
+
+=======
+>>>>>>> 478e5faf6d335dc5fcc07a937a798404ad74ad56
     
     return 0;
 }

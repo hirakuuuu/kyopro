@@ -17,6 +17,52 @@ template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 // https://atcoder.jp/contests/abc345/tasks/abc345_f
 
 int main(){
+<<<<<<< HEAD
+    int n, m, k; cin >> n >> m >> k;
+    vector<vector<pair<int, int>>> g(n);
+    rep(i, 0, m){
+        int u, v; cin >> u >> v;
+        u--, v--;
+        g[u].push_back({v, i});
+        g[v].push_back({u, i});
+    }
+    if(k%2){
+        cout << "No" << endl;
+        return 0;
+    }
+
+    int total = 0;
+    vector<int> cnt(n), seen(n);
+    vector<int> ans;
+    auto dfs = [&](auto self, int pos, int pre) -> void {
+        if(seen[pos]) return;
+        seen[pos] = true;
+        for(auto [nxt, id]: g[pos]){
+            if(nxt == pre) continue;
+            self(self, nxt, pos);
+            if(cnt[nxt] == 0 && total < k){
+                total -= cnt[nxt]+cnt[pos];
+                cnt[pos] ^= 1;
+                cnt[nxt] ^= 1;
+                total += cnt[nxt]+cnt[pos];
+                ans.push_back(id);
+            }
+        }
+    };
+    rep(i, 0, n){
+        dfs(dfs, i, -1);
+    }
+    
+    if(total == k){
+        cout << "Yes" << endl;
+        cout << ans.size() << endl;
+        for(auto aa: ans) cout << aa+1 << ' ';
+        cout << endl;
+    }else{
+        cout << "No" << endl;
+    }
+=======
+>>>>>>> 478e5faf6d335dc5fcc07a937a798404ad74ad56
     
     return 0;
 }

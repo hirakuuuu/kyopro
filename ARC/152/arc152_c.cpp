@@ -18,6 +18,15 @@ template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
 int main(){
     int n; cin >> n;
+<<<<<<< HEAD
+    vector<int> a(n);
+    rep(i, 0, n) cin >> a[i];
+    int d = a[n-1]-a[0];
+    int g = d;
+    rep(i, 0, n) g = gcd(g, 2*(a[i]-a[0]));
+    cout << a[0]%g+d << endl;
+    
+=======
     vector<ll> a(n);
     rep(i, 0, n) cin >> a[i];
     while(true){
@@ -44,5 +53,6 @@ int main(){
         chmin(ans, 2*a[i]-a[0]);
     }
     cout << ans << endl;
+>>>>>>> 478e5faf6d335dc5fcc07a937a798404ad74ad56
     return 0;
 }

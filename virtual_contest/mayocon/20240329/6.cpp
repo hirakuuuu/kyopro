@@ -1,6 +1,17 @@
 #include <bits/stdc++.h>
 using namespace std;
+#define rep(i, a, n) for(int i = a; i < n; i++)
+#define rrep(i, a, n) for(int i = a; i >= n; i--)
 #define ll long long
+#define pii pair<int, int>
+#define pll pair<ll, ll>
+// constexpr ll MOD = 1000000007;
+constexpr ll MOD = 998244353;
+constexpr int IINF = 1001001001;
+constexpr ll INF = 1LL<<60;
+
+template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
+template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
 template <class T, T (*op)(T, T), T (*e)()> 
 class SegmentTree {
@@ -114,16 +125,79 @@ public:
 };
 
 using S = int;
-S op(S a, S b) {
+S op_mx(S a, S b) {
     return max(a, b);
 }
 
-S e() {
-    return -1;
+S e_mx() {
+    return -IINF;
+}
+
+S op_mi(S a, S b) {
+    return min(a, b);
+}
+
+S e_mi() {
+    return IINF;
 }
 
 
 int main(){
+    int n; cin >> n;
 
+    vector<int> x(n), y(n);
+    map<int, int> mx, mi;
+    rep(i, 0, n){
+        cin >> x[i] >> y[i];
+        chmax(mx[x[i]], y[i]);
+        if(mi.find(x[i]) == mi.end()) mi[x[i]] = y[i];
+        else chmin(mi[x[i]], y[i]);
+    }
+
+    vector<int> all_x(n), all_y(n);
+    rep(i, 0, n){
+        all_x[i] = x[i];
+        all_y[i] = y[i];
+    }
+    rep(_, 0, 2){
+        sort(all_x.begin(), all_x.end());
+        all_x.erase(unique(all_x.begin(), all_x.end()), all_x.end());
+        swap(all_x, all_y);
+    }
+
+    int ok = 0, ng = 1e9+1;
+    SegmentTree<S, op_mx, e_mx> st_plus(all_x.size());
+    rep(i, 0, all_x.size()){
+        st_plus.set(i, mx[all_x[i]]);
+    }
+    SegmentTree<S, op_mi, e_mi> st_minus(all_x.size());
+    rep(i, 0, all_x.size()){
+        st_minus.set(i, mi[all_x[i]]);
+    }
+
+    while(ng-ok > 1){
+        int mid = (ok+ng)/2;
+        bool f = false;
+        rep(i, 0, n){
+            int r = upper_bound(all_x.begin(), all_x.end(), x[i]-mid)-all_x.begin();
+            int l = lower_bound(all_x.begin(), all_x.end(), x[i]+mid)-all_x.begin();
+            if(r > 0){
+                int tmp_mx = st_plus.prod(0, r);
+                int tmp_mi = st_minus.prod(0, r);
+                if(max(abs(tmp_mx-y[i]), abs(tmp_mi-y[i])) >= mid) f = true;
+            }
+            if(l < all_x.size()){
+                int tmp_mx = st_plus.prod(l, all_x.size());
+                int tmp_mi = st_minus.prod(l, all_x.size());
+                if(max(abs(tmp_mx-y[i]), abs(tmp_mi-y[i])) >= mid) f = true;
+            }
+        }
+        if(f) ok = mid;
+        else ng = mid;
+    }
+    cout << ok << endl;
+
+
+    
     return 0;
 }
