@@ -1,15 +1,20 @@
 #include <bits/stdc++.h>
 using namespace std;
 #define rep(i, a, n) for(int i = a; i < n; i++)
+#define rrep(i, a, n) for(int i = a; i >= n; i--)
+#define inr(l, x, r) (l <= x && x < r)
 #define ll long long
+#define ld long double
+#define pii pair<int, int>
+#define pll pair<ll, ll>
 // constexpr ll MOD = 1000000007;
 constexpr ll MOD = 998244353;
+constexpr int IINF = 1001001001;
+constexpr ll INF = 1LL<<60;
 
 template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
-
-// ここから
 template <ll MOD> class modint {
     ll val;
     static vector<modint<MOD>> factorial_vec;
@@ -128,50 +133,72 @@ mint binom(int a,int b){
 mint catalan(int n){
 	return binom(n,n)-(n-1>=0?binom(n-1,n+1):0);
 }
-/*
-initfact() 忘れないように
-*/
-
-
-// ここまで
-
 
 
 int main(){
-    mint a = 1000000000;
-    cout << a << endl;
-    
-    mint b = 0;
-    rep(i, 0, 6){
-        b += mint::combination(5, i);
-        cout << b << endl;
+    int n; cin >> n;
+    vector<int> p(n);
+    rep(i, 0, n){
+        cin >> p[i];
+        p[i]--;
     }
-
-    auto matmal = [&](vector<vector<mint>> A, vector<vector<mint>> B){
-        vector<vector<mint>> C(A.size(), vector<mint>(B[0].size()));
-        rep(i, 0, A.size()){
-            rep(j, 0, B.size()){
-                rep(l, 0, B[0].size()){
-                    C[i][l] += A[i][j]*B[j][l];
-                }
+    string s; cin >> s;
+    mint ans = 0;
+    // 1人目の行動でどのスプーンをとるかが決まる
+    if(s[p[0]] == 'L'){
+        // 左側のスプーンをとる
+        // 自分の右側の人がまだスプーンをとってないかつ右利きだったら詰み
+        vector<bool> picked(n);
+        ans = 1;
+        rep(i, 0, n){
+            if(s[p[i]] == 'R' && !picked[(p[i]+1)%n]){
+                cout << 0 << endl;
+                return 0;
             }
+            if(s[p[i]] == '?' && picked[(p[i]+1)%n]) ans *= 2;
+            picked[p[i]] = true;
         }
-        return C;
-    };
-
-    auto matpow = [&](vector<vector<mint>> A, ll N){
-        vector<vector<mint>> C(A.size(), vector<mint>(A[0].size()));
-        rep(i, 0, A.size()){
-            C[i][i] = 1;
+    }else if(s[p[0]] == 'R'){
+        // 右側のスプーンをとる
+        // 自分の左側の人がまだスプーンをとってないかつ左利きだったら詰み
+        vector<bool> picked(n);
+        ans = 1;
+        rep(i, 0, n){
+            if(s[p[i]] == 'L' && !picked[(p[i]-1+n)%n]){
+                cout << 0 << endl;
+                return 0;
+            }
+            if(s[p[i]] == '?' && picked[(p[i]-1+n)%n]) ans *= 2;
+            picked[p[i]] = true;
         }
-
-        ll tmp = N;
-        while(tmp){
-            if(tmp&1) C = matmal(C, A);
-            A = matmal(A, A);
-            tmp >>= 1;
+    }else{
+        // 左側のスプーンをとる
+        // 自分の右側の人がまだスプーンをとってないかつ右利きだったら詰み
+        vector<bool> picked(n);
+        mint ans_l = 1;
+        s[p[0]] = 'L';
+        rep(i, 0, n){
+            if(s[p[i]] == 'R' && !picked[(p[i]+1)%n]){
+                ans_l = 0;
+                break;
+            }
+            if(s[p[i]] == '?' && picked[(p[i]+1)%n]) ans_l *= 2;
+            picked[p[i]] = true;
         }
-
-        return C;
-    };
+        // 右側のスプーンをとる
+        // 自分の左側の人がまだスプーンをとってないかつ左利きだったら詰み
+        fill(picked.begin(), picked.end(), false);
+        mint ans_r = 1;
+        s[p[0]] = 'R';
+        rep(i, 0, n){
+            if(s[p[i]] == 'L' && !picked[(p[i]-1+n)%n]){
+                ans_r = 0;
+            }
+            if(s[p[i]] == '?' && picked[(p[i]-1+n)%n]) ans_r *= 2;
+            picked[p[i]] = true;
+        }
+        ans = ans_l+ans_r;
+    }
+    cout << ans << endl;
+    return 0;
 }

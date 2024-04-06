@@ -1,15 +1,21 @@
 #include <bits/stdc++.h>
 using namespace std;
-#define rep(i, a, n) for(int i = a; i < n; i++)
+#define rep(i, a, n) for(ll i = a; i < n; i++)
+#define rrep(i, a, n) for(ll i = a; i >= n; i--)
 #define ll long long
+#define pii pair<int, int>
+#define pll pair<ll, ll>
 // constexpr ll MOD = 1000000007;
 constexpr ll MOD = 998244353;
+constexpr int IINF = 1001001001;
+constexpr ll INF = 1LL<<60;
 
 template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
+// 問題
+// 
 
-// ここから
 template <ll MOD> class modint {
     ll val;
     static vector<modint<MOD>> factorial_vec;
@@ -128,50 +134,18 @@ mint binom(int a,int b){
 mint catalan(int n){
 	return binom(n,n)-(n-1>=0?binom(n-1,n+1):0);
 }
-/*
-initfact() 忘れないように
-*/
-
-
-// ここまで
-
 
 
 int main(){
-    mint a = 1000000000;
-    cout << a << endl;
-    
-    mint b = 0;
-    rep(i, 0, 6){
-        b += mint::combination(5, i);
-        cout << b << endl;
+    ll n; cin >> n;
+    vector<vector<mint>> dp(n+1, vector<mint>(2));
+    dp[n][0] = dp[n][1] = 0;
+    rrep(i, n-1, 0){
+        dp[i][0] = (mint(i)/(n+i))*dp[i+1][0] + (mint(n)/(n+i))*dp[i+1][1];
+        dp[i][0] += mint(i*n)/(n*n-i*i);
+        dp[i][1] = (mint(i)/n)*dp[i][0] + (mint(n-i)/n)*dp[i+1][0];
     }
-
-    auto matmal = [&](vector<vector<mint>> A, vector<vector<mint>> B){
-        vector<vector<mint>> C(A.size(), vector<mint>(B[0].size()));
-        rep(i, 0, A.size()){
-            rep(j, 0, B.size()){
-                rep(l, 0, B[0].size()){
-                    C[i][l] += A[i][j]*B[j][l];
-                }
-            }
-        }
-        return C;
-    };
-
-    auto matpow = [&](vector<vector<mint>> A, ll N){
-        vector<vector<mint>> C(A.size(), vector<mint>(A[0].size()));
-        rep(i, 0, A.size()){
-            C[i][i] = 1;
-        }
-
-        ll tmp = N;
-        while(tmp){
-            if(tmp&1) C = matmal(C, A);
-            A = matmal(A, A);
-            tmp >>= 1;
-        }
-
-        return C;
-    };
+    cout << dp[0][0] << ' ' << dp[0][1] << endl;
+    
+    return 0;
 }

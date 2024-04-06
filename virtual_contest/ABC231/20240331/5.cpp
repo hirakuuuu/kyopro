@@ -1,15 +1,20 @@
 #include <bits/stdc++.h>
 using namespace std;
 #define rep(i, a, n) for(int i = a; i < n; i++)
+#define rrep(i, a, n) for(int i = a; i >= n; i--)
+#define inr(l, x, r) (l <= x && x < r)
 #define ll long long
+#define ld long double
+#define pii pair<int, int>
+#define pll pair<ll, ll>
 // constexpr ll MOD = 1000000007;
 constexpr ll MOD = 998244353;
+constexpr int IINF = 1001001001;
+constexpr ll INF = 1LL<<60;
 
 template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
-
-// ここから
 template <ll MOD> class modint {
     ll val;
     static vector<modint<MOD>> factorial_vec;
@@ -128,50 +133,34 @@ mint binom(int a,int b){
 mint catalan(int n){
 	return binom(n,n)-(n-1>=0?binom(n-1,n+1):0);
 }
-/*
-initfact() 忘れないように
-*/
-
-
-// ここまで
-
 
 
 int main(){
-    mint a = 1000000000;
-    cout << a << endl;
-    
-    mint b = 0;
-    rep(i, 0, 6){
-        b += mint::combination(5, i);
-        cout << b << endl;
+    mint h, w;
+    int k; cin >> h >> w >> k;
+    vector<int> x(2), y(2);
+    rep(i, 0, 2) cin >> x[i] >> y[i];
+    if(k == 1){
+        if(((x[0] == x[1])^(y[0] == y[1])) > 0) cout << 1 << endl;
+        else cout << 0 << endl;
+        return 0;
     }
+    vector<mint> dp(4);
+    if(x[0] == x[1] && y[0] == y[1]) dp[0] = 1;
+    else if(x[0] == x[1]) dp[1] = 1;
+    else if(y[0] == y[1]) dp[2] = 1;
+    else dp[3] = 1;
+    rep(i, 1, k+1){
+        vector<mint> dp_(4);
 
-    auto matmal = [&](vector<vector<mint>> A, vector<vector<mint>> B){
-        vector<vector<mint>> C(A.size(), vector<mint>(B[0].size()));
-        rep(i, 0, A.size()){
-            rep(j, 0, B.size()){
-                rep(l, 0, B[0].size()){
-                    C[i][l] += A[i][j]*B[j][l];
-                }
-            }
-        }
-        return C;
-    };
-
-    auto matpow = [&](vector<vector<mint>> A, ll N){
-        vector<vector<mint>> C(A.size(), vector<mint>(A[0].size()));
-        rep(i, 0, A.size()){
-            C[i][i] = 1;
-        }
-
-        ll tmp = N;
-        while(tmp){
-            if(tmp&1) C = matmal(C, A);
-            A = matmal(A, A);
-            tmp >>= 1;
-        }
-
-        return C;
-    };
+        dp_[0] = dp[1]+dp[2];
+        dp_[1] = dp[0]*(w-1)+dp[1]*(w-2)+dp[3];
+        dp_[2] = dp[0]*(h-1)+dp[2]*(h-2)+dp[3];
+        dp_[3] = dp[1]*(h-1)+dp[2]*(w-1)+dp[3]*(h+w-4);
+        swap(dp, dp_);
+    }
+    cout << dp[0] << endl;
+    
+    
+    return 0;
 }

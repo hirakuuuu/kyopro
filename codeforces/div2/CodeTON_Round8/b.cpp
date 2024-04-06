@@ -10,12 +10,32 @@ using namespace std;
 // constexpr ll MOD = 1000000007;
 constexpr ll MOD = 998244353;
 constexpr int IINF = 1001001001;
-constexpr ll INF = 9e18;
+constexpr ll INF = 1LL<<60;
 
 template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
 int main(){
+    int t; cin >> t;
+    while(t--){
+        int n; cin >> n;
+        vector<int> a(n);
+        rep(i, 0, n){
+            cin >> a[i];
+        }
+        vector<int> p(n);
+        p[n-1] = n-a[n-1];
+        int mi = p[n-1];
+        rrep(i, n-2, 0){
+            p[i] = mi-a[i];
+            chmin(mi, p[i]);
+        }
+        rep(i, 0, n){
+            cout << p[i] << ' ';
+        }
+        cout << endl;
+
+    }
     
     return 0;
 }

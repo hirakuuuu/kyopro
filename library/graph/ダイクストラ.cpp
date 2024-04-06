@@ -11,9 +11,9 @@ vector<ll> a(100005);
 vector<vector<pll>> g(100005);
 
 // sを始点とする各頂点への距離の最小値を格納した配列を返す
-vector<ll> dijk(int s){
-    priority_queue<pair<ll, ll>, vector<pair<ll, ll>>, greater<pair<ll, ll>>> que;
-    vector<ll> dist(100005, (1LL<<60));
+vector<ll> dijk(int s, vector<vector<pll>> &g){
+    priority_queue<pll, vector<pll>, greater<pll>> que;
+    vector<ll> dist(g.size(), (1LL<<60));
     que.push(make_pair(0, s));
     dist[s] = 0;
     while(!que.empty()){
@@ -31,6 +31,7 @@ vector<ll> dijk(int s){
     return dist;
 }
 
+
 int main(){
     int n, m; cin >> n >> m;
     rep(i, 0, m){
@@ -39,7 +40,7 @@ int main(){
         g[v].push_back({u, c});
     }
 
-    vector<ll> d = dijk(1);
+    vector<ll> d = dijk(1, g);
     rep(i, 1, n+1){
         cout << d[i] << endl;
     }

@@ -1,15 +1,20 @@
 #include <bits/stdc++.h>
 using namespace std;
 #define rep(i, a, n) for(int i = a; i < n; i++)
+#define rrep(i, a, n) for(int i = a; i >= n; i--)
+#define inr(l, x, r) (l <= x && x < r)
 #define ll long long
+#define ld long double
+#define pii pair<int, int>
+#define pll pair<ll, ll>
 // constexpr ll MOD = 1000000007;
 constexpr ll MOD = 998244353;
+constexpr int IINF = 1001001001;
+constexpr ll INF = 1LL<<60;
 
 template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
-
-// ここから
 template <ll MOD> class modint {
     ll val;
     static vector<modint<MOD>> factorial_vec;
@@ -104,7 +109,7 @@ public:
 using mint = modint<MOD>;
 template <ll MOD> vector<modint<MOD>> modint<MOD>::factorial_vec;
 
-const int vmax = 250005;
+const int vmax = 3000005;
 mint fact[vmax],finv[vmax],invs[vmax];
 void initfact(){
 	fact[0]=1;
@@ -128,50 +133,21 @@ mint binom(int a,int b){
 mint catalan(int n){
 	return binom(n,n)-(n-1>=0?binom(n-1,n+1):0);
 }
-/*
-initfact() 忘れないように
-*/
-
-
-// ここまで
+mint homogeneous(int n, int k){
+    return choose(n+k-1, k);
+}
 
 
 
 int main(){
-    mint a = 1000000000;
-    cout << a << endl;
+    int r, g, b, k; cin >> r >> g >> b >> k;
+    initfact();
+    // Bをb個、RGをk個、Rをr-k個並べる
+    // Gをg-k個並べる、このとき、Rの後ろには置けない
+    mint cnt1 = fact[b+r]/(fact[b]*fact[k]*fact[r-k]);
+    mint cnt2 = homogeneous(b+k+1, g-k);
+    cout << cnt1*cnt2 << endl;
+
     
-    mint b = 0;
-    rep(i, 0, 6){
-        b += mint::combination(5, i);
-        cout << b << endl;
-    }
-
-    auto matmal = [&](vector<vector<mint>> A, vector<vector<mint>> B){
-        vector<vector<mint>> C(A.size(), vector<mint>(B[0].size()));
-        rep(i, 0, A.size()){
-            rep(j, 0, B.size()){
-                rep(l, 0, B[0].size()){
-                    C[i][l] += A[i][j]*B[j][l];
-                }
-            }
-        }
-        return C;
-    };
-
-    auto matpow = [&](vector<vector<mint>> A, ll N){
-        vector<vector<mint>> C(A.size(), vector<mint>(A[0].size()));
-        rep(i, 0, A.size()){
-            C[i][i] = 1;
-        }
-
-        ll tmp = N;
-        while(tmp){
-            if(tmp&1) C = matmal(C, A);
-            A = matmal(A, A);
-            tmp >>= 1;
-        }
-
-        return C;
-    };
+    return 0;
 }

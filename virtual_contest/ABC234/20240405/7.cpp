@@ -1,15 +1,25 @@
 #include <bits/stdc++.h>
 using namespace std;
 #define rep(i, a, n) for(int i = a; i < n; i++)
+#define rrep(i, a, n) for(int i = a; i >= n; i--)
+#define inr(l, x, r) (l <= x && x < r)
 #define ll long long
+#define ld long double
+#define pii pair<int, int>
+#define pll pair<ll, ll>
 // constexpr ll MOD = 1000000007;
 constexpr ll MOD = 998244353;
+constexpr int IINF = 1001001001;
+constexpr ll INF = 1LL<<60;
 
 template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
+/*
+dp[i] = Σ dp[j]*(max(a[j+1], ... , a[i])) みたいな形は高速化と相性がいい
+今回は stack を使って、 max の部分が同じところをまとめておくことができる.
+*/
 
-// ここから
 template <ll MOD> class modint {
     ll val;
     static vector<modint<MOD>> factorial_vec;
@@ -128,50 +138,42 @@ mint binom(int a,int b){
 mint catalan(int n){
 	return binom(n,n)-(n-1>=0?binom(n-1,n+1):0);
 }
-/*
-initfact() 忘れないように
-*/
-
-
-// ここまで
-
 
 
 int main(){
-    mint a = 1000000000;
-    cout << a << endl;
-    
-    mint b = 0;
-    rep(i, 0, 6){
-        b += mint::combination(5, i);
-        cout << b << endl;
+    int n; cin >> n;
+    vector<ll> a(n);
+    rep(i, 0, n){
+        cin >> a[i];
     }
-
-    auto matmal = [&](vector<vector<mint>> A, vector<vector<mint>> B){
-        vector<vector<mint>> C(A.size(), vector<mint>(B[0].size()));
-        rep(i, 0, A.size()){
-            rep(j, 0, B.size()){
-                rep(l, 0, B[0].size()){
-                    C[i][l] += A[i][j]*B[j][l];
-                }
-            }
+    vector<mint> dp(n+1);
+    dp[0] = 1;
+    stack<pair<ll, mint>> mx, mi;
+    mint mx_sum = 0, mi_sum = 0;
+    rep(i, 0, n){
+        // max
+        mint mx_total = dp[i];
+        while(!mx.empty() && mx.top().first < a[i]){
+            auto [m, sum_dp] = mx.top(); mx.pop();
+            mx_sum -= sum_dp*m;
+            mx_total += sum_dp;
         }
-        return C;
-    };
+        mx_sum += mx_total*a[i];
+        mx.push({a[i], mx_total});
 
-    auto matpow = [&](vector<vector<mint>> A, ll N){
-        vector<vector<mint>> C(A.size(), vector<mint>(A[0].size()));
-        rep(i, 0, A.size()){
-            C[i][i] = 1;
+        // min
+        mint mi_total = dp[i];
+        while(!mi.empty() && mi.top().first > a[i]){
+            auto [m, sum_dp] = mi.top(); mi.pop();
+            mi_sum -= sum_dp*m;
+            mi_total += sum_dp;
         }
-
-        ll tmp = N;
-        while(tmp){
-            if(tmp&1) C = matmal(C, A);
-            A = matmal(A, A);
-            tmp >>= 1;
-        }
-
-        return C;
-    };
+        mi_sum += mi_total*a[i];
+        mi.push({a[i], mi_total});
+        dp[i+1] = mx_sum-mi_sum;
+        // cout << mx_sum << ' ' << mi_sum << endl;
+    }
+    cout << dp[n] << endl;
+    
+    return 0;
 }
