@@ -120,13 +120,13 @@ public:
     }
 };
 
-using S = double;
+using S = ll;
 S op(S a, S b) {
     return a+b;
 }
 
 S e() {
-    return 0.0;
+    return 0LL;
 }
 
 int main(){

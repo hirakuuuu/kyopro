@@ -113,13 +113,13 @@ public:
     }
 };
 
-using S = pair<int, int>;
+using S = ll;
 S op(S a, S b) {
     return min(a, b);
 }
 
 S e() {
-    return {IINF, IINF};
+    return LLONG_MAX;
 }
 
 int target;

@@ -13,9 +13,6 @@ constexpr ll INF = 1LL<<60;
 template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
-// 問題
-// https://atcoder.jp/contests/abc216/tasks/abc216_g_2
-
 template <class T>
 class FenwickTree {
 
@@ -38,7 +35,8 @@ public:
 
     void set(int p, T x) {
         assert(0 <= p && p < _n);
-        add(p, x-data[p]);
+        T tmp = sum(p+1)-sum(p);
+        add(p, x-tmp);
     }
 
     void add(int p, T x) {
@@ -50,6 +48,7 @@ public:
         }
     }
 
+    // [l, r)
     T sum(int l, int r) {
         assert(0 <= l && l <= r && r <= _n);
         return sum(r) - sum(l);
@@ -80,7 +79,7 @@ int main(){
             if(tmp >= x) continue;
             rep(i, 0, x-tmp){
                 int p = que.top(); que.pop();
-                ft.add(p, 1);
+                ft.set(p, 1);
             }
         }
     }
