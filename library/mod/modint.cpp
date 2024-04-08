@@ -128,6 +128,9 @@ mint binom(int a,int b){
 mint catalan(int n){
 	return binom(n,n)-(n-1>=0?binom(n-1,n+1):0);
 }
+/*
+initfact() 忘れないように
+*/
 
 
 // ここまで

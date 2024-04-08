@@ -113,13 +113,12 @@ public:
     }
 };
 
-using S = int;
+using S = ll;
 S op(S a, S b) {
     return max(a, b);
 }
-
 S e() {
-    return -1;
+    return LLONG_MIN;
 }
 
 

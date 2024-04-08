@@ -36,6 +36,11 @@ public:
     FenwickTree() : _n(0) {}
     explicit FenwickTree(int n) : _n(n), data(n) {}
 
+    void set(int p, T x) {
+        assert(0 <= p && p < _n);
+        add(p, x-data[p]);
+    }
+
     void add(int p, T x) {
         assert(0 <= p && p < _n);
         p++;

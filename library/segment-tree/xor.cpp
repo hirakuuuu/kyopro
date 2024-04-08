@@ -113,19 +113,14 @@ public:
     }
 };
 
-int op(int a, int b) {
+using S = ll;
+S op(S a, S b) {
     return a^b;
 }
-
-int e() {
-    return 0;
+S e() {
+    return 0LL;
 }
 
-int target;
-
-bool f(int v){
-    return v < target;
-}
 
 int main(){
 
