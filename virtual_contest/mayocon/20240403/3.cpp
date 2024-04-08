@@ -13,17 +13,27 @@ constexpr ll INF = 1LL<<60;
 template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
-ll power(ll a, ll b, ll m=MOD){
-    ll res = 1;
-    while(b > 0){
-        if(b%2 == 1) res = res*a%m;
-        a = a*a%m;
-        b /= 2;
-    }
-    return res;
-}
+// 問題
+// 
 
 int main(){
+    int n; cin >> n;
+    vector<pair<int, int>> task(n);
+    rep(i, 0, n){
+        int a, b; cin >> a >> b;
+        task[i] = {b, a};
+    }
+    sort(task.begin(), task.end());
+    int t = 0;
+    rep(i, 0, n){
+        auto [b, a] = task[i];
+        if(t+a > b){
+            cout << "No" << endl;
+            return 0;
+        }
+        t += a;
+    }
+    cout << "Yes" << endl;
     
     return 0;
 }

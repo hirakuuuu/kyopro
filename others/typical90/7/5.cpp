@@ -5,7 +5,7 @@ using namespace std;
 #define pii pair<int, int>
 #define pll pair<ll, ll>
 const int MOD = 1000000007;
-const int mod = 998244353;
+
 
 // 問題
 // https://atcoder.jp/contests/typical90/tasks/typical90_e
@@ -130,60 +130,54 @@ mint catalan(int n){
 }
 
 
+/*
+行列累乗（繰り返し二乗法）だとO(b^3logn)とかで間に合わない
+DPのダブリングに注目すると
+ dp[i][j] := i桁の数字でbで割ったあまりがｊとなる数
+ dp[i+j][i*10^j+l (Mod. b)] = dp[i][k]*dp[j][l];
+という遷移に成り、各 2^i についてO(b^2) 程度で求まる
+あとは、2進数でビットが立っているところに注目してまとめる
+*/
+
 int main(){
-    ll n, b, k; cin >> n >> b >> k;
-    vector<int> c(k);
-    rep(i, 0, k) cin >> c[i];
-    vector<vector<mint>> a(b, vector<mint>(b));
-    rep(i, 0, b){
-        rep(j, 0, k){
-            int tmp = (10*i+c[j])%b;
-            a[i][tmp] += 1;
-        }
+    ll n, b, k_; cin >> n >> b >> k_;
+    vector<int> c(k_);
+    rep(i, 0, k_) cin >> c[i];
+
+    vector<int> ten(62);
+    ten[0] = 1;
+    ten[1] = 10%b;
+    rep(i, 2, 62){
+        ten[i] = (ten[i-1]*ten[i-1])%b;
     }
-    auto matmal = [&](vector<vector<mint>> A, vector<vector<mint>> B){
-        vector<vector<mint>> C(A.size(), vector<mint>(B[0].size()));
-        rep(i, 0, A.size()){
-            rep(j, 0, B.size()){
-                rep(l, 0, B[0].size()){
-                    C[i][l] += A[i][j]*B[j][l];
-                }
+
+    vector<vector<mint>> dp(62, vector<mint>(b));
+    rep(i, 0, k_) dp[0][c[i]%b] += 1;
+    rep(i, 1, 62){
+        rep(j, 0, b){
+            rep(k, 0, b){
+                dp[i][(j*ten[i]+k)%b] += dp[i-1][j]*dp[i-1][k];
             }
         }
-        return C;
-    };
+    }
 
-    auto matpow = [&](vector<vector<mint>> A, ll N){
-        vector<vector<mint>> C(A.size(), vector<mint>(A[0].size()));
-        rep(i, 0, A.size()){
-            C[i][i] = 1;
-        }
-
-        ll tmp = N;
-        while(tmp){
-            if(tmp&1) C = matmal(C, A);
-            A = matmal(A, A);
-            tmp >>= 1;
-        }
-
-        return C;
-    };
-    vector<vector<mint>> d = matpow(a, n);
-    // rep(i, 0, b){
-    //     rep(j, 0, b){
-    //         cout << d[i][j] << ' ';
-    //     }
-    //     cout << endl;
-    // }
-    vector<mint> init(b);
-    init[0] += 1;
     vector<mint> ans(b);
-    rep(i, 0, b){
-        rep(j, 0, b){
-            ans[i] += init[j]*d[j][i];
+    ans[0] = 1;
+    rep(i, 0, 62){
+        if((n>>i)&1){
+            vector<mint> ans_(b);
+            rep(j, 0, b){
+                rep(k, 0, b){
+                    ans_[(j*ten[i+1]+k)%b] += ans[j]*dp[i][k];
+                }
+            }
+            swap(ans, ans_);
         }
     }
     cout << ans[0] << endl;
+
+
+
 
 
     return 0;

@@ -13,17 +13,23 @@ constexpr ll INF = 1LL<<60;
 template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
-ll power(ll a, ll b, ll m=MOD){
-    ll res = 1;
-    while(b > 0){
-        if(b%2 == 1) res = res*a%m;
-        a = a*a%m;
-        b /= 2;
-    }
-    return res;
-}
+// 問題
+// 
 
 int main(){
-    
+    ll w; cin >> w;
+    cout << 297 << endl;
+    rep(i, 1, 100){
+        cout << i << ' ';
+    }
+    cout << endl;
+    rep(i, 1, 100){
+        cout << i << "00 ";
+    }
+    cout << endl;
+    rep(i, 1, 100){
+        cout << i << "0000 ";
+    }
+    cout << endl;
     return 0;
 }
