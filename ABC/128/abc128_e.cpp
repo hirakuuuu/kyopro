@@ -2,19 +2,19 @@
 using namespace std;
 #define rep(i, a, n) for(int i = a; i < n; i++)
 #define rrep(i, a, n) for(int i = a; i >= n; i--)
+#define inr(l, x, r) (l <= x && x < r)
 #define ll long long
+#define ld long double
 #define pii pair<int, int>
 #define pll pair<ll, ll>
 // constexpr ll MOD = 1000000007;
 constexpr ll MOD = 998244353;
 constexpr int IINF = 1001001001;
-constexpr ll INF = 1LL<<60;
+constexpr ll INF = 9e18;
 
 template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
-// 問題
-// https://atcoder.jp/contests/abc128/tasks/abc128_e
 template <class T, T (*op)(T, T), T (*e)(), class F, T (*mapping)(F, T), F (*composition)(F, F), F (*id)()> 
 class LazySegmentTree {
     int _n, size, log;
@@ -201,47 +201,32 @@ S e() { return 9e18; }
 // 一次関数 a x + b によって恒等写像と代入を表現
 using F = ll;
 S mapping(F a, S x) { return min(a, x); }
+// a(b(x)) という包含関係
 F composition(F a, F b) { return min(a, b); }
 F id() { return 9e18; }
 
-
-
 int main(){
     int n, q; cin >> n >> q;
-    vector<ll> s(n), t(n);
-    vector<pair<ll, ll>> x(n);
+    vector<tuple<int, int, int>> kouji(n);
     rep(i, 0, n){
-        cin >> s[i] >> t[i] >> x[i].first;
-        x[i].second = i;
-    }
-    sort(x.begin(), x.end());
-    reverse(x.begin(), x.end());
-    vector<pair<ll, ll>> obs(n);
-    rep(i, 0, n){
-        ll id = x[i].second;
-        obs[i].first = s[id]-x[i].first;
-        obs[i].second = obs[i].first+(t[id]-s[id])-1;
-        //cout << obs[i].first << ' ' << obs[i].second << endl;
-    }
-
-    LazySegmentTree<ll, op, e, F, mapping, composition, id> lst(205000);
-
-
+        int s, t, x; cin >> s >> t >> x;
+        kouji[i] = {x, s, t};
+    } 
+    sort(kouji.rbegin(), kouji.rend());
+    LazySegmentTree<S, op, e, F, mapping, composition, id> lst(q);
     vector<ll> d(q);
     rep(i, 0, q) cin >> d[i];
     rep(i, 0, n){
-        int l = lower_bound(d.begin(), d.end(), obs[i].first)-d.begin();
-        int r = upper_bound(d.begin(), d.end(), obs[i].second)-d.begin();
-        //cout << l << ' ' << r << endl;
-        lst.apply(l, r, x[i].first);
+        auto [x, s, t] = kouji[i];
+        // s-x <= d < t-x に出発するとxで止まる
+        int l = lower_bound(d.begin(), d.end(), s-x)-d.begin();
+        int r = lower_bound(d.begin(), d.end(), t-x)-d.begin();
+        lst.apply(l, r, x);
     }
-
     rep(i, 0, q){
-        ll tmp = lst.get(i);
-        if(tmp == 9e18) cout << -1 << '\n';
-        else cout << tmp << '\n';
+        ll tmp = lst.prod(i, i+1);
+        if(tmp == 9e18) cout << -1 << endl;
+        else cout << lst.prod(i, i+1) << endl;
     }
-    
-    
     return 0;
 }
