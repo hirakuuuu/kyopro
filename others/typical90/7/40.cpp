@@ -2,18 +2,34 @@
 using namespace std;
 #define rep(i, a, n) for(int i = a; i < n; i++)
 #define rrep(i, a, n) for(int i = a; i >= n; i--)
+#define inr(l, x, r) (l <= x && x < r)
 #define ll long long
+#define ld long double
 #define pii pair<int, int>
 #define pll pair<ll, ll>
 // constexpr ll MOD = 1000000007;
 constexpr ll MOD = 998244353;
 constexpr int IINF = 1001001001;
-constexpr ll INF = 1LL<<60;
+constexpr ll INF = 9e18;
 
 template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
-// 最大フロー問題を解くためのアルゴリズム
+ll power(ll a, ll b, ll m=MOD){
+    ll res = 1;
+    while(b > 0){
+        if(b%2 == 1) res = res*a%m;
+        a = a*a%m;
+        b /= 2;
+    }
+    return res;
+}
+
+/*
+燃やす埋める
+辺の向きを考えるときは、頂点が2つの場合とかを考えると良い
+*/
+
 template <class Cap> 
 class Dinic {
     int _n;
@@ -151,26 +167,33 @@ public:
 };
 
 int main(){
-    int n, w; cin >> n >> w;
-    int sum_a = 0;
-    vector<int> a(n);
-    rep(i, 0, n){
-        cin >> a[i];
-        sum_a += a[i];
-    }
-    Dinic<int> mf(n+2);
-    int s = n, t = n+1;
-    rep(i, 0, n) mf.add_edge(s, i, w);
-    rep(i, 0, n) mf.add_edge(i, t, a[i]);
+    int n;
+    ll w; cin >> n >> w;
+    vector<ll> a(n);
+    rep(i, 0, n) cin >> a[i];
+    ll sum = 0;
+    rep(i, 0, n) sum += a[i];
+    vector<vector<int>> c(n);
     rep(i, 0, n){
         int k; cin >> k;
+        c[i].resize(k);
         rep(j, 0, k){
-            int c; cin >> c; c--;
-            // cに入るために i に入る必要がある
-            mf.add_edge(i, c, IINF);
+            cin >> c[i][j];
+            c[i][j]--;
         }
     }
-    cout << sum_a-mf.flow(s, t) << endl;
+
+    Dinic<ll> fl(n+2);
+    int s = n, t = n+1;
+    rep(i, 0, n){
+        fl.add_edge(s, i, w);
+        rep(j, 0, (int)c[i].size()){
+            fl.add_edge(i, c[i][j], INF);
+        }
+        fl.add_edge(i, t, a[i]);
+    }
+    cout << sum - fl.flow(s, t) << endl;
+ 
 
     
     return 0;

@@ -4,11 +4,9 @@ using namespace std;
 #define rrep(i, a, n) for(int i = a; i >= n; i--)
 #define inr(l, x, r) (l <= x && x < r)
 #define ll long long
-#define ld long double
 #define pii pair<int, int>
 #define pll pair<ll, ll>
 constexpr ll MOD = 1000000007;
-// constexpr ll MOD = 998244353;
 constexpr int IINF = 1001001001;
 constexpr ll INF = 9e18;
 
@@ -145,29 +143,79 @@ mint catalan(int n){
 }
 
 /*
-x座標とy座標を分けて考える
-X座標が異なる２つの座標に駒がおかれているとき、（Xの差）× {n*m-2}_C_{k-2} だけ答えに影響する
-また、差を dとすると ２つの座標の選び方は (n-d)*m^2 通り存在する。
-後はこれをかけ合わせればよい。
-Y座標についても同様。
+部分点解法
+DFSで左上の頂点から埋めていく
+再帰の際に、使えない頂点を # で埋める
 
-1箇所に着目して、それがどれだけ寄与するかを考える典型
+nが小さいので bitDPを考える
+マス (i, j) を埋めるのに必要な情報は前 w+1 マス
+O(2^w) なので w <= 17 程度であれば、全部持てる
+
+w <= 24 の解法はあり得る状態のみを持つようにすれば良いが、難しそうなので後で...
+
 */
 
+vector<int> di = {0, 0, 1, 1, 1};
+vector<int> dj = {0, 1, -1, 0, 1};
 
 int main(){
-    int n, m, k; cin >> n >> m >> k;
-    mint mn = n, mm = m;
-    mint ans = 0;
-    initfact();
-    rep(i, 1, n){
-        mint d = i;
-        ans += d*(mn-d)*mm*mm*choose(n*m-2, k-2);
+    int h, w; cin >> h >> w;
+    vector<string> c(h);
+    rep(i, 0, h) cin >> c[i];
+
+    vector<vector<mint>> dp(h*w, vector<mint>(1<<(w+1)));
+    dp[0][0] = 1;
+    if(c[0][0] == '.'){
+        dp[0][0+(1<<w)] = 1;
     }
-    rep(i, 1, m){
-        mint d = i;
-        ans += d*(mm-d)*mn*mn*choose(n*m-2, k-2);
+    rep(i, 1, h*w){
+        int x = i/w, y = i%w;
+        if(y == 0){
+            rep(j, 0, 1<<(w+1)){
+                /*
+                .....x
+                xxxxxx
+                o.....
+                */
+               int tmp = (j&6);
+               dp[i][j>>1] += dp[i-1][j];
+               if(c[x][y] == '.' && tmp == 0){
+                    dp[i][(j>>1)+(1<<w)] += dp[i-1][j];
+               }
+            }
+        }else if(y == w-1){
+            rep(j, 0, 1<<(w+1)){
+                /*
+                ....xx
+                xxxxxo
+                */
+               int tmp = (j&3)+((j>>w)&1);
+               dp[i][j>>1] += dp[i-1][j];
+               if(c[x][y] == '.' && tmp == 0){
+                    dp[i][(j>>1)+(1<<w)] += dp[i-1][j];
+               }
+            }
+        }else{
+            rep(j, 0, 1<<(w+1)){
+                /*
+                .xxxxx
+                xxo...
+                */
+               int tmp = (j&7)+((j>>w)&1);
+               dp[i][j>>1] += dp[i-1][j];
+               if(c[x][y] == '.' && tmp == 0){
+                    dp[i][(j>>1)+(1<<w)] += dp[i-1][j];
+               }
+            }
+        }
+    }
+
+    mint ans = 0;
+    rep(k, 0, 1<<(w+1)){
+        ans += dp[h*w-1][k];
     }
     cout << ans << endl;
+
+    
     return 0;
 }

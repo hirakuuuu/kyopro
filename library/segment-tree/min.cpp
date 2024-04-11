@@ -122,12 +122,6 @@ S e() {
     return LLONG_MAX;
 }
 
-int target;
-
-bool f(int v){
-    return v < target;
-}
-
 int main(){
 
     return 0;

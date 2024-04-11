@@ -1,17 +1,29 @@
 #include <bits/stdc++.h>
 using namespace std;
 #define rep(i, a, n) for(int i = a; i < n; i++)
+#define rrep(i, a, n) for(int i = a; i >= n; i--)
+#define inr(l, x, r) (l <= x && x < r)
 #define ll long long
+#define ld long double
 #define pii pair<int, int>
 #define pll pair<ll, ll>
-const int MOD = 1000000007;
-const int mod = 998244353;
+// constexpr ll MOD = 1000000007;
+constexpr ll MOD = 998244353;
+constexpr int IINF = 1001001001;
+constexpr ll INF = 9e18;
 
 template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
-// 問題
-// https://atcoder.jp/contests/abc126/tasks/abc126_e
+ll power(ll a, ll b, ll m=MOD){
+    ll res = 1;
+    while(b > 0){
+        if(b%2 == 1) res = res*a%m;
+        a = a*a%m;
+        b /= 2;
+    }
+    return res;
+}
 
 class UnionFind {
     vector<ll> parent, maxi, mini;
@@ -71,21 +83,16 @@ public:
 
 int main(){
     int n, m; cin >> n >> m;
-    UnionFind uf(n+1);
+    UnionFind uf(n);
     rep(i, 0, m){
-        int x, y, z; cin >> x >> y >> z;
+        int x, y, _; cin >> x >> y >> _;
+        x--, y--;
         uf.unite(x, y);
     }
+    set<int> r;
+    rep(i, 0, n) r.insert(uf[i]);
+    cout << r.size() << endl;
 
-    int ans = 0;
-    vector<bool> seen(n+1);
-    rep(i, 1, n+1){
-        if(seen[uf[i]]) continue;
-        seen[uf[i]] = true;
-        ans++;
-    }
 
-    cout << ans << endl;
-    
     return 0;
 }

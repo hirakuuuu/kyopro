@@ -13,9 +13,6 @@ constexpr ll INF = 1LL<<60;
 template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
-// 問題
-// https://atcoder.jp/contests/abc314/tasks/abc314_f
-
 template <ll MOD> class modint {
     ll val;
     static vector<modint<MOD>> factorial_vec;
@@ -135,6 +132,7 @@ mint catalan(int n){
 	return binom(n,n)-(n-1>=0?binom(n-1,n+1):0);
 }
 
+
 class UnionFind {
     vector<ll> parent, maxi, mini;
     inline ll root(ll n){
@@ -191,46 +189,37 @@ public:
     }
 };
 
-vector<bool> seen(200005);
-vector<mint> memo(200005);
-mint f(int n, vector<int> &par, vector<mint> &e){
-    if(seen[n]) return memo[n];
-    seen[n] = true;
-    memo[n] = e[n];
-    if(n != par[n]) memo[n] += f(par[n], par, e);
-    return memo[n];
-}
-
-
-
 int main(){
     int n; cin >> n;
     UnionFind uf(n);
-    vector<int> par(n);
+    vector<int> par(2*n-1);
     iota(par.begin(), par.end(), 0);
-    vector<mint> e(n);
+    vector<vector<pair<int, mint>>> g(2*n-1);
+
     rep(i, 0, n-1){
         int p, q; cin >> p >> q;
         p--, q--;
-        p = uf[p], q = uf[q];
-        mint a = uf.size(p), b = uf.size(q);
-        e[p] += a/(a+b), e[q] += b/(a+b);
+        mint a = mint(uf.size(p)), b = mint(uf.size(q));
+        g[i+n].push_back({par[uf[p]], a/(a+b)});
+        g[i+n].push_back({par[uf[q]], b/(a+b)});
         uf.unite(p, q);
-        if(p != uf[p]){
-            par[p] = q;
-            e[p] -= e[q];
-        }
-        if(q != uf[q]){
-            par[q] = p;
-            e[q] -= e[p];
-        }
+        par[uf[p]] = i+n;
     }
-
-    vector<mint> ans(n);
+    vector<mint> e(n);
+    auto dfs = [&](auto self, int pos, mint tmp) -> void{
+        if(pos < n){
+            e[pos] = tmp;
+            return;
+        }
+        for(auto [nxt, cost]: g[pos]){
+            self(self, nxt, tmp+cost);
+        }
+    };
+    dfs(dfs, 2*n-2, 0);
     rep(i, 0, n){
-        cout << f(i, par, e) << ' ';
+        cout << e[i] << ' ';
     }
     cout << endl;
-    
+
     return 0;
 }

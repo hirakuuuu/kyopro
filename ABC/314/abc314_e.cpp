@@ -13,37 +13,32 @@ constexpr ll INF = 1LL<<60;
 template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
-// 問題
-// https://atcoder.jp/contests/abc314/tasks/abc314_e
-
 int main(){
     int n, m; cin >> n >> m;
-    vector<double> c(n);
-    vector<int> p(n);
+    vector<long double> c(n), p(n);
     vector<vector<int>> s(n);
-
+    vector<long double> cnt_zero(n);
     rep(i, 0, n){
-        cin >> c[i] >> p[i];
+        int P; cin >> c[i] >> P;
+        s[i].resize(P);
+        p[i] = (long double)P;
         rep(j, 0, p[i]){
-            int S; cin >> S;
-            if(S) s[i].push_back(S);
+            cin >> s[i][j];
+            if(s[i][j] == 0) cnt_zero[i] += 1.0;
         }
-        c[i] *= (double)p[i]/s[i].size();
-        p[i] = s[i].size();
     }
-
-    vector<double> dp(m+1, 9e18);
-    dp[m] = 0.0;
+    vector<long double> dp(2*m, 9e18);
+    rep(i, m, 2*m) dp[i] = 0.0;
     rrep(i, m-1, 0){
         rep(j, 0, n){
-            double sum = 0.0;
-            rep(k, 0, p[j]){
-                sum += (double)dp[min(m, i+s[j][k])];
+            long double tmp = 0.0, sum = 0.0;
+            for(auto ss: s[j]){
+                if(ss == 0) continue;
+                sum += dp[i+ss];
             }
-            sum /= (double)p[j];
-            chmin(dp[i], c[j]+sum);
+            tmp = (c[j]*p[j]+sum)/(p[j]-cnt_zero[j]);
+            chmin(dp[i], tmp);
         }
     }
-    printf("%.10f\n", dp[0]);
-    return 0;
+    cout << setprecision(20) << dp[0] << endl;
 }
