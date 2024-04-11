@@ -13,33 +13,36 @@ constexpr ll INF = 1LL<<60;
 template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
-ll power(ll a, ll b, ll m=MOD){
-    ll res = 1;
-    while(b > 0){
-        if(b%2 == 1) res = res*a%m;
-        a = a*a%m;
-        b /= 2;
-    }
-    return res;
-}
+// 問題
+// 
 
 int main(){
     int n, m; cin >> n >> m;
-    vector<pair<int, int>> lr(m);
+    vector<int> x(m), y(m);
     rep(i, 0, m){
-         cin >> lr[i].first >> lr[i].second;
-         lr[i].first--, lr[i].second--;
+        cin >> x[i] >> y[i];
     }
-    sort(lr.begin(), lr.end());
-    vector<vector<int>> l
+    map<int, bool> dp;
+    map<int, vector<int>> porn;
     rep(i, 0, m){
-        int L, R; cin >> L >> R;
-        L--, R--;
-        l[R].push_back(L);
-        r[L].push_back(R);
+        porn[x[i]].push_back(y[i]);
     }
+    dp[n] = true;
+    for(auto [_, vec]: porn){
+        map<int, bool> dp_;
+        for(auto xx: vec){
+            if(0 < xx) dp_[xx] |= dp[xx-1];
+            if(xx < 2*n) dp_[xx] |= dp[xx+1];
+        }
+        for(auto xx: vec){
+            dp[xx] = dp_[xx];
+        }
+    }
+    int ans = 0;
+    for(auto [key, val]: dp){
+        if(val) ans++;
+    }
+    cout << ans << endl;
 
-
-    
     return 0;
 }
