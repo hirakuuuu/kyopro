@@ -2,18 +2,17 @@
 using namespace std;
 #define rep(i, a, n) for(int i = a; i < n; i++)
 #define rrep(i, a, n) for(int i = a; i >= n; i--)
+#define inr(l, x, r) (l <= x && x < r)
 #define ll long long
+#define ld long double
 #define pii pair<int, int>
 #define pll pair<ll, ll>
 constexpr ll MOD = 1000000007;
 constexpr int IINF = 1001001001;
-constexpr ll INF = 1LL<<60;
+constexpr ll INF = 9e18;
 
 template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
-
-// 問題
-// https://atcoder.jp/contests/abc135/tasks/abc135_d
 
 template <ll MOD> class modint {
     ll val;
@@ -109,31 +108,52 @@ public:
 using mint = modint<MOD>;
 template <ll MOD> vector<modint<MOD>> modint<MOD>::factorial_vec;
 
+const int vmax = 250005;
+mint fact[vmax],finv[vmax],invs[vmax];
+void initfact(){
+	fact[0]=1;
+	rep(i,1,vmax){
+		fact[i]=fact[i-1]*i;
+	}
+	finv[vmax-1]=mint::inv(fact[vmax-1]);
+	for(int i=vmax-2;i>=0;i--){
+		finv[i]=finv[i+1]*(i+1);
+	}
+	for(int i=vmax-1;i>=1;i--){
+		invs[i]=finv[i]*fact[i-1];
+	}
+}
+mint perm(int n, int k){
+	return n-k >= 0?fact[n]*finv[n-k]:0;
+}
+mint choose(int n,int k){
+	return n-k >= 0?fact[n]*finv[n-k]*finv[k]:0;
+}
+mint binom(int a,int b){
+	return 0<=a&&0<=b?fact[a+b]*finv[a]*finv[b]:0;
+}
+mint catalan(int n){
+	return binom(n,n)-(n-1>=0?binom(n-1,n+1):0);
+}
+
 int main(){
     string s; cin >> s;
-    int n = s.size();
-    reverse(s.begin(), s.end());
+    int n = (int)s.size();
     vector<vector<mint>> dp(n+1, vector<mint>(13));
     dp[0][0] = 1;
-    int base = 1;
-    rep(i, 1, n+1){
-        if(s[i-1] == '?'){
-            rep(j, 0, 10){
-                int tmp = (j*base)%13;
-                rep(k, 0, 13){
-                    dp[i][(k+tmp)%13] += dp[i-1][k];
-                }
+    rep(i, 0, n){
+        if(s[i] != '?'){
+            rep(j, 0, 13){
+                dp[i+1][(j*10+(s[i]-'0'))%13] += dp[i][j];
             }
         }else{
-            int j = s[i-1]-'0';
-            int tmp = (j*base)%13;
-            rep(k, 0, 13){
-                dp[i][(k+tmp)%13] += dp[i-1][k];
+            rep(j, 0, 13){
+                rep(k, 0, 10){
+                    dp[i+1][(j*10+k)%13] += dp[i][j];
+                }
             }
         }
-        base = (10*base)%13;
     }
-
     cout << dp[n][5] << endl;
     
     return 0;
