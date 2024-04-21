@@ -41,40 +41,30 @@ int main(){
         g[b].push_back(a);
     }
     // vector<vector<vector<mint>>> cnt(2, vector<vector<mint>>(n, vector<mint>(n+1)));
-    auto dfs = [&](auto self, int pos, int pre) -> pair<vector<mint>, vector<mint>> {
+    auto dfs = [&](auto self, int pos, int pre) -> vector<vector<mint>> {
         // cnt[0][pos][1] = 1;
         // cnt[1][pos][0] = 1;
-        vector<mint> res1(2), res2(1);
-        res1[1] = 1;
-        res2[0] = 1;
+        vector<vector<mint>> res(2, vector<mint>(2));
+        res[0][1] = 1;
+        res[1][0] = 1;
         for(auto nxt: g[pos]){
             if(nxt == pre) continue;
-            auto [cnt1, cnt2] = self(self, nxt, pos);
-
-            vector<mint> cnt3 = cnt2;
-            while(cnt3.size() < cnt1.size()-1) cnt3.push_back(0);
-            rep(i, 0, cnt1.size()-1){
-                cnt3[i] += cnt1[i+1];
+            vector<vector<mint>> ch = self(self, nxt, pos);
+            vector<vector<mint>> dp(2, vector<mint>(res[1].size()+ch[1].size()+1));
+            rep(i, 0, res[1].size()){
+                rep(j, 0, ch[1].size()){
+                    dp[0][i+j] += res[0][i]*ch[1][j];
+                    if(i+j > 0) dp[0][i+j-1] += res[0][i]*ch[0][j];
+                    dp[1][i+j] += res[1][i]*(ch[0][j]+ch[1][j]);
+                }
             }
-            vector<mint> sum = convolution(res1, cnt3);
-            while(res1.size() < sum.size()) res1.push_back(0);
-            rep(i, 0, sum.size()) res1[i] += sum[i];
-
-            vector<mint> cnt4 = cnt1;
-            while(cnt4.size() < cnt2.size()) cnt4.push_back(0);
-            rep(i, 0, cnt2.size()) cnt4[i] += cnt2[i];
-            sum = convolution(res2, cnt4);
-            while(res2.size() < sum.size()) res2.push_back(0);
-            rep(i, 0, sum.size()) res2[i] += sum[i];
+            swap(res, dp);
         }
-        res2[0]--;
-        return {res1, res2};
+        return res;
     };
-    auto [ans1, ans2] = dfs(dfs, 0, -1);
-    while(ans1.size() <= n) ans1.push_back(0);
-    while(ans2.size() <= n) ans2.push_back(0);
+    vector<vector<mint>> ans = dfs(dfs, 0, -1);
     rep(i, 1, n+1){
-        cout << (ans1[i]+ans2[i]).val() << endl;
+        cout << (ans[0][i]+ans[1][i]).val() << endl;
     }
 
     return 0;
