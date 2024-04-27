@@ -12,9 +12,6 @@ constexpr ll INF = 1LL<<60;
 template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
-// 問題
-// https://atcoder.jp/contests/abc205/tasks/abc205_e
-
 template <ll MOD> class modint {
     ll val;
     static vector<modint<MOD>> factorial_vec;
@@ -91,17 +88,12 @@ public:
 
     // 階乗
     static modint<MOD> factorial(ll n){
-        return factorial_vec[n];
-    }
-
-    // 階乗の初期化
-    static void init_factorial(ll n){
-        factorial_vec.resize(n+1);
-        factorial_vec[0] = factorial_vec[1] = 1;
-        for(int i = 2; i <= n; i++){
-            modint<MOD> ret(i);
-            factorial_vec[i] = factorial_vec[i-1]*ret;
-        }
+        modint<MOD> ret(1);
+        if(n == 0) return ret;
+        if((ll)factorial_vec.size() >= n) return factorial_vec[n-1];
+        ret = factorial(n-1)*n;
+        factorial_vec.push_back(ret);
+        return ret;
     }
 
     // コンビネーション
@@ -114,16 +106,50 @@ public:
 using mint = modint<MOD>;
 template <ll MOD> vector<modint<MOD>> modint<MOD>::factorial_vec;
 
+const int vmax = 2500005;
+mint fact[vmax],finv[vmax],invs[vmax];
+void initfact(){
+	fact[0]=1;
+	rep(i,1,vmax){
+		fact[i]=fact[i-1]*i;
+	}
+	finv[vmax-1]=mint::inv(fact[vmax-1]);
+	for(int i=vmax-2;i>=0;i--){
+		finv[i]=finv[i+1]*(i+1);
+	}
+	for(int i=vmax-1;i>=1;i--){
+		invs[i]=finv[i]*fact[i-1];
+	}
+}
+mint choose(int n,int k){
+	return n-k >= 0?fact[n]*finv[n-k]*finv[k]:0;
+}
+mint binom(int a,int b){
+	return 0<=a&&0<=b?fact[a+b]*finv[a]*finv[b]:0;
+}
+mint catalan(int n){
+	return binom(n,n)-(n-1>=0?binom(n-1,n+1):0);
+}
+
+/*
+n > m+k のとき、最後に必ずkを超えるので０
+黒を置くことをx軸方向に進む、白を置くことをｙ軸方向に進むと置き換えれば、格子状の経路に置き換えられる
+カタラン数の数え上げでやったこと
+直線 y=x+k+1 との共通点で折り返すと、(-k-1, k+1) -> (m, n) への経路に置き換えられる.
+途中経過の和をｋ以下に抑える→格子経路の総数
+*/
+
 int main(){
-    ll n, m, k; cin >> n >> m >> k;
-    mint::init_factorial(n+m);
-
-    mint ans = mint::combination(n+m, n);
-    if(n > m+k) ans = 0;
-    else if(n >= k+1) ans -= mint::combination(n+m, m+k+1);
-
-  
+    int n, m, k; cin >> n >> m >> k;
+    if(n > m+k){
+        cout << 0 << endl;
+        return 0;
+    }
+    initfact();
+    mint ans = choose(n+m, n);
+    ans -= choose(n+m, m+k+1);
     cout << ans << endl;
-    
-    return 0;
+
+
+
 }

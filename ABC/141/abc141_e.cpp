@@ -14,8 +14,7 @@ template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
 // 問題
-// https://atcoder.jp/contests/abc141/tasks/abc141_e
-
+// https://atcoder.jp/contests/abc140/tasks/abc140_e
 
 template< unsigned mod >
 struct RollingHash {
@@ -64,28 +63,32 @@ struct RollingHash {
   }
 };
 
-using RH = RollingHash< 1000000007 >;
 
 int main(){
     int n; cin >> n;
-    string S; cin >> S;
-    RollingHash<MOD> rh(S);
-    RollingHash<mod> rh2(S);
-    int ok = 0, ng = n+1;
+    string s; cin >> s;
+    RollingHash<MOD> rh(s);
+    RollingHash<mod> rh2(s);
+    int ok = 0, ng = n;
     while(ng-ok > 1){
-        int mid = (ng+ok)/2;
-        set<pair<unsigned, unsigned>> s;
+        int mid = (ok+ng)/2;
         bool f = false;
-        rep(i, mid, n){
-            s.insert({rh.get(i-mid, i), rh2.get(i-mid, i)});
-            if(i+mid <= n && s.count({rh.get(i, i+mid), rh2.get(i, i+mid)})) f = true;
+        set<pair<unsigned, unsigned>> hash;
+        rep(i, 0, n){
+            if(i+mid > n) break;
+            unsigned h1 = rh.get(i, i+mid);
+            unsigned h2 = rh2.get(i, i+mid);
+            if(hash.find({h1, h2}) != hash.end()){
+                f = true;
+            }
+            if(i+1 >= mid){
+                hash.insert({rh.get(i+1-mid, i+1), rh2.get(i+1-mid, i+1)});
+            }
         }
-
         if(f) ok = mid;
         else ng = mid;
     }
     cout << ok << endl;
 
-    
     return 0;
 }

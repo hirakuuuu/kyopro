@@ -2,18 +2,18 @@
 using namespace std;
 #define rep(i, a, n) for(int i = a; i < n; i++)
 #define rrep(i, a, n) for(int i = a; i >= n; i--)
+#define inr(l, x, r) (l <= x && x < r)
 #define ll long long
+#define ld long double
 #define pii pair<int, int>
 #define pll pair<ll, ll>
+// constexpr ll MOD = 1000000007;
 constexpr ll MOD = 998244353;
 constexpr int IINF = 1001001001;
-constexpr ll INF = 1LL<<60;
+constexpr ll INF = 9e18;
 
 template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
-
-// 問題
-// https://atcoder.jp/contests/abc313/tasks/abc313_e
 
 template <ll MOD> class modint {
     ll val;
@@ -134,21 +134,28 @@ mint catalan(int n){
 	return binom(n,n)-(n-1>=0?binom(n-1,n+1):0);
 }
 
+/*
+「一列にならんだ何かを処理する系」で区間の幅を増やしてあげる遷移ができる→区間DP
+区間の長さが同じところをまとめてあげられる→O(n^2+k^2) まで落ちる
+*/
+
 int main(){
-    int n; cin >> n;
-    string s; cin >> s;
-    rep(i, 0, n-1){
-        if(s[i]-'1' && s[i+1]-'1'){
-            cout << -1 << endl;
-            return 0;
+    /*小課題5*/
+    ll n, k; cin >> n >> k;
+    assert(n <= 10000 && k <= 10000);
+    vector<vector<mint>> dp(k+2, vector<mint>(n+1));
+    rep(i, 0, k+2) dp[i][0] += 1;
+    rep(r, 1, n+1){
+        rrep(x, k/r, 0){
+            dp[x][r] += dp[x+1][r];
+            rep(i, 0, r){
+                dp[x][r] += dp[x][i]*dp[x+1][r-i-1];
+            }
         }
     }
-    mint ans = 0;
-    reverse(s.begin(), s.end());
-    // 自分を消す1回とそれまでに自分の前にいる1を増やした分だけ消す
-    // これを全部足す
-    rep(i, 0, n-1){
-        ans += (ans+1)*(s[i]-'1')+1;
-    }
-    cout << ans << endl;
+    cout << dp[0][n] << endl;
+
+
+
+    return 0;
 }

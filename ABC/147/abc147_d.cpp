@@ -16,20 +16,25 @@ constexpr ll INF = 9e18;
 template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
-
 int main(){
     int n; cin >> n;
-    vector<ll> c(n);
-    rep(i, 0, n) cin >> c[i];
-    sort(c.begin(), c.end());
-    mint ans = 0, two = mint(2).pow(n-1); 
-    rep(i, 0, n){
-        mint cnt = mint(2).pow(2*i+(n-i));
-        if(n-i-2 >= 0) cnt *= mint(2).pow(n-i-1)+mint(n-i-1)*mint(2).pow(n-i-2);
-        else cnt *= mint(2).pow(n-i-1);
-        cout << c[i] << ' ' << cnt.val() << endl;
-        ans += c[i]*cnt;
+    vector<ll> a(n);
+    rep(i, 0, n) cin >> a[i];
+    mint ans = 0;
+    rep(i, 0, 60){
+        vector<int> b(n);
+        rep(j, 0, n){
+            if((a[j]>>i)&1) b[j] = 1;
+        }
+        vector<mint> cnt(2);
+        mint sum = 0;
+        rep(j, 0, n){
+            sum += cnt[1-b[j]];
+            cnt[b[j]]++;
+        }
+        ans += sum*(1LL<<i);
     }
-    cout << ans.val() << endl;    
+    cout << ans.val() << endl;
+    
     return 0;
 }

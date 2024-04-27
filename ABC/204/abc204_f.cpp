@@ -2,18 +2,19 @@
 using namespace std;
 #define rep(i, a, n) for(int i = a; i < n; i++)
 #define rrep(i, a, n) for(int i = a; i >= n; i--)
+#define inr(l, x, r) (l <= x && x < r)
 #define ll long long
+#define ld long double
 #define pii pair<int, int>
 #define pll pair<ll, ll>
+// constexpr ll MOD = 1000000007;
 constexpr ll MOD = 998244353;
 constexpr int IINF = 1001001001;
-constexpr ll INF = 1LL<<60;
+constexpr ll INF = 9e18;
 
 template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
-// 問題
-// https://atcoder.jp/contests/abc313/tasks/abc313_e
 
 template <ll MOD> class modint {
     ll val;
@@ -134,21 +135,90 @@ mint catalan(int n){
 	return binom(n,n)-(n-1>=0?binom(n-1,n+1):0);
 }
 
+ll power(ll a, ll b, ll m=MOD){
+    ll res = 1;
+    while(b > 0){
+        if(b%2 == 1) res = res*a%m;
+        a = a*a%m;
+        b /= 2;
+    }
+    return res;
+}
+
 int main(){
-    int n; cin >> n;
-    string s; cin >> s;
-    rep(i, 0, n-1){
-        if(s[i]-'1' && s[i+1]-'1'){
-            cout << -1 << endl;
-            return 0;
+    ll h, w; cin >> h >> w;
+    vector<mint> init(1<<h);
+    rep(i, 0, 1<<h){
+        bool ok = true;
+        bool nxt = false;
+        rep(j, 0, h){
+            if(nxt){
+                if((i>>j)&1) nxt = false;
+                else ok = false;
+            }else{
+                if((i>>j)&1) nxt = true;
+            }
+        }
+        if(nxt) ok = false;
+        if(ok){
+            init[i] = 1;
         }
     }
+    vector<vector<mint>> dp(1<<h, vector<mint>(1<<h));
+    rep(i, 0, 1<<h){
+        rep(j, 0, 1<<h){
+            rep(k, 0, 1<<h){
+                bool ok = true;
+                rep(l, 0, h){
+                    if((k>>l)&1){
+                        if((i>>l)&1 || (j>>l)&1) ok = false;
+                    }
+                }
+                if(ok){
+                    int j2 = j;
+                    rep(l, 0, h){
+                        if((k>>l)&1) j2 += 1<<l;
+                    }
+                    dp[i][j2] += init[j];
+                }
+            }
+        }
+    }
+    auto matmal = [&](vector<vector<mint>> A, vector<vector<mint>> B){
+        vector<vector<mint>> C(A.size(), vector<mint>(B[0].size()));
+        rep(i, 0, A.size()){
+            rep(j, 0, B.size()){
+                rep(l, 0, B[0].size()){
+                    C[i][l] += A[i][j]*B[j][l];
+                }
+            }
+        }
+        return C;
+    };
+    auto matpow = [&](vector<vector<mint>> A, ll N){
+        vector<vector<mint>> C(A.size(), vector<mint>(A[0].size()));
+        rep(i, 0, A.size()){
+            C[i][i] = 1;
+        }
+
+        ll tmp = N;
+        while(tmp){
+            if(tmp&1) C = matmal(C, A);
+            A = matmal(A, A);
+            tmp >>= 1;
+        }
+
+        return C;
+    };
+    dp = matpow(dp, w-1);
     mint ans = 0;
-    reverse(s.begin(), s.end());
-    // 自分を消す1回とそれまでに自分の前にいる1を増やした分だけ消す
-    // これを全部足す
-    rep(i, 0, n-1){
-        ans += (ans+1)*(s[i]-'1')+1;
+    rep(i, 0, 1<<h){
+        rep(j, 0, 1<<h){
+            ans += dp[i][j]*init[i];
+        }
     }
     cout << ans << endl;
+
+
+    return 0;
 }

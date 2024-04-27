@@ -1,19 +1,20 @@
 #include <bits/stdc++.h>
+// #include <atcoder/all>
 using namespace std;
+// using namespace atcoder;
 #define rep(i, a, n) for(int i = a; i < n; i++)
 #define rrep(i, a, n) for(int i = a; i >= n; i--)
+#define inr(l, x, r) (l <= x && x < r)
 #define ll long long
-#define pii pair<int, int>
-#define pll pair<ll, ll>
+#define ld long double
+
+// using mint = modint1000000007;
 constexpr ll MOD = 998244353;
 constexpr int IINF = 1001001001;
-constexpr ll INF = 1LL<<60;
+constexpr ll INF = 9e18;
 
 template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
-
-// 問題
-// https://atcoder.jp/contests/abc313/tasks/abc313_e
 
 template <ll MOD> class modint {
     ll val;
@@ -135,20 +136,68 @@ mint catalan(int n){
 }
 
 int main(){
-    int n; cin >> n;
-    string s; cin >> s;
-    rep(i, 0, n-1){
-        if(s[i]-'1' && s[i+1]-'1'){
-            cout << -1 << endl;
-            return 0;
-        }
+    int n, m; cin >> n >> m;
+    vector<int> a(m), b(m), c(m);
+    vector<int> p(n, IINF);
+    vector<int> lim(n, IINF);
+    vector<vector<pair<int, int>>> g(n);
+    vector<vector<int>> mi(n);
+    rep(i, 0, m){
+        cin >> a[i] >> b[i] >> c[i];
+        a[i]--, b[i]--, c[i]--;
+        chmin(lim[a[i]], c[i]);
+        chmin(lim[b[i]], c[i]);
+        g[c[i]].push_back({a[i], b[i]});
     }
-    mint ans = 0;
-    reverse(s.begin(), s.end());
-    // 自分を消す1回とそれまでに自分の前にいる1を増やした分だけ消す
-    // これを全部足す
-    rep(i, 0, n-1){
-        ans += (ans+1)*(s[i]-'1')+1;
+    rep(i, 0, n){
+        if(lim[i] == IINF) continue;
+        mi[lim[i]].push_back(i);
+    }
+
+    set<int> kouho;
+    rep(i, 0, n){
+        if(lim[i] == IINF) kouho.insert(i);
+    }
+    mint ans = 1;
+    rrep(i, n-1, 0){
+        if(g[i].size() >= 2){
+            int v = -1;
+            rep(_, 0, 2){
+                if(g[i][0].first == g[i][1].first || g[i][0].first == g[i][1].second){
+                    v = g[i][0].first;
+                }
+                swap(g[i][0].first, g[i][0].second);
+            }
+            rep(j, 0, g[i].size()){
+                if(v != g[i][j].first && v != g[i][j].second){
+                    cout << 0 << endl;
+                    return 0;
+                }
+            }
+            p[v] = i;
+        }else if(g[i].size() == 1){
+            auto [u, v] = g[i][0];
+            if(lim[u] < i && lim[v] < i){
+                cout << 0 << endl;
+                return 0;
+            }
+            if(i == lim[u] && i == lim[v]) ans *= 2;
+            if(i == lim[u]) p[u] = i;
+            else p[v] = i;
+        }else{
+            if(kouho.empty()){
+                cout << 0 << endl;
+                return 0;
+            }
+            ans *= kouho.size();
+            kouho.erase(kouho.begin());
+        }
+        for(auto mm: mi[i]){
+            if(p[mm] == IINF) kouho.insert(mm);
+        }
+        // cout << ans << endl;
     }
     cout << ans << endl;
+
+    return 0;
 }
