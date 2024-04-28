@@ -18,40 +18,37 @@ template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
 int main(){
     int n; cin >> n;
-    vector<vector<vector<int>>> belong(101, vector<vector<int>>(101, vector<int>(101)));
-    rep(id, 1, n+1){
-        int x1, y1, z1; cin >> x1 >> y1 >> z1;
-        int x2, y2, z2; cin >> x2 >> y2 >> z2;
-
+    vector<vector<vector<int>>> dp(100, vector<vector<int>>(100, vector<int>(100, -1)));
+    rep(ind, 0, n){
+        int x1, y1, z1, x2, y2, z2;
+        cin >> x1 >> y1 >> z1 >> x2 >> y2 >> z2;
         rep(i, x1, x2){
             rep(j, y1, y2){
                 rep(k, z1, z2){
-                    belong[i][j][k] = id;
+                    dp[i][j][k] = ind;
                 }
             }
         }
     }
-
-    vector<set<int>> ans(n+1);
-    rep(i, 0, 101){
-        rep(j, 0, 101){
-            rep(k, 0, 101){
-                if(belong[i][j][k] == 0) continue;
-                int id = belong[i][j][k];
-
-                if(i-1 >= 0 && belong[i-1][j][k] && belong[i-1][j][k] != id) ans[id].insert(belong[i-1][j][k]);
-                if(j-1 >= 0 && belong[i][j-1][k] && belong[i][j-1][k] != id) ans[id].insert(belong[i][j-1][k]);
-                if(k-1 >= 0 && belong[i][j][k-1] && belong[i][j][k-1] != id) ans[id].insert(belong[i][j][k-1]);
-                if(i+1 <= 100 && belong[i+1][j][k] && belong[i+1][j][k] != id) ans[id].insert(belong[i+1][j][k]);
-                if(j+1 <= 100 && belong[i][j+1][k] && belong[i][j+1][k] != id) ans[id].insert(belong[i][j+1][k]);
-                if(k+1 <= 100 && belong[i][j][k+1] && belong[i][j][k+1] != id) ans[id].insert(belong[i][j][k+1]);
+    vector<set<int>> ans(n);
+    rep(i, 0, n){
+        ans[i].insert(-1);
+        ans[i].insert(i);
+    }
+    rep(i, 0, 100){
+        rep(j, 0, 100){
+            rep(k, 0, 100){
+                if(i+1 < 100 && dp[i+1][j][k] != -1) ans[dp[i+1][j][k]].insert(dp[i][j][k]);
+                if(0 <= i-1 && dp[i-1][j][k] != -1) ans[dp[i-1][j][k]].insert(dp[i][j][k]);
+                if(j+1 < 100 && dp[i][j+1][k] != -1) ans[dp[i][j+1][k]].insert(dp[i][j][k]);
+                if(0 <= j-1 && dp[i][j-1][k] != -1) ans[dp[i][j-1][k]].insert(dp[i][j][k]);
+                if(k+1 < 100 && dp[i][j][k+1] != -1) ans[dp[i][j][k+1]].insert(dp[i][j][k]);
+                if(0 <= k-1 && dp[i][j][k-1] != -1) ans[dp[i][j][k-1]].insert(dp[i][j][k]);
             }
         }
     }
-
-    rep(i, 1, n+1){
-        cout << ans[i].size() << endl;
+    rep(i, 0, n){
+        cout << ans[i].size()-2 << endl;
     }
-    
     return 0;
 }

@@ -17,6 +17,26 @@ template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
 int main(){
+    ll n, k; cin >> n >> k;
+    vector<ll> a(n);
+    rep(i, 0, n){
+        cin >> a[i];
+        a[i]--;
+    }
+    map<ll, ll> cnt;
+    vector<ll> acc(n+1);
+    cnt[0] = 1;
+    ll ans = 0;
+    rep(i, 0, n){
+        if(i >= k-1){
+            cnt[acc[i-k+1]]--;
+        }
+        acc[i+1] += a[i]+acc[i];
+        acc[i+1] %= k;
+        ans += cnt[acc[i+1]];
+        cnt[acc[i+1]]++;
+    }
+    cout << ans << endl;
     
     return 0;
 }

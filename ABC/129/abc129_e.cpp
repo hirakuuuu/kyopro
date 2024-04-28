@@ -2,18 +2,28 @@
 using namespace std;
 #define rep(i, a, n) for(int i = a; i < n; i++)
 #define rrep(i, a, n) for(int i = a; i >= n; i--)
+#define inr(l, x, r) (l <= x && x < r)
 #define ll long long
+#define ld long double
 #define pii pair<int, int>
 #define pll pair<ll, ll>
-constexpr ll MOD = 998244353;
+constexpr ll MOD = 1000000007;
+// constexpr ll MOD = 998244353;
 constexpr int IINF = 1001001001;
-constexpr ll INF = 1LL<<60;
+constexpr ll INF = 9e18;
 
 template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
-// 問題
-// https://atcoder.jp/contests/abc313/tasks/abc313_e
+ll power(ll a, ll b, ll m=MOD){
+    ll res = 1;
+    while(b > 0){
+        if(b%2 == 1) res = res*a%m;
+        a = a*a%m;
+        b /= 2;
+    }
+    return res;
+}
 
 template <ll MOD> class modint {
     ll val;
@@ -134,21 +144,30 @@ mint catalan(int n){
 	return binom(n,n)-(n-1>=0?binom(n-1,n+1):0);
 }
 
+
+/*
+a+b = a^b+a&b
+*/
+
 int main(){
-    int n; cin >> n;
-    string s; cin >> s;
-    rep(i, 0, n-1){
-        if(s[i]-'1' && s[i+1]-'1'){
-            cout << -1 << endl;
-            return 0;
+    string l; cin >> l;
+    vector<mint> eq(l.size()+1);
+    vector<mint> dp(l.size()+1);
+    eq[0] = 1;
+    rep(i, 0, l.size()){
+        if(l[i] == '0'){
+            // eq は 0 0 しかありえない
+            eq[i+1] = eq[i];
+            // dp は 0 1, 1 0 もあり
+            dp[i+1] = dp[i]*3;
+        }else{
+            // eq は 1 0, 0 1 しかありえない
+            eq[i+1] = eq[i]*2;
+            // dp は eq[i]+(0, 0) からやってくる
+            dp[i+1] = eq[i]+dp[i]*3;
         }
+        // cout << eq[i+1] << ' ' << dp[i+1] << endl;
     }
-    mint ans = 0;
-    reverse(s.begin(), s.end());
-    // 自分を消す1回とそれまでに自分の前にいる1を増やした分だけ消す
-    // これを全部足す
-    rep(i, 0, n-1){
-        ans += (ans+1)*(s[i]-'1')+1;
-    }
-    cout << ans << endl;
+    cout << eq[l.size()]+dp[l.size()] << endl;
+    return 0;
 }
