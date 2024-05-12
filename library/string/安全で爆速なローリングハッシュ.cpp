@@ -1,6 +1,5 @@
 #include <bits/stdc++.h>
 using namespace std;
-#define ll long long
 
 /*
 
@@ -13,15 +12,17 @@ MOD２つは嫌なので、10^18 程度のMODの方を実装する
 2^61-1 の原始根を用いることで、衝突しにくくする
 */
 
+// Reference: https://qiita.com/keymoon/items/11fac5627672a6d6a9f6
 #define ull unsigned long long 
 // ハッシュの計算用
 constexpr ull MASK30 = (1LL<<30)-1;
 constexpr ull MASK31 = (1LL<<31)-1;
 constexpr ull MOD = (1LL<<61)-1;
 constexpr ull MASK61 = MOD;
+constexpr ull POSITIVIZER = MOD * ((1<<3)-1);
 
 // mod 2^61-1 を計算する関数
-ull calcMod(ll x){
+ull calcMod(ull x){
     ull xu = x>>61;
     ull xd = x&MASK61;
     ull res = xu+xd;
@@ -61,7 +62,6 @@ ull randomized_base(ull r=37, ull max_s=127){
 }
 
 
-// 本体
 template<typename Str>
 class RollingHash {
     int n; // 文字列のサイズ
@@ -94,7 +94,7 @@ public:
         if(r == -1) r = n;
         assert(l <= r);
         if(l == r) return 0LL;
-        return calcMod(hash[r] + MOD - calcMod(mul(hash[l], powmemo[r-l])));
+        return calcMod(hash[r] + POSITIVIZER - mul(hash[l], powmemo[r-l]));
     }
 
     // hash a+b を求める（b の文字列としてのサイズが必要）
@@ -114,7 +114,6 @@ public:
         return low;
     }
 };
-
 
 
 int main(){
