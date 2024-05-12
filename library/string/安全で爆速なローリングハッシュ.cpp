@@ -1,21 +1,17 @@
 #include <bits/stdc++.h>
-#include <atcoder/all>
 using namespace std;
-using namespace atcoder;
-#define rep(i, a, n) for(int i = a; i < n; i++)
-#define rrep(i, a, n) for(int i = a; i >= n; i--)
-#define inr(l, x, r) (l <= x && x < r)
 #define ll long long
-#define ld long double
 
-// using mint = modint1000000007;
-// using mint = modint998244353;
-constexpr int IINF = 1001001001;
-constexpr ll INF = 9e18;
+/*
 
-template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
-template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
+衝突を避けるために10^9 程度のMODを２つ使うか、 10^18程度のMODを使いたい
+MOD２つは嫌なので、10^18 程度のMODの方を実装する
+そのまま実装すると、積をとったときにオーバーフローしてしまう
+なので、MOD = 2^61-1 とすることで、安全かつ高速にハッシュ値を求められるようにする
 
+基底はハックされないように、乱数で生成する
+2^61-1 の原始根を用いることで、衝突しにくくする
+*/
 
 #define ull unsigned long long 
 // ハッシュの計算用
@@ -23,7 +19,6 @@ constexpr ull MASK30 = (1LL<<30)-1;
 constexpr ull MASK31 = (1LL<<31)-1;
 constexpr ull MOD = (1LL<<61)-1;
 constexpr ull MASK61 = MOD;
-constexpr ull POSITIVIZER = MOD * 3;
 
 // mod 2^61-1 を計算する関数
 ull calcMod(ll x){
@@ -99,7 +94,7 @@ public:
         if(r == -1) r = n;
         assert(l <= r);
         if(l == r) return 0LL;
-        return calcMod(hash[r] + POSITIVIZER - mul(hash[l], powmemo[r-l]));
+        return calcMod(hash[r] + MOD - calcMod(mul(hash[l], powmemo[r-l])));
     }
 
     // hash a+b を求める（b の文字列としてのサイズが必要）
@@ -123,24 +118,5 @@ public:
 
 
 int main(){
-  int n; cin >> n;
-  string s; cin >> s;
-  RollingHash<string> rh(s);
-  int ok = 0, ng = n;
-  while(ng-ok > 1){
-    int mid = (ok+ng)/2;
-    bool f = false;
-    set<ull> t;
-    rep(i, mid, n){
-      t.insert(rh.get(i-mid, i));
-      if(i+mid <= n && t.count(rh.get(i, i+mid))) f = true;
-    }
-    if(f) ok = mid;
-    else ng = mid;
-  } 
-  cout << ok << endl;
-  
-
-
-    return 0;
+    
 }

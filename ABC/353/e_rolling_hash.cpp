@@ -23,7 +23,6 @@ constexpr ull MASK30 = (1LL<<30)-1;
 constexpr ull MASK31 = (1LL<<31)-1;
 constexpr ull MOD = (1LL<<61)-1;
 constexpr ull MASK61 = MOD;
-constexpr ull POSITIVIZER = MOD * 3;
 
 // mod 2^61-1 を計算する関数
 ull calcMod(ll x){
@@ -99,7 +98,7 @@ public:
         if(r == -1) r = n;
         assert(l <= r);
         if(l == r) return 0LL;
-        return calcMod(hash[r] + POSITIVIZER - mul(hash[l], powmemo[r-l]));
+        return calcMod(hash[r] + MOD - calcMod(mul(hash[l], powmemo[r-l])));
     }
 
     // hash a+b を求める（b の文字列としてのサイズが必要）
@@ -120,27 +119,19 @@ public:
     }
 };
 
-
-
 int main(){
-  int n; cin >> n;
-  string s; cin >> s;
-  RollingHash<string> rh(s);
-  int ok = 0, ng = n;
-  while(ng-ok > 1){
-    int mid = (ok+ng)/2;
-    bool f = false;
-    set<ull> t;
-    rep(i, mid, n){
-      t.insert(rh.get(i-mid, i));
-      if(i+mid <= n && t.count(rh.get(i, i+mid))) f = true;
+    int n; cin >> n;
+    unordered_map<ull, ll> cnt;
+    ll ans = 0;
+    ull b = randomized_base(); // 基数を固定する
+    rep(i, 0, n){
+        string s; cin >> s;
+        RollingHash<string> rh(s, b);
+        rep(j, 0, s.size()){
+            ans += cnt[rh.get(0, j+1)];
+            cnt[rh.get(0, j+1)]++;
+        }
     }
-    if(f) ok = mid;
-    else ng = mid;
-  } 
-  cout << ok << endl;
-  
-
-
+    cout << ans << endl;
     return 0;
 }

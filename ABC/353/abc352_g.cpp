@@ -1,6 +1,20 @@
 #include <bits/stdc++.h>
+// #include <atcoder/all>
 using namespace std;
+// using namespace atcoder;
+#define rep(i, a, n) for(int i = a; i < n; i++)
+#define rrep(i, a, n) for(int i = a; i >= n; i--)
+#define inr(l, x, r) (l <= x && x < r)
 #define ll long long
+#define ld long double
+
+// using mint = modint1000000007;
+// using mint = modint998244353;
+constexpr int IINF = 1001001001;
+constexpr ll INF = 9e18;
+
+template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
+template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
 template <class T, T (*op)(T, T), T (*e)()> 
 class SegmentTree {
@@ -121,8 +135,24 @@ S e() {
     return -9e18;
 }
 
-
 int main(){
-
+    ll n, c; cin >> n >> c;
+    ll m; cin >> m;
+    vector<ll> init(n);
+    SegmentTree<ll, op, e> plus(n), minus(n);
+    plus.set(0, 0);
+    minus.set(0, 0);
+    ll ans = 0;
+    while(m--){
+        int t;
+        ll p; cin >> t >> p;
+        ll mx_l = plus.prod(0, t)-c*(t-1);
+        ll mx_r = minus.prod(t, n)+c*(t-1);
+        chmax(ans, max(mx_l, mx_r)+p);
+        plus.set(t-1, max(plus.get(t-1), max(mx_l, mx_r)+p+c*(t-1)));
+        minus.set(t-1, max(minus.get(t-1), max(mx_l, mx_r)+p-c*(t-1)));
+    }
+    cout << ans << endl;
+    
     return 0;
 }

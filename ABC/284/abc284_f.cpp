@@ -1,69 +1,145 @@
 #include <bits/stdc++.h>
+// #include <atcoder/all>
 using namespace std;
+// using namespace atcoder;
 #define rep(i, a, n) for(int i = a; i < n; i++)
+#define rrep(i, a, n) for(int i = a; i >= n; i--)
+#define inr(l, x, r) (l <= x && x < r)
 #define ll long long
-#define pii pair<int, int>
-#define pll pair<ll, ll>
-const int MOD = 1000000007;
-const int mod = 998244353;
+#define ld long double
+
+// using mint = modint1000000007;
+// using mint = modint998244353;
+constexpr int IINF = 1001001001;
+constexpr ll INF = 9e18;
 
 template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
-// 問題
-// https://atcoder.jp/contests/abc284/tasks/abc284_f
+#define ull unsigned long long 
+// ハッシュの計算用
+constexpr ull MASK30 = (1LL<<30)-1;
+constexpr ull MASK31 = (1LL<<31)-1;
+constexpr ull MOD = (1LL<<61)-1;
+constexpr ull MASK61 = MOD;
 
-const ll b = 26;
-vector<ll> b_n(1000005);
-void init_b(){
-    b_n[0] = 1;
-    rep(i, 1, 1000005){
-        b_n[i] = b_n[i-1]*b;
-        b_n[i] %= MOD;
-    }
+// mod 2^61-1 を計算する関数
+ull calcMod(ll x){
+    ull xu = x>>61;
+    ull xd = x&MASK61;
+    ull res = xu+xd;
+    if(res >= MOD) res -= MOD;
+    return res;
 }
 
+// a*b mod 2^61-1 を返す関数
+ull mul(ull a, ull b){
+    ull au = a>>31, ad = a&MASK31;
+    ull bu = b>>31, bd = b&MASK31;
+    ull mid = ad*bu+au*bd;
+    ull midu = mid>>30;
+    ull midd = mid&MASK30;
+    return au*bu*2+midu+(midd<<31)+ad*bd; // ハッシュの計算の時に mod をとった方が早くなる、
+}
+
+// a^b mod 2^61-1 を計算
+ull modpow(ull a, ull b){
+    ull res = 1;
+    while(b > 0){
+        if(b&1) res = calcMod(mul(res, a));
+        a = calcMod(mul(a, a));
+        b >>= 1;
+    }
+    return res;
+}
+
+// 基数を乱数を使って定める（ハック対策）
+// Reference: https://trap.jp/post/1036/
+ull randomized_base(ull r=37, ull max_s=127){
+    ull k = rand()+max_s+1;
+    while(gcd(MOD-1, k) != 1 || modpow(r, k) <= max_s){
+        k = rand()+max_s+1;
+    }
+    return modpow(r, k);
+}
+
+
+// 本体
+template<typename Str>
+class RollingHash {
+    int n; // 文字列のサイズ
+    ull base; // 基数 
+    vector<ull> hash, powmemo; // ハッシュテーブルと基数の累乗のメモ
+
+
+    // ハッシュテーブル構築
+    void build(const Str &s){
+        n = (int)s.size();
+        hash.resize(n+1);
+        powmemo.resize(n+1);
+        powmemo[0] = 1;
+        hash[0] = 0;
+        for(int i = 0; i < n; i++){
+            hash[i+1] = calcMod(mul(hash[i], base)+s[i]);
+            powmemo[i+1] = calcMod(mul(powmemo[i], base));
+        }
+    }
+
+public:
+    RollingHash(const Str &s, ull _base=0){
+        if(_base != 0) base = _base;
+        else base = randomized_base();
+        build(s);
+    }
+    
+    // 開区間 [l, r) の hash 値を求める
+    ull get(int l, int r = -1){
+        if(r == -1) r = n;
+        assert(l <= r);
+        if(l == r) return 0LL;
+        return calcMod(hash[r] + MOD - calcMod(mul(hash[l], powmemo[r-l])));
+    }
+
+    // hash a+b を求める（b の文字列としてのサイズが必要）
+    ull unite(ull a, ull b, int bsize){
+        return calcMod(mul(a, powmemo[bsize])+b);
+    }
+
+    // 開区間 [l1, r1) と ハッシュテーブル b の開区間 [l2, r2) における最長共通接頭辞
+    int LCP(const RollingHash &b, int l1, int r1, int l2, int r2) {
+        int len = min(r1 - l1, r2 - l2);
+        int low = -1, high = len + 1;
+        while(high - low > 1) {
+            int mid = (low + high) / 2;
+            if(get(l1, l1 + mid) == b.get(l2, l2 + mid)) low = mid;
+            else high = mid;
+        }
+        return low;
+    }
+};
+
+
+
 int main(){
+
     int n; cin >> n;
-    string s; cin >> s;
-    init_b();
-    vector<int> t(2*n);
-    rep(i, 0, 2*n) t[i] = s[i]-'a';
-
-    vector<ll> s_hash(n+1);
-    rep(i, 0, n){
-        s_hash[n] *= b;
-        s_hash[n] += t[2*n-i-1];
-        s_hash[n] %= MOD;
-    }
-
-    rep(i, 0, n){
-        ll s_hash_l = (s_hash[n-i]-(t[2*n-i-1]*b_n[n-1])%MOD+MOD)%MOD;
-        s_hash[n-1-i] = (s_hash_l*b+t[n-i-1])%MOD;
-    }
-
-    vector<ll> l_hash(n+1), r_hash(n+1);
-    rep(i, 0, n){
-        l_hash[n-i-1] = l_hash[n-i]+t[i]*b_n[n-i-1];
-        l_hash[n-i-1] %= MOD;
-
-        r_hash[i+1] = r_hash[i]+t[2*n-i-1]*b_n[i];
-        r_hash[i+1] %= MOD;
-    }
-
+    ull b = randomized_base();
+    string t; cin >> t;
+    string rt = t;
+    reverse(rt.begin(), rt.end());
+    RollingHash<string> rh1(t, b);
+    RollingHash<string> rh2(rt, b);
     rep(i, 0, n+1){
-        cout << s_hash[n-i] << ' ' << l_hash[i] << ' ' << r_hash[i] << endl;
-        if(s_hash[n-i] == (l_hash[i]+r_hash[i])%MOD){
-            string ans = s.substr(n-i, n);
-            reverse(ans.begin(), ans.end());
-            cout << ans << endl;
-            cout << n-i << endl;
+        ull hl = rh1.get(0, i), hr = rh1.get(i+n, 2*n);
+        ull h1 = rh1.unite(hl, hr, n-i);
+        ull h2 = rh2.get(n-i, 2*n-i);
+        if(h1 == h2){
+            cout << t.substr(0, i) << t.substr(i+n, 2*n-i) << endl;
+            cout << i << endl;
             return 0;
         }
     }
     cout << -1 << endl;
-
-    
     
     return 0;
 }
