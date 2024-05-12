@@ -116,6 +116,20 @@ public:
 };
 
 
+// verify: https://atcoder.jp/contests/abc353/tasks/abc353_e
 int main(){
-    
+    int n; cin >> n;
+    unordered_map<ull, ull> cnt;
+    ull ans = 0;
+    ull b = randomized_base(); // 基数を固定する
+    for(int i = 0; i < n; i++){
+        string s; cin >> s;
+        RollingHash<string> rh(s, b);
+        for(int j = 0; j < (int)s.size(); j++){
+            ans += cnt[rh.get(0, j+1)];
+            cnt[rh.get(0, j+1)]++;
+        }
+    }
+    cout << ans << endl;
+    return 0;
 }
