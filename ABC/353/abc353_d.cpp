@@ -16,27 +16,36 @@ constexpr ll INF = 9e18;
 template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
-/*
-a[i]*b[i]の最大値が最小になる割り当て→a を昇順、bを降順
-最大値の最小値→二分探索
-*/
-
 int main(){
-    ll n, k; cin >> n >> k;
-    vector<ll> a(n), f(n);
+    int n; cin >> n;
+    vector<ll> a(n);
     rep(i, 0, n) cin >> a[i];
-    rep(i, 0, n) cin >> f[i];
-    sort(a.begin(), a.end());
-    sort(f.rbegin(), f.rend());
-    ll ok = 9e18, ng = -1;
-    while(ok-ng > 1){
-        ll mid = (ok+ng)/2, cnt = 0;
-        rep(i, 0, n){
-            cnt += max(0LL, (a[i]*f[i]-mid+f[i]-1)/f[i]);
-        }
-        if(cnt <= k) ok = mid;
-        else ng = mid;
+    vector<mint> b(n);
+    rep(i, 0, n) b[i] = a[i];
+    mint ans = 0;
+    rep(i, 0, n){
+        ans += b[i]*i;
     }
-    cout << ok << endl;
+    vector<int> c(n), cnt(11);
+    vector<mint> ten(11);
+    ten[1] = 10;
+    rep(i, 2, 11) ten[i] = ten[i-1]*10;
+    rep(i, 0, n){
+        ll a_ = a[i];
+        int o = 0;
+        while(a_){
+            o++;
+            a_ /= 10;
+        }
+        c[i] = o;
+        cnt[o]++;
+    }
+    rep(i, 0, n){
+        cnt[c[i]]--;
+        rep(j, 1, 11){
+            ans += ten[j]*b[i]*cnt[j];
+        }
+    }
+    cout << ans.val() << endl;
     return 0;
 }

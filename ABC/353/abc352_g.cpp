@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
-#include <atcoder/all>
+// #include <atcoder/all>
 using namespace std;
-using namespace atcoder;
+// using namespace atcoder;
 #define rep(i, a, n) for(int i = a; i < n; i++)
 #define rrep(i, a, n) for(int i = a; i >= n; i--)
 #define inr(l, x, r) (l <= x && x < r)
@@ -9,7 +9,7 @@ using namespace atcoder;
 #define ld long double
 
 // using mint = modint1000000007;
-using mint = modint998244353;
+// using mint = modint998244353;
 constexpr int IINF = 1001001001;
 constexpr ll INF = 9e18;
 
@@ -132,47 +132,27 @@ S op(S a, S b) {
     return max(a, b);
 }
 S e() {
-    return LLONG_MIN;
+    return -9e18;
 }
-
-// 座標圧縮
-void comp(vector<int>&a){
-  set<int>s(a.begin(),a.end());
-  map<int,int>d;
-  int cnt=0;
-  for(auto x:s)d[x]=cnt++;
-  for(auto&x:a)x=d[x];
-}
-
-/*
-indexの間違いがなければ通っていたので、気を付けましょう
-*/
 
 int main(){
-    int n; cin >> n;
-    vector<int> l(n), r(n);
-    vector<int> sr(n), id_r(n);
-    rep(i, 0, n){
-        cin >> l[i] >> r[i];
-        sr[i] = r[i];
-        id_r[i] = r[i];
-    }
-    sort(sr.begin(), sr.end());
-    sr.erase(unique(sr.begin(), sr.end()), sr.end());
-    comp(id_r);
+    ll n, c; cin >> n >> c;
+    ll m; cin >> m;
     vector<ll> init(n);
-    SegmentTree<S, op, e> st(n), st_r(n);
-    vector<ll> dp(n);
+    SegmentTree<ll, op, e> plus(n), minus(n);
+    plus.set(0, 0);
+    minus.set(0, 0);
     ll ans = 0;
-    rep(i, 0, n){
-        int pos = lower_bound(sr.begin(), sr.end(), l[i])-sr.begin();
-        dp[i] = max({(ll)r[i]-l[i]+1LL, st.prod(0, pos)+(r[i]-l[i]+1), st_r.prod(pos, id_r[i])+r[i]});
-        st.set(id_r[i], dp[i]);
-        st_r.set(id_r[i], dp[i]-r[i]);
-        chmax(ans, dp[i]);
+    while(m--){
+        int t;
+        ll p; cin >> t >> p;
+        ll mx_l = plus.prod(0, t)-c*(t-1);
+        ll mx_r = minus.prod(t, n)+c*(t-1);
+        chmax(ans, max(mx_l, mx_r)+p);
+        plus.set(t-1, max(plus.get(t-1), max(mx_l, mx_r)+p+c*(t-1)));
+        minus.set(t-1, max(minus.get(t-1), max(mx_l, mx_r)+p-c*(t-1)));
     }
     cout << ans << endl;
-
-
+    
     return 0;
 }

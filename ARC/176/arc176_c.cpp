@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
-// #include <atcoder/all>
+#include <atcoder/all>
 using namespace std;
-// using namespace atcoder;
+using namespace atcoder;
 #define rep(i, a, n) for(int i = a; i < n; i++)
 #define rrep(i, a, n) for(int i = a; i >= n; i--)
 #define inr(l, x, r) (l <= x && x < r)
@@ -9,156 +9,28 @@ using namespace std;
 #define ld long double
 
 // using mint = modint1000000007;
-constexpr ll MOD = 998244353;
+using mint = modint998244353;
 constexpr int IINF = 1001001001;
 constexpr ll INF = 9e18;
 
 template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
-template <ll MOD> class modint {
-    ll val;
-    static vector<modint<MOD>> factorial_vec;
-public:
-    // コンストラクタ
-    modint(ll x = 0){
-        val = x % MOD;
-        if(val < 0) x += MOD;
-    }
-
-    // 入出力ストリーム
-    friend constexpr istream &operator>>(istream &is, modint<MOD> &x){
-        ll y; is >> y;
-        x = y;
-        return is;
-    }
-    friend constexpr ostream &operator<<(ostream &os, const modint<MOD> &x){
-        return os << x.val;
-    }
-
-    // 算術演算子
-    modint<MOD> operator -(){return modint<MOD>(-val);}
-    modint<MOD> operator +(const modint<MOD> &r) const { return modint<MOD>(*this) += r; }
-    modint<MOD> operator -(const modint<MOD> &r) const { return modint<MOD>(*this) -= r; }
-    modint<MOD> operator *(const modint<MOD> &r) const { return modint<MOD>(*this) *= r; }
-    modint<MOD> operator /(const modint<MOD> &r) const { return modint<MOD>(*this) /= r; }
-
-    // 代入演算子
-    modint<MOD> &operator +=(const modint<MOD> &r){
-        val += r.val;
-        if(val >= MOD) val -= MOD;
-        return *this;
-    }
-    modint<MOD> &operator -=(const modint<MOD> &r){
-        if(val < r.val) val += MOD;
-        val -= r.val;
-        return *this;
-    }
-    modint<MOD> &operator *=(const modint<MOD> &r){
-        val = val*r.val%MOD;
-        if(val < 0) val += MOD;
-        return *this;
-    }
-    modint<MOD> &operator /=(const modint<MOD> &r){
-        *this *= inv(r);
-        return *this;
-    }
-
-    //等価比較演算子
-    bool operator ==(const modint<MOD>& r){return this -> val == r.val;}
-    bool operator !=(const modint<MOD>& r){return this -> val != r.val;}
-    bool operator <(const modint<MOD>& r){return this -> val < r.val;}
-    bool operator <=(const modint<MOD>& r){return this -> val <= r.val;}
-    bool operator >(const modint<MOD>& r){return this -> val > r.val;}
-    bool operator >=(const modint<MOD>& r){return this -> val >= r.val;}
-
-    // 累乗
-    static modint<MOD> modpow(modint<MOD> num, ll exp){
-        if(!exp) return modint<MOD>(1); // 0乗
-        modint<MOD> ret(1);
-        modint<MOD> tmp = num;
-        while(exp){
-            if(exp&1) ret *= tmp;
-            tmp *= tmp;
-            exp >>= 1;
-        }
-        return ret;
-    }
-
-    // 逆元
-    static modint<MOD> inv(modint<MOD> num){
-        return modpow(num, MOD-2);
-    }
-
-    // 階乗
-    static modint<MOD> factorial(ll n){
-        modint<MOD> ret(1);
-        if(n == 0) return ret;
-        if((ll)factorial_vec.size() >= n) return factorial_vec[n-1];
-        ret = factorial(n-1)*n;
-        factorial_vec.push_back(ret);
-        return ret;
-    }
-
-    // コンビネーション
-    static modint<MOD> combination(ll n, ll r){
-        return factorial(n) / factorial(r) / factorial(n-r);
-    }
-
-};
-
-using mint = modint<MOD>;
-template <ll MOD> vector<modint<MOD>> modint<MOD>::factorial_vec;
-
-const int vmax = 250005;
-mint fact[vmax],finv[vmax],invs[vmax];
-void initfact(){
-	fact[0]=1;
-	rep(i,1,vmax){
-		fact[i]=fact[i-1]*i;
-	}
-	finv[vmax-1]=mint::inv(fact[vmax-1]);
-	for(int i=vmax-2;i>=0;i--){
-		finv[i]=finv[i+1]*(i+1);
-	}
-	for(int i=vmax-1;i>=1;i--){
-		invs[i]=finv[i]*fact[i-1];
-	}
-}
-mint choose(int n,int k){
-	return n-k >= 0?fact[n]*finv[n-k]*finv[k]:0;
-}
-mint binom(int a,int b){
-	return 0<=a&&0<=b?fact[a+b]*finv[a]*finv[b]:0;
-}
-mint catalan(int n){
-	return binom(n,n)-(n-1>=0?binom(n-1,n+1):0);
-}
-
 int main(){
     int n, m; cin >> n >> m;
     vector<int> a(m), b(m), c(m);
-    vector<int> p(n, IINF);
-    vector<int> lim(n, IINF);
-    vector<vector<pair<int, int>>> g(n);
-    vector<vector<int>> mi(n);
+    vector<int> p(n, -1);
+    vector<int> mx(n, IINF);
     rep(i, 0, m){
         cin >> a[i] >> b[i] >> c[i];
         a[i]--, b[i]--, c[i]--;
-        chmin(lim[a[i]], c[i]);
-        chmin(lim[b[i]], c[i]);
+        chmin(mx[a[i]], c[i]);
+        chmin(mx[b[i]], c[i]);
+    }
+    vector<vector<pair<int, int>>> g(n);
+    rep(i, 0, m){
         g[c[i]].push_back({a[i], b[i]});
     }
-    rep(i, 0, n){
-        if(lim[i] == IINF) continue;
-        mi[lim[i]].push_back(i);
-    }
-
-    set<int> kouho;
-    rep(i, 0, n){
-        if(lim[i] == IINF) kouho.insert(i);
-    }
-    mint ans = 1;
     rrep(i, n-1, 0){
         if(g[i].size() >= 2){
             int v = -1;
@@ -168,36 +40,59 @@ int main(){
                 }
                 swap(g[i][0].first, g[i][0].second);
             }
-            rep(j, 0, g[i].size()){
-                if(v != g[i][j].first && v != g[i][j].second){
+            if(v == -1){
+                cout << 0 << endl;
+                return 0;
+            }
+            rep(j, 2, g[i].size()){
+                if(g[i][j].first != v && g[i][j].second != v){
                     cout << 0 << endl;
                     return 0;
                 }
             }
             p[v] = i;
         }else if(g[i].size() == 1){
-            auto [u, v] = g[i][0];
-            if(lim[u] < i && lim[v] < i){
+            if(p[g[i][0].first] != -1 && p[g[i][0].second] != -1){
                 cout << 0 << endl;
                 return 0;
             }
-            if(i == lim[u] && i == lim[v]) ans *= 2;
-            if(i == lim[u]) p[u] = i;
-            else p[v] = i;
-        }else{
-            if(kouho.empty()){
-                cout << 0 << endl;
-                return 0;
-            }
-            ans *= kouho.size();
-            kouho.erase(kouho.begin());
-        }
-        for(auto mm: mi[i]){
-            if(p[mm] == IINF) kouho.insert(mm);
-        }
-        // cout << ans << endl;
-    }
-    cout << ans << endl;
+            
 
+        }else{
+
+        }
+    }
+    rep(i, 0, m){
+        if(p[a[i]] != -1 && p[b[i]] != -1 && max(p[a[i]], p[b[i]]) != c[i]){
+            cout << 0 << endl;
+            return 0;
+        }
+        if(mx[a[i]] < c[i] && mx[b[i]] < c[i]){
+            cout << 0 << endl;
+            return 0;
+        }else if(mx[a[i]] < c[i] && mx[b[i]] == c[i]){
+            p[b[i]] = c[i]; 
+        }else if(mx[b[i]] < c[i] && mx[a[i]] == c[i]){
+            p[a[i]] = c[i];
+        }
+    }
+    // 重複していたらアウト
+    vector<int> cnt(n);
+    rep(i, 0, n){
+        if(p[i] >= 0) cnt[p[i]]++;
+    }
+    rep(i, 0, n){
+        if(cnt[i] >= 2){
+            cout << 0 << endl;
+            return 0;
+        }
+    }
+
+
+    rep(i, 0, n){
+        cout << p[i] << ' ';
+    }
+    cout << endl;
+    
     return 0;
 }

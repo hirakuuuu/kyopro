@@ -1,20 +1,16 @@
 #include <bits/stdc++.h>
-// #include <atcoder/all>
 using namespace std;
-// using namespace atcoder;
-#define rep(i, a, n) for(int i = a; i < n; i++)
-#define rrep(i, a, n) for(int i = a; i >= n; i--)
-#define inr(l, x, r) (l <= x && x < r)
-#define ll long long
-#define ld long double
 
-// using mint = modint1000000007;
-// using mint = modint998244353;
-constexpr int IINF = 1001001001;
-constexpr ll INF = 9e18;
+/*
 
-template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
-template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
+衝突を避けるために10^9 程度のMODを２つ使うか、 10^18程度のMODを使いたい
+MOD２つは嫌なので、10^18 程度のMODの方を実装する
+そのまま実装すると、積をとったときにオーバーフローしてしまう
+なので、MOD = 2^61-1 とすることで、安全かつ高速にハッシュ値を求められるようにする
+
+基底はハックされないように、乱数で生成する
+2^61-1 の原始根を用いることで、衝突しにくくする
+*/
 
 // Reference: https://qiita.com/keymoon/items/11fac5627672a6d6a9f6
 #define ull unsigned long long 
@@ -120,27 +116,20 @@ public:
 };
 
 
-
+// verify: https://atcoder.jp/contests/abc353/tasks/abc353_e
 int main(){
-
     int n; cin >> n;
-    ull b = randomized_base();
-    string t; cin >> t;
-    string rt = t;
-    reverse(rt.begin(), rt.end());
-    RollingHash<string> rh1(t, b);
-    RollingHash<string> rh2(rt, b);
-    rep(i, 0, n+1){
-        ull hl = rh1.get(0, i), hr = rh1.get(i+n, 2*n);
-        ull h1 = rh1.unite(hl, hr, n-i);
-        ull h2 = rh2.get(n-i, 2*n-i);
-        if(h1 == h2){
-            cout << t.substr(0, i) << t.substr(i+n, 2*n-i) << endl;
-            cout << i << endl;
-            return 0;
+    unordered_map<ull, ull> cnt;
+    ull ans = 0;
+    ull b = randomized_base(); // 基数を固定する
+    for(int i = 0; i < n; i++){
+        string s; cin >> s;
+        RollingHash<string> rh(s, b);
+        for(int j = 0; j < (int)s.size(); j++){
+            ans += cnt[rh.get(0, j+1)];
+            cnt[rh.get(0, j+1)]++;
         }
     }
-    cout << -1 << endl;
-    
+    cout << ans << endl;
     return 0;
 }
