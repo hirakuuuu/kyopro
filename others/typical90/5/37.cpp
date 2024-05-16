@@ -1,14 +1,25 @@
 #include <bits/stdc++.h>
+// #include <atcoder/all>
 using namespace std;
+// using namespace atcoder;
 #define rep(i, a, n) for(int i = a; i < n; i++)
+#define rrep(i, a, n) for(int i = a; i >= n; i--)
+#define inr(l, x, r) (l <= x && x < r)
 #define ll long long
-#define pii pair<int, int>
-#define pll pair<ll, ll>
-const int MOD = 1000000007;
-const int mod = 998244353;
+#define ld long double
 
-// 問題
-// https://atcoder.jp/contests/typical90/tasks/typical90_ac
+// using mint = modint1000000007;
+// using mint = modint998244353;
+constexpr int IINF = 1001001001;
+constexpr ll INF = 9e18;
+
+template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
+template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
+
+/*
+DPをセグ木で高速化
+配るDPで考えると遅延セグ木になるが、もらうDPで考えるとセグ木でいける
+*/
 
 template <class T, T (*op)(T, T), T (*e)(), class F, T (*mapping)(F, T), F (*composition)(F, F), F (*id)()> 
 class LazySegmentTree {
@@ -190,26 +201,38 @@ public:
 };
 
 // 遅延セグメント木の準備
-ll op(ll a, ll b) { return max(a, b); }
-ll e() { return 0; }
+using S =  ll;
+S op(S a, S b) { return max(a, b); }
+S e() { return -9e18; }
 // 一次関数 a x + b によって恒等写像と代入を表現
-ll mapping(pair<ll, ll> a, ll x) { return a.first * x + a.second; }
-pair<ll, ll> composition(pair<ll, ll> a, pair<ll, ll> b) { return {a.first * b.first, a.first * b.second + a.second}; }
-pair<ll, ll> id() { return {1, 0}; }
+using F = ll;
+S mapping(F a, S x) { return max(a, x); }
+// a(b(x)) という包含関係
+F composition(F a, F b) { return max(a, b); }
+F id() { return -9e18; }
 
 
 
 int main(){
     int w, n; cin >> w >> n;
-    vector<ll> a(w+1);
-    LazySegmentTree<ll, op, e, pair<ll, ll>, mapping, composition, id> lst(a);
-
+    vector<int> l(n), r(n);
+    vector<ll> v(n);
+    rep(i, 0, n) cin >> l[i] >> r[i] >> v[i];
+    LazySegmentTree<ll, op, e, ll, mapping, composition, id> lst(w+1);
+    lst.set(0, 0);
     rep(i, 0, n){
-        ll l, r; cin >> l >> r;
-        ll h = lst.prod(l, r+1);
-        lst.apply(l, r+1, {0, h+1});
-        cout << h+1 << endl;
+        vector<ll> tmp(w+1);
+        rep(j, 0, w+1) tmp[j] = lst.get(j);
+        rep(j, 0, w){
+            int L = min(w+1, j+l[i]), R = min(w+1, j+r[i]+1);
+            lst.apply(L, R, tmp[j]+v[i]);
+        }
     }
+    ll ans = lst.get(w);
+    if(ans < 0) cout << -1 << endl;
+    else cout << ans << endl;
     
+
+
     return 0;
 }

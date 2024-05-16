@@ -1,19 +1,23 @@
 #include <bits/stdc++.h>
+// #include <atcoder/all>
 using namespace std;
+// using namespace atcoder;
+
 #define rep(i, a, n) for(int i = a; i < n; i++)
 #define rrep(i, a, n) for(int i = a; i >= n; i--)
+#define inr(l, x, r) (l <= x && x < r)
 #define ll long long
-#define pii pair<int, int>
-#define pll pair<ll, ll>
+#define ld long double
+
+// using mint = modint1000000007;
+// using mint = modint998244353;
 constexpr ll MOD = 1000000007;
 constexpr int IINF = 1001001001;
-constexpr ll INF = 1LL<<60;
+constexpr ll INF = 9e18;
 
 template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
-// 問題
-// https://atcoder.jp/contests/arc108/tasks/arc108_d
 
 template <ll MOD> class modint {
     ll val;
@@ -133,37 +137,50 @@ mint binom(int a,int b){
 mint catalan(int n){
 	return binom(n,n)-(n-1>=0?binom(n-1,n+1):0);
 }
+mint homogeneous(int n, int k){
+    return choose(n+k-1, k);
+}
 
 int main(){
+    initfact();
     int n; cin >> n;
-    vector<int> c(4);
-    rep(i, 0, 4){
-        char ab; cin >> ab;
-        if(ab == 'A') c[i] = 0;
-        else c[i] = 1;
-    }
-
-    vector<vector<mint>> dp(4, vector<mint>(n+1));
-    // rep(i, 0, 4) dp[i][2] = 1;
-    rep(j, 0, 4){
-        int l = (j&2)+c[j], r = c[j]*2+(j&1);
-        dp[l][2] = dp[r][2] = 1;
-    }
-    rep(i, 3, n+1){
-        rep(j, 0, 4){
-            int l = (j&2)+c[j], r = c[j]*2+(j&1);
-            rep(k, 2, i){
-                dp[j][i] += dp[l][k]*dp[r][i-k+1];
-            }
-            cout << l << ' ' << r << ' ';
-            cout << dp[j][i] << ' ';
+    vector<vector<char>> c(2, vector<char>(2));
+    rep(i, 0, 2){
+        rep(j, 0, 2){
+            cin >> c[i][j];
         }
-        cout << endl;
     }
-
-    cout << dp[1][n] << endl;
-
-
+    if(n <= 3){
+        cout << 1 << endl;
+        return 0;
+    }
+    mint ans = 0;
+    if(c[0][1] == 'A'){
+        if(c[0][0] == 'A'){
+            ans = 1;
+        }else{
+            if(c[1][0] == 'A'){
+                rep(i, 1, n/2+1){
+                    ans += homogeneous(i, n-2*i);
+                }
+            }else{
+                ans = mint::modpow(2, n-3);
+            }
+        }
+    }else{
+        if(c[1][1] == 'B'){
+            ans = 1;
+        }else{
+            if(c[1][0] == 'B'){
+                rep(i, 1, n/2+1){
+                    ans += homogeneous(i, n-2*i);
+                }
+            }else{
+                ans = mint::modpow(2, n-3);
+            }
+        }
+    }
+    cout << ans << endl;
 
     return 0;
 }

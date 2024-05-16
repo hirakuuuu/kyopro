@@ -118,7 +118,7 @@ S op(S a, S b) {
     return max(a, b);
 }
 S e() {
-    return LLONG_MIN;
+    return -9e18;
 }
 
 

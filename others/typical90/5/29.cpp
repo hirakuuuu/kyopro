@@ -1,6 +1,24 @@
 #include <bits/stdc++.h>
+// #include <atcoder/all>
 using namespace std;
+// using namespace atcoder;
+#define rep(i, a, n) for(int i = a; i < n; i++)
+#define rrep(i, a, n) for(int i = a; i >= n; i--)
+#define inr(l, x, r) (l <= x && x < r)
 #define ll long long
+#define ld long double
+
+// using mint = modint1000000007;
+// using mint = modint998244353;
+constexpr int IINF = 1001001001;
+constexpr ll INF = 9e18;
+
+template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
+template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
+
+/*
+遅延セグ木 単位元が0ならそれ使った方がよくね
+*/
 
 template <class T, T (*op)(T, T), T (*e)(), class F, T (*mapping)(F, T), F (*composition)(F, F), F (*id)()> 
 class LazySegmentTree {
@@ -184,17 +202,22 @@ public:
 // 遅延セグメント木の準備
 using S =  ll;
 S op(S a, S b) { return max(a, b); }
-S e() { return -9e18; }
+S e() { return 0LL; }
 // 一次関数 a x + b によって恒等写像と代入を表現
 using F = ll;
 S mapping(F a, S x) { return max(a, x); }
 // a(b(x)) という包含関係
 F composition(F a, F b) { return max(a, b); }
-F id() { return -9e18; }
-
-
+F id() { return 0LL; }
 int main(){
-
-
+    int w, n; cin >> w >> n;
+    LazySegmentTree<ll, op, e, ll, mapping, composition, id> st(w+1);
+    rep(i, 0, n){
+        int l, r; cin >> l >> r;
+        l--;
+        int h = st.prod(l, r);
+        cout << h+1 << endl;
+        st.apply(l, r, h+1);
+    }
     return 0;
 }
