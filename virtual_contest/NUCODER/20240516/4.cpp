@@ -16,65 +16,6 @@ constexpr ll INF = 9e18;
 template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
-/*
-*/
-
-class UnionFind {
-    vector<ll> parent, maxi, mini;
-    inline ll root(ll n){
-        return (parent[n] < 0? n:parent[n] = root(parent[n]));
-    }
-public:
-    UnionFind(ll n_ = 1): parent(n_, -1), maxi(n_), mini(n_){
-        iota(maxi.begin(), maxi.end(), 0);
-        iota(mini.begin(), mini.end(), 0);
-    }
-
-    inline bool same(ll x, ll y){
-        return root(x) == root(y);
-    }
-
-    inline void unite(ll x, ll y){
-        ll rx = root(x);
-        ll ry = root(y);
-        if(rx == ry) return;
-        if(parent[rx] > parent[ry]) swap(rx, ry);
-        parent[rx] += parent[ry];
-        parent[ry] = rx;
-        maxi[x] = std::max(maxi[x],maxi[y]);
-        mini[x] = std::min(mini[x],mini[y]);
-    }
-
-    inline ll min(ll x){
-        return mini[root(x)];
-    }
-
-    inline ll max(int x){
-        return mini[root(x)];
-    }
-
-    inline ll size(ll x){
-        return (-parent[root(x)]);
-    }
-
-    inline ll operator[](ll x){
-        return root(x);
-    }
-
-    inline void print(){
-        rep(i, 0, (ll)parent.size()) cout << root(i) << " ";
-        cout << endl;
-    }
-
-    void clear(){
-        rep(i, 0, (ll)parent.size()){
-            parent[i] = -1;
-        }
-        iota(maxi.begin(), maxi.end(), 0);
-        iota(mini.begin(), mini.end(), 0);
-    }
-};
-
 template <class T, T (*op)(T, T), T (*e)()> 
 class SegmentTree {
     int _n, size, log;
@@ -193,54 +134,36 @@ public:
     }
 };
 
-using S = ll;
+using S = int;
 S op(S a, S b) {
     return a+b;
 }
 
 S e() {
-    return 0LL;
+    return 0;
 }
 
+
 int main(){
-    int n; cin >> n;
-    int q; cin >> q;
-    SegmentTree<ll, op, e> st_e(n+1), st_o(n+1);
-    UnionFind uf(n);
+    int n, q; cin >> n >> q;
+    string s; cin >> s;
+    SegmentTree<int, op, e> st(n);
+    rep(i, 0, n-1){
+        if(s[i] != s[i+1]) st.set(i, 0);
+        else st.set(i, 1);
+    }
     while(q--){
-        int t, x, y;
-        ll v; cin >> t >> x >> y >> v;
-        x--, y--;
-        if(t == 0){
-            uf.unite(x, y);
-            if(x%2){
-                st_e.set(x, v);
-                st_o.set(x, -v);
-            }else{
-                st_e.set(x, -v);
-                st_o.set(x, v);
-            }
+        int t, l, r; cin >> t >> l >> r;
+        l--, r--;
+        if(t == 1){
+            if(l > 0) st.set(l-1, 1-st.get(l-1));
+            if(r < n-1) st.set(r, 1-st.get(r));
         }else{
-            if(uf.same(x, y)){
-                if(x < y){
-                    ll ans = 0;
-                    if(y%2 == 0) ans = st_e.prod(x, y);
-                    else ans = st_o.prod(x, y);
-                    if((y-x)%2) ans -= v;
-                    else ans += v;
-                    cout << ans << endl;
-                }else{
-                    ll ans = 0;
-                    if(y%2) ans = st_e.prod(y, x);
-                    else ans = st_o.prod(y, x);
-                    if((y-x)%2) ans -= v;
-                    else ans += v;
-                    cout << ans << endl;
-                }
-            }else{
-                cout << "Ambiguous" << endl;
-            }
+            if(st.prod(l, r) == 0) cout << "Yes" << endl;
+            else cout << "No" << endl;
         }
     }
+
+
     return 0;
 }
