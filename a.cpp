@@ -2,15 +2,15 @@
 using namespace std;
 
 int main(){
-    int n, k; cin >> n >> k;
-    for(int i = 0; i < n; i++){
-        int a; cin >> a;
-        int di = a/k, mo = a%k;
-        if(mo == 0){
-            cout << di << ' ';
-        }
+    int tmp = 10;
+    long double total = 0.0;
+    while(tmp--){
+        string _; cin >> _;
+        long double t; cin >> t;
+        cin >> _;
+        total += t;
     }
-    cout << endl;
-
+    total /= 10.0;
+    cout << setprecision(13) << total << endl;
     return 0;
 }
