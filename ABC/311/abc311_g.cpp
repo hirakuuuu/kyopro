@@ -1,6 +1,20 @@
 #include <bits/stdc++.h>
+// #include <atcoder/all>
 using namespace std;
+// using namespace atcoder;
+#define rep(i, a, n) for(int i = a; i < n; i++)
+#define rrep(i, a, n) for(int i = a; i >= n; i--)
+#define inr(l, x, r) (l <= x && x < r)
 #define ll long long
+#define ld long double
+
+// using mint = modint1000000007;
+// using mint = modint998244353;
+constexpr int IINF = 1001001001;
+constexpr ll INF = 9e18;
+
+template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
+template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
 template <class T, T (*op)(T, T), T (*e)()> 
 class SegmentTree {
@@ -31,10 +45,6 @@ public:
         p += size;
         d[p] = x;
         for(int i = 1; i <= log; i++) update(p >> i);
-    }
-
-    void apply(int p, T x){
-        set(p, op(x, d[p+size]));
     }
 
     T get(int p) const {
@@ -119,14 +129,66 @@ public:
 
 using S = ll;
 S op(S a, S b) {
-    return max(a, b);
+    return min(a, b);
 }
+
 S e() {
-    return -9e18;
+    return 9e18;
+}
+
+ll target;
+bool f(S x){
+    return x >= target;
 }
 
 
 int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<ll>> A(n, vector<ll>(m));
+    rep(i, 0, n){
+        rep(j, 0, m){
+            cin >> A[i][j];
+        }
+    }
+    vector<vector<ll>> acc(n+1, vector<ll>(m+1));
+    rep(i, 0, n){
+        rep(j, 0, m){
+            acc[i+1][j+1] = acc[i][j+1]+acc[i+1][j]-acc[i][j]+A[i][j];
+        }
+    }
+    auto sum = [&](int lx, int ly, int rx, int ry) -> ll {
+        return acc[rx][ry]-acc[rx][ly]-acc[lx][ry]+acc[lx][ly];
+    };
 
+    ll ans = 0;
+    vector<SegmentTree<ll, op, e>> st(m, SegmentTree<ll, op, e>(n));
+    rrep(mi, 301, 1){
+        vector<vector<ll>> a(n, vector<ll>(m));
+        vector<vector<int>> r(n);
+        rep(i, 0, n){
+            rep(j, 0, m){
+                if(A[i][j] >= mi) a[i][j] = A[i][j];
+                else r[i].push_back(j);
+            }
+            r[i].push_back(m);
+        }
+        rep(i, 0, n){
+            rep(j, 0, m){
+                ll w = *lower_bound(r[i].begin(), r[i].end(), j)-j;
+                st[j].set(i, w);
+            }
+        }
+        rep(i, 0, n){
+            rep(j, 0, m){
+                if(a[i][j] == 0) continue;
+                target = st[j].get(i);
+                int lx = st[j].min_left<f>(i+1);
+                int rx = st[j].max_right<f>(i+1);
+                // cout << target << ' ' <<  lx << ' ' << rx << ' ' << j << ' ' << j+target << ' ' << sum(lx, j, rx, j+target) << endl; 
+                chmax(ans, sum(lx, j, rx, j+target)*mi);
+            }
+        }
+    }
+    cout << ans << endl;
     return 0;
 }
