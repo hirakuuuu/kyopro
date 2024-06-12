@@ -1,6 +1,20 @@
 #include <bits/stdc++.h>
+// #include <atcoder/all>
 using namespace std;
+// using namespace atcoder;
+#define rep(i, a, n) for(int i = a; i < n; i++)
+#define rrep(i, a, n) for(int i = a; i >= n; i--)
+#define inr(l, x, r) (l <= x && x < r)
 #define ll long long
+#define ld long double
+
+// using mint = modint1000000007;
+// using mint = modint998244353;
+constexpr int IINF = 1001001001;
+constexpr ll INF = 9e18;
+
+template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
+template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
 template <class T, T (*op)(T, T), T (*e)()> 
 class SegmentTree {
@@ -32,7 +46,7 @@ public:
         d[p] = x;
         for(int i = 1; i <= log; i++) update(p >> i);
     }
-
+    
     void apply(int p, T x){
         set(p, op(x, d[p+size]));
     }
@@ -117,16 +131,68 @@ public:
     }
 };
 
-using S = ll;
+using S = pair<ll, int>;
 S op(S a, S b) {
-    return max(a, b);
+    return min(a, b);
 }
+
 S e() {
-    return -9e18;
+    return {1e18, -1};
 }
 
 
 int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<pair<int, ll>>> g(n);
+    rep(i, 0, m){
+        int u, v;
+        ll w; cin >> u >> v >> w;
+        u--, v--;
+        g[u].push_back({v, w});
+        g[v].push_back({u, w});
+    }
+    
+    vector<pair<ll, int>> init(n);
+    rep(i, 0, n) init[i] = {1e18, i};
+    SegmentTree<pair<ll, int>, op, e> st(init);
+    int k; cin >> k;
+    vector<int> ans(n, -1);
+    rep(i, 0, k){
+        int a; cin >> a;
+        a--;
+        ans[a] = 0;
+        st.set(a, {1e18, i});
+        for(auto [v, w]: g[a]){
+            if(ans[v] != -1) continue;
+            st.apply(v, {w, v});
+        }
+    }
+    int d; cin >> d;
+    rep(i, 0, d){
+        ll x; cin >> x;
+        set<int> ids;
+        while(true){
+            auto [dist, u] = st.all_prod();
+            if(dist > x) break;
+            st.set(u, {1e18, u});
+            ans[u] = i+1;
+            ids.insert(u);
+            for(auto [v, w]: g[u]){
+                if(ans[v] != -1) continue;
+                st.apply(v, {dist+w, v});
+            }
+        }
+        for(auto u: ids){
+            for(auto [v, w]: g[u]){
+                if(ans[v] != -1) continue;
+                st.apply(v, {w, v});
+            }
+        }
+    }
 
+    rep(i, 0, n){
+        cout << ans[i] << '\n';
+    }
+    
     return 0;
 }

@@ -32,6 +32,10 @@ public:
         d[p] = x;
         for(int i = 1; i <= log; i++) update(p >> i);
     }
+    
+    void apply(int p, T x){
+        set(p, op(x, d[p+size]));
+    }
 
     T get(int p) const {
         assert(0 <= p && p < _n);
