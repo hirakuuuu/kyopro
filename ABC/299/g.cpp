@@ -1,6 +1,20 @@
 #include <bits/stdc++.h>
+// #include <atcoder/all>
 using namespace std;
+// using namespace atcoder;
+#define rep(i, a, n) for(int i = a; i < n; i++)
+#define rrep(i, a, n) for(int i = a; i >= n; i--)
+#define inr(l, x, r) (l <= x && x < r)
 #define ll long long
+#define ld long double
+
+// using mint = modint1000000007;
+// using mint = modint998244353;
+constexpr int IINF = 1001001001;
+constexpr ll INF = 9e18;
+
+template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
+template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
 template <class T, T (*op)(T, T), T (*e)()> 
 class SegmentTree {
@@ -113,16 +127,48 @@ public:
     }
 };
 
-using S = ll;
+using S = int;
 S op(S a, S b) {
     return min(a, b);
 }
 
 S e() {
-    return 9e18;
+    return IINF;
 }
 
 int main(){
+    int n, m; cin >> n >> m;
+    vector<int> a(n), r(m);
+    vector<vector<int>> pos(m);
+    SegmentTree<int, op, e> st(n);
+    rep(i, 0, n){
+        cin >> a[i];
+        a[i]--;
+        pos[a[i]].push_back(i);
+        st.set(i, a[i]);
+        r[a[i]] = i;
+    }
+    sort(r.begin(), r.end());
+    vector<int> p;
+    int l = 0, ind = 0;
+    rep(_, 0, m){
+        // cout << l << ' ' << r[ind]+1 << endl;
+        int tmp = st.prod(l, r[ind]+1);
+        p.push_back(tmp);
 
+        bool ok = false;
+        for(auto pp: pos[tmp]){
+            st.set(pp, e());
+            if(!ok && l <= pp){
+                ok = true;
+                l = pp;
+            }
+        }
+        while(ind < m && st.get(r[ind]) == e()) ind++;
+    }
+    for(auto pp: p){
+        cout << pp+1 << ' ';
+    }
+    cout << endl;
     return 0;
 }

@@ -1,6 +1,20 @@
 #include <bits/stdc++.h>
+// #include <atcoder/all>
 using namespace std;
+// using namespace atcoder;
+#define rep(i, a, n) for(int i = a; i < n; i++)
+#define rrep(i, a, n) for(int i = a; i >= n; i--)
+#define inr(l, x, r) (l <= x && x < r)
 #define ll long long
+#define ld long double
+
+// using mint = modint1000000007;
+// using mint = modint998244353;
+constexpr int IINF = 1001001001;
+constexpr ll INF = 9e18;
+
+template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
+template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
 template <class T, T (*op)(T, T), T (*e)()> 
 class SegmentTree {
@@ -115,14 +129,26 @@ public:
 
 using S = ll;
 S op(S a, S b) {
-    return min(a, b);
+    return a^b;
 }
-
 S e() {
-    return 9e18;
+    return 0LL;
 }
 
 int main(){
-
+    int n, q; cin >> n >> q;
+    vector<ll> a(n);
+    rep(i, 0, n) cin >> a[i];
+    SegmentTree<ll, op, e> st(a);
+    while(q--){
+        int t; cin >> t;
+        ll x, y; cin >> x >> y;
+        if(t == 1){
+            st.set(x-1, st.get(x-1)^y);
+        }else{
+            cout << st.prod(x-1, y) << endl;
+        }
+    }
+    
     return 0;
 }
