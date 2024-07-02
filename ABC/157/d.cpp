@@ -1,62 +1,81 @@
 #include <bits/stdc++.h>
+// #include <atcoder/all>
 using namespace std;
+// using namespace atcoder;
 #define rep(i, a, n) for(int i = a; i < n; i++)
+#define rrep(i, a, n) for(int i = a; i >= n; i--)
+#define inr(l, x, r) (l <= x && x < r)
 #define ll long long
-#define pii pair<int, int>
-#define pll pair<ll, ll>
-const int MOD = 1000000007;
-const int mod = 998244353;
+#define ld long double
 
-// 問題
-// https://atcoder.jp/contests/abc157/tasks/abc157_d
+// using mint = modint1000000007;
+// using mint = modint998244353;
+constexpr int IINF = 1001001001;
+constexpr ll INF = 9e18;
 
-vector<int> par(100005, -1);
+template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
+template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
-int root(int x){
-    if(par[x] < 0) return x;
-    else return par[x] = root(par[x]);
-}
+class UnionFind {
+    vector<ll> parent;
+    inline ll root(ll n){
+        return (parent[n] < 0? n:parent[n] = root(parent[n]));
+    }
+public:
+    UnionFind(ll n_ = 1): parent(n_, -1){}
 
-bool same(int x, int y){
-    return root(x) == root(y);
-}
+    inline bool same(ll x, ll y){
+        return root(x) == root(y);
+    }
 
-void unite(int x, int y){
-    if(same(x, y)) return;
-    x = root(x);
-    y = root(y);
-    if(par[x] > par[y]) swap(x, y);
-    par[x] += par[y];
-    par[y] = x;
-}
+    inline void unite(ll x, ll y){
+        ll rx = root(x);
+        ll ry = root(y);
+        if(rx == ry) return;
+        if(parent[rx] > parent[ry]) swap(rx, ry);
+        parent[rx] += parent[ry];
+        parent[ry] = rx;
+    }
 
-int size(int x){
-    x = root(x);
-    return -1*par[x];
-}
+    inline ll size(ll x){
+        return (-parent[root(x)]);
+    }
+
+    inline ll operator[](ll x){
+        return root(x);
+    }
+};
 
 int main(){
     int n, m, k; cin >> n >> m >> k;
-    vector<int> ans(n+1, -1);
+    UnionFind uf(n);
+    vector<int> a(m), b(m), c(k), d(k);
     rep(i, 0, m){
-        int a, b; cin >> a >> b;
-        unite(a, b);
-        ans[a]--;
-        ans[b]--;
-    }
-    rep(i, 1, n+1){
-        ans[i] += size(i);
+        cin >> a[i] >> b[i];
+        a[i]--, b[i]--;
+        uf.unite(a[i], b[i]);
     }
     rep(i, 0, k){
-        int c, d; cin >> c >> d;
-        if(same(c, d)){
-            ans[c]--;
-            ans[d]--;
+        cin >> c[i] >> d[i];
+        c[i]--, d[i]--;
+    }
+
+    vector<int> ans(n);
+    rep(i, 0, n) ans[i] = uf.size(i)-1;
+    rep(i, 0, m){
+        ans[a[i]]--;
+        ans[b[i]]--;
+    }
+    rep(i, 0, k){
+        if(uf.same(c[i], d[i])){
+            ans[c[i]]--;
+            ans[d[i]]--;
         }
     }
-    cout << ans[1];
-    rep(i, 2, n+1){
-        cout << ' ' << ans[i];
+    rep(i, 0, n){
+        cout << ans[i] << ' ';
     }
     cout << endl;
+
+    return 0;
 }
