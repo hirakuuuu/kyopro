@@ -29,16 +29,22 @@ int main(){
         }
         sort(mb[i].begin(), mb[i].end());
     }
-
-    vector<int> ans(29);
+    vector<int> cnt(29);
     rep(i, 0, n){
         rep(j, 0, 29){
             int tmp = a[i]%(1<<j+1);
-            ans[j] += lower_bound(mb[j].begin(), mb[j].end(), (1<<j)-tmp)
-
-
+            auto cnt1 = lower_bound(mb[j].begin(), mb[j].end(), 2*(1<<j)-tmp)-lower_bound(mb[j].begin(), mb[j].end(), (1<<j)-tmp);
+            auto cnt2 = lower_bound(mb[j].begin(), mb[j].end(), 4*(1<<j)-tmp)-lower_bound(mb[j].begin(), mb[j].end(), 3*(1<<j)-tmp);
+            cnt[j] += (cnt1+cnt2);
         }
     }
+    int ans = 0;
+    rep(i, 0, 29){
+        if(cnt[i]%2) ans += (1<<i);
+    }
+    cout << ans << endl;
+
+
     
     return 0;
 }

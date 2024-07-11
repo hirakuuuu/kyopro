@@ -16,21 +16,34 @@ constexpr ll INF = 9e18;
 template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
+/*
+求めるものは (L, x_1, x_2, ... , x_k, R) の数と言い換えられる
+L, LR がそれぞれ確定した状態を持つような DP をすることで解ける
+
+多項式的な考え方の方が分かりやすかった
+*/
+
 int main(){
     int n, s; cin >> n >> s;
-    int sum = 0;
     vector<int> a(n);
+    rep(i, 0, n) cin >> a[i];
+    vector<vector<vector<mint>>> dp(n+1, vector<vector<mint>>(s+1, vector<mint>(3)));
+    dp[0][0][0] = 1;
     rep(i, 0, n){
-        cin >> a[i];
-        sum += a[i];
+        rep(j, 0, s+1){
+            rep(k, 0, 3){
+                rep(l, k, 3){
+                    dp[i+1][j][l] += dp[i][j][k];
+                    if(j-a[i] >= 0 && l != 0 && k != 2) dp[i+1][j][l] += dp[i][j-a[i]][k];
+                }
+            }
+        }
     }
-    vector<mint> dp(sum+1);
-    dp[0] = 1;
-    int acc = 0;
-    mint ans = 0;
-    rep(i, 0, n){
-        acc += a[i];
-        dp[acc]++;
-    }
+
+    cout << dp[n][s][2].val() << endl;
+
+
+    
+    
     return 0;
 }

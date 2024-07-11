@@ -7,35 +7,32 @@ using namespace std;
 
 // ここから
 class RollbackUnionFind {
-    vector<ll> parent, maxi, mini;
+    vector<ll> parent;
     stack<pair<int, int>> history;
     int inner_snap;
 
-    inline ll find(ll n){
-        // 経路圧縮を行わない
-        return (parent[n] < 0? n:find(parent[n]));
-    }
+
 public:
-    RollbackUnionFind(ll n_ = 1): parent(n_, -1), maxi(n_), mini(n_), inner_snap(0){
-        iota(maxi.begin(), maxi.end(), 0);
-        iota(mini.begin(), mini.end(), 0);
+    RollbackUnionFind(ll n_ = 1): inner_snap(0){ parent.assign(n_, -1); }
+
+    inline int find(int x){
+        // 経路圧縮を行わない
+        return (parent[x] < 0? x:find(parent[x]));
     }
 
-    inline bool same(ll x, ll y){
+    inline bool same(int x, int y){
         return find(x) == find(y);
     }
 
-    inline void unite(ll x, ll y){
-        ll rx = find(x);
-        ll ry = find(y);
+    inline bool unite(int x, int y){
+        x = find(x), y = find(y);
         history.emplace(x, parent[x]);
         history.emplace(y, parent[y]);
-        if(rx == ry) return;
-        if(parent[rx] > parent[ry]) swap(rx, ry);
-        parent[rx] += parent[ry];
-        parent[ry] = rx;
-        maxi[x] = std::max(maxi[x],maxi[y]);
-        mini[x] = std::min(mini[x],mini[y]);
+        if(x == y) return false;
+        if(parent[x] > parent[y]) swap(x, y);
+        parent[x] += parent[y];
+        parent[y] = x;
+        return true;
     }
 
     // rollback処理（stackの上2つを使って戻す）
@@ -57,28 +54,12 @@ public:
         while (state < (int)history.size()) undo();
     }
 
-    inline ll min(ll x){
-        return mini[find(x)];
-    }
-
-    inline ll max(int x){
-        return mini[find(x)];
-    }
-
-    inline ll size(ll x){
+    inline int size(int x){
         return (-parent[find(x)]);
     }
 
-    inline ll operator[](ll x){
+    inline int operator[](int x){
         return find(x);
-    }
-
-    void clear(){
-        for(int i = 0; i < (ll)parent.size(); i++){
-            parent[i] = -1;
-        }
-        iota(maxi.begin(), maxi.end(), 0);
-        iota(mini.begin(), mini.end(), 0);
     }
 };
 // ここまで
