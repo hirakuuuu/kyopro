@@ -16,31 +16,28 @@ constexpr ll INF = 9e18;
 template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
-const long double pi = 3.14159265358979;
-
-/*
-
-*/
-
 int main(){
-    ll n; cin >> n;
-    vector<ll> a(2*n);
-    rep(i, 0, 2*n) cin >> a[i];
-
-    vector<vector<ll>> dp(2*n+1, vector<ll>(2*n+1, 1e10));
-    rep(i, 0, 2*n+1) dp[i][i] = 0; 
-    for(ll k = 2; k <= 2*n; k += 2){
-        rep(i, 0, 2*n){
-            if(i+k > 2*n) break;
-            rep(j, i+1, i+k){
-                chmin(dp[i][i+k], abs(a[i]-a[j])+dp[i+1][j]+dp[j+1][i+k]);
+    string s, t; cin >> s >> t;
+    rep(w, 1, s.size()){
+        vector<string> ss;
+        int l = 0;
+        while(l < s.size()){
+            if(l+w <= s.size()) ss.push_back(s.substr(l, w));
+            else ss.push_back(s.substr(l, s.size()-l));
+            l += w;
+        }
+        rep(c, 0, w){
+            string tmp;
+            for(auto sss: ss){
+                if(sss.size() > c) tmp += sss[c];
+            }
+            if(tmp == t){
+                cout << "Yes" << endl;
+                return 0;
             }
         }
     }
-    cout << dp[0][2*n] << endl;
+    cout << "No" << endl;
     
-
-
-
     return 0;
 }

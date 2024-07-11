@@ -16,31 +16,23 @@ constexpr ll INF = 9e18;
 template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
-const long double pi = 3.14159265358979;
-
 /*
-
+山みたいな形なら max a で良い
+連続した区間に対する操作 → 区間の端に着目
+端のところで絶対値の差が高々2しか変化しない
+下界があって、実際これは達成可能
+操作を逆に見ると、必ず max(maxA, sum d) を1か2減らせる.
 */
 
 int main(){
-    ll n; cin >> n;
-    vector<ll> a(2*n);
-    rep(i, 0, 2*n) cin >> a[i];
-
-    vector<vector<ll>> dp(2*n+1, vector<ll>(2*n+1, 1e10));
-    rep(i, 0, 2*n+1) dp[i][i] = 0; 
-    for(ll k = 2; k <= 2*n; k += 2){
-        rep(i, 0, 2*n){
-            if(i+k > 2*n) break;
-            rep(j, i+1, i+k){
-                chmin(dp[i][i+k], abs(a[i]-a[j])+dp[i+1][j]+dp[j+1][i+k]);
-            }
-        }
-    }
-    cout << dp[0][2*n] << endl;
+    int n; cin >> n;
+    vector<ll> a(n);
+    rep(i, 0, n) cin >> a[i];
+    ll mx = 0;
+    rep(i, 0, n) chmax(mx, a[i]);
+    ll sum = 0;
+    rep(i, 0, n) sum += abs(a[i]-a[(i+1)%n]);
+    cout << max(mx, sum/2) << endl;
     
-
-
-
     return 0;
 }

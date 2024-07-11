@@ -20,6 +20,7 @@ template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 ビットの部分集合
 for(int s = i; ; s = (s-1)&i){
     if(s == 0) break; // 空集合を含めるか
+    // 差集合は s-i で取れる
 }
 計算量 O(3^n)
 */

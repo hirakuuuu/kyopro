@@ -16,31 +16,32 @@ constexpr ll INF = 9e18;
 template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
-const long double pi = 3.14159265358979;
-
-/*
-
-*/
-
 int main(){
-    ll n; cin >> n;
-    vector<ll> a(2*n);
-    rep(i, 0, 2*n) cin >> a[i];
-
-    vector<vector<ll>> dp(2*n+1, vector<ll>(2*n+1, 1e10));
-    rep(i, 0, 2*n+1) dp[i][i] = 0; 
-    for(ll k = 2; k <= 2*n; k += 2){
-        rep(i, 0, 2*n){
-            if(i+k > 2*n) break;
-            rep(j, i+1, i+k){
-                chmin(dp[i][i+k], abs(a[i]-a[j])+dp[i+1][j]+dp[j+1][i+k]);
+    string s; cin >> s;
+    int n = (int)s.size();
+    vector<int> acc(n+1);
+    rep(i, 0, n){
+        int tmp = s[i]-'a';
+        acc[i+1] = (acc[i]^(1<<tmp));
+    } 
+    map<int, int> dp;
+    dp[0] = 0;
+    rep(i, 1, n+1){
+        if(__popcount(acc[i]) <= 1){
+            dp[acc[i]] = 1;
+        }else{
+            int mi = dp[acc[i-1]]+1;
+            rep(j, 0, 26){
+                int tmp = (acc[i]^(1<<j));
+                if(dp.find(tmp) != dp.end()){
+                    chmin(mi, dp[tmp]+1);
+                }
             }
+            dp[acc[i]] = mi;
         }
     }
-    cout << dp[0][2*n] << endl;
+    cout << dp[acc[n]] << endl;
+
     
-
-
-
     return 0;
 }
