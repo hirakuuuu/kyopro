@@ -16,7 +16,7 @@ constexpr ll INF = 9e18;
 template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
-const int vmax = 200005; // ここは問題ごとに考慮が必要
+const int vmax = 2005; // ここは問題ごとに考慮が必要
 mint fact[vmax], finv[vmax];
 void initfact(){
 	fact[0]= 1;
@@ -44,18 +44,32 @@ mint homogeneous(int n, int k){
 }
 
 
+/*
+ナイーブなDPを考えると O(n^3). 
+i 人のグループが最大でも n/i グループしか作れないことを考えると, 調和級数的に O(n^2\log{n}) に落ちることが分かる
+*/
+
 int main(){
     initfact();
-    int n, a, b, c; cin >> n >> a >> b >> c;
-    mint pa = a, pb = b;
-    pa /= 100-c, pb /= 100-c;
-    mint e = 0;
-    rep(i, n, 2*n){
-        // (i回目に A が勝つ確率+i回目にBが勝つ確率)*(i*100/(100-c))
-        mint q = mint(i*100)/(100-c);
-        e += (choose(i-1, n-1)*(pa.pow(n)*pb.pow(i-n)+pa.pow(i-n)*pb.pow(n)))*q;
+    int n, a, b, c, d; cin >> n >> a >> b >> c >> d;
+    vector<mint> dp(n+1);
+    dp[0] = 1;
+
+    auto f = [&](int n_, int k, int p) -> mint {
+        assert(n_-p*k >= 0);
+        return fact[n_]*finv[n_-p*k]*finv[k].pow(p)*finv[p];
+    };
+
+    rep(i, a, b+1){
+        vector<mint> dp_ = dp;
+        rep(j, 0, n+1){
+            rep(k, c, d+1){
+                if(j+i*k > n) break;
+                dp[j+i*k] += dp_[j]*f(n-j, i, k);
+            }
+        }
     }
-    cout << e.val() << endl;
+    cout << dp[n].val() << endl;
     
     return 0;
 }
