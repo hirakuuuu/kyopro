@@ -153,16 +153,16 @@ void initfact(){
 	fact[0]= 1;
 	for(int i = 1; i < vmax; i++) fact[i] = fact[i-1]*i; // 階乗の計算
 	finv[vmax-1] = fact[vmax-1].inv();
-	for(int i = vmax-2; i >=0; i--) finv[i] = finv[i+1]*(i+1); // 階乗の逆元
+	for(int i = vmax-2; i >= 0; i--) finv[i] = finv[i+1]*(i+1); // 階乗の逆元
 }
 // nCk
-mint choose(int n,int k){
+mint choose(int n, int k){
     if(n < 0 || k < 0 || n < k) return 0;
     if(n == 0 && k == 0) return 1;
 	return fact[n]*finv[n-k]*finv[k];
 }
 // (a+b)!/(a!b!)
-mint binom(int a,int b){
+mint binom(int a, int b){
 	return 0<=a&&0<=b?fact[a+b]*finv[a]*finv[b]:0;
 }
 // カタラン数（括弧列とか）
