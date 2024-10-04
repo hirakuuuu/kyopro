@@ -195,14 +195,23 @@ public:
     }
 };
 
-// 遅延セグメント木の準備
+/*
+区間 min 範囲等差更新 遅延セグメント木
+- 区間 [l, r) に対して, 初項 x, 公差 d の等差数列で更新する
+- 区間に対して、左端が数列の何項目かが分かれば更新できる
+- min なので, 左端が最小値になる 
+
+reference: https://phyllo-algo.hatenablog.com/entry/2020/09/30/185129
+*/
+
 struct S {
-    ll val; // 区間 min
-    ll range_l, range_r; // そのセグメントが持つ区間 [l, r)
+    ll val; // 区間最小値
+    ll range_l, range_r; // 区間 [range_l, range_r)
 }; 
 struct F {
     ll x; // 等差更新の初項
-    ll range_l, range_r; // 更新対象の区間
+    ll d; // 等差更新の公差
+    ll range_l, range_r; // 更新対象の範囲 [range_l, range_r)
 };
 S op(S a, S b) {
     S ret;
@@ -216,18 +225,16 @@ S e() { return S(INF, -INF, INF); }
 // 一次関数 a x + b によって恒等写像と代入を表現
 S mapping(F a, S x) {
     if(a.x == INF) return x;
-    return S(a.x+(x.range_l-a.range_l), x.range_l, x.range_r);
+    return S(a.x+(x.range_l-a.range_l)*a.d, x.range_l, x.range_r);
 }
 // a(b(x)) という包含関係
 F composition(F a, F b) {
     if(a.x == INF) return b;
     return a; 
 }
-F id() { return F(INF, -INF, INF); }
+F id() { return F(INF, INF, -INF, INF); }
 
-
-// bool f(S a){ return a.first <= 10000000; };
-
+// verify: https://atcoder.jp/contests/abc177/tasks/abc177_f
 int main(){
     int h, w; cin >> h >> w;
     vector<S> init(w);
@@ -237,16 +244,11 @@ int main(){
     rep(k, 1, h+1){
         int a, b; cin >> a >> b;
         a--;
-        if(a == 0) lst.apply(a, b, F(w+1, a, b));
-        else lst.apply(a, b, F(lst.get(a-1).val, a-1, b));
+        if(a == 0) lst.apply(a, b, F(w+1, 1, a, b));
+        else lst.apply(a, b, F(lst.get(a-1).val, 1, a-1, b));
         ll ans = lst.all_prod().val;
         if(ans >= w) cout << -1 << endl;
         else cout << ans+k << endl;
-
-        // rep(i, 0, w){
-        //     cout << "{" << lst.get(i).val << "}, ";
-        // }
-        // cout << endl;
     }
 
     
