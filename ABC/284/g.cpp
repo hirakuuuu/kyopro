@@ -13,28 +13,31 @@ using namespace std;
 constexpr int IINF = 1001001001;
 constexpr ll INF = 9e18;
 
-
 template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
-/*
-{-1, 0, 1} → {0, 1, 2} に変えてみると、面倒なところが消えてくれることがある
-今回の場合、全部 2 で初期化して、前から 0 でないものを選んで、-1 することで全てのパターンが作れる
-このとき最適な操作は、p[i] が最小のモノを選ぶこと
-*/
-
 int main(){
-    int n; cin >> n;
-    vector<ll> p(n);
-    rep(i, 0, n) cin >> p[i];
+    int n, m; cin >> n >> m;
+    // mint::set_mod(m);
+    vector<ll> fact(n+1);
+    fact[0] = fact[1] = 1;
+    rep(i, 2, n+1) fact[i] = (fact[i-1]*i)%m;
 
-    priority_queue<ll> que;
-    ll ans = 0;
-    rep(i, 0, n){
-        ans += p[i];
-        que.push(-p[i]); que.push(-p[i]);
-        ans += que.top(); que.pop();
+    vector<ll> finv(n+1);
+    finv[n] = 1;
+    rrep(i, n-1, 0) finv[i] = (finv[i+1]*(i+1))%m;
+
+    ll ans = 0, sum = 0, pn = 1;
+    rrep(l, n-1, 0){
+        sum = (sum*(n-l-1)+pn)%m;
+        ans += (((finv[n-1-l]*sum)%m)*l)%m;
+        ans %= m;
+        pn = (pn*n)%m;
     }
+
     cout << ans << endl;
+
+
+    
     return 0;
 }
