@@ -15,7 +15,7 @@ template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
 struct BiconnectedComponent {
     vector<int> ord;                   // 頂点に番号付け（行きがけ順） 
-    vector<int> low;                   // どの連結成分に属するか
+    vector<int> low;                   // どの連結成分に属するか（後退辺を１つたどっていける ord の min）
     vector<bool> used;                 // 探索済みかどうか
     vector<vector<int>> g;             // グラフの隣接リスト表現
     vector<vector<pair<int, int>>> bc; // 成分ごとに辺を格納するリスト
@@ -27,6 +27,7 @@ struct BiconnectedComponent {
             low.resize(n, -1);
             used.resize(n, false);
     }
+    
     void dfs(int u, int prev) {
         used[u] = true; // 探索済みにする
         ord[u] = k ++;  // 行きがけ順にナンバリング
