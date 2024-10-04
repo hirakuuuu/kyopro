@@ -1,22 +1,26 @@
 #include <bits/stdc++.h>
+// #include <atcoder/all>
 using namespace std;
+// using namespace atcoder;
 #define rep(i, a, n) for(int i = a; i < n; i++)
 #define rrep(i, a, n) for(int i = a; i >= n; i--)
+#define inr(l, x, r) (l <= x && x < r)
 #define ll long long
-#define pii pair<int, int>
-#define pll pair<ll, ll>
-// constexpr ll MOD = 1000000007;
-constexpr ll MOD = 998244353;
+#define ld long double
+
+// using mint = modint1000000007;
+// using mint = modint998244353;
 constexpr int IINF = 1001001001;
-constexpr ll INF = 1LL<<60;
+constexpr ll INF = 9e18;
 
 template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
-// 問題
-// 
-
 int main(){
+    string x; cin >> x;
+    while(x.back() == '0') x.pop_back();
+    if(x.back() == '.') x.pop_back();
+    cout << x << endl;
     
     return 0;
 }

@@ -1,14 +1,17 @@
 #include <bits/stdc++.h>
+// #include <atcoder/all>
 using namespace std;
+// using namespace atcoder;
 #define rep(i, a, n) for(int i = a; i < n; i++)
 #define rrep(i, a, n) for(int i = a; i >= n; i--)
+#define inr(l, x, r) (l <= x && x < r)
 #define ll long long
-#define pii pair<int, int>
-#define pll pair<ll, ll>
-// constexpr ll MOD = 1000000007;
-constexpr ll MOD = 998244353;
+#define ld long double
+
+// using mint = modint1000000007;
+// using mint = modint998244353;
 constexpr int IINF = 1001001001;
-constexpr ll INF = 1LL<<60;
+constexpr ll INF = 9e18;
 
 template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
@@ -56,43 +59,32 @@ public:
 
 };
 
-
-
+// 座標圧縮
+void comp(vector<int>&a){
+  set<int>s(a.begin(),a.end());
+  map<int,int>d;
+  int cnt=0;
+  for(auto x:s)d[x]=cnt++;
+  for(auto&x:a)x=d[x];
+}
 
 int main(){
-    int n, m; cin >> n >> m;
-    vector<vector<pair<int, int>>> q(n+1);
-    rep(i, 0, m){
-        int l, r, x; cin >> l >> r >> x;
-        l--;
-        q[r].push_back({l, x});
-    }
-    rep(i, 1, n+1){
-        sort(q[i].begin(), q[i].end());
-    }
+    int n; cin >> n;
+    vector<ll> x(n), p(n);
+    rep(i, 0, n) cin >> x[i];
+    rep(i, 0, n) cin >> p[i];
 
-    FenwickTree<int> ft(n);
-    priority_queue<int> que;
-    rep(r, 1, n+1){
-        que.push(r-1);
-        for(auto lx: q[r]){
-            auto [l, x] = lx;
-            int tmp = ft.sum(l, r);
-            if(tmp >= x) continue;
-            rep(i, 0, x-tmp){
-                int p = que.top(); que.pop();
-                ft.set(p, 1);
-            }
-        }
-    }
-
+    FenwickTree<ll> bit(n);
     rep(i, 0, n){
-        cout << ft.sum(i, i+1) << ' ';
+        bit.add(i, p[i]);
     }
-    cout << endl;
-
-
-
     
+    int q; cin >> q;
+    while(q--){
+        ll l, r; cin >> l >> r;
+        int pl = lower_bound(x.begin(), x.end(), l)-x.begin();
+        int pr = upper_bound(x.begin(), x.end(), r)-x.begin();
+        cout << bit.sum(pl, pr) << endl;
+    }
     return 0;
 }

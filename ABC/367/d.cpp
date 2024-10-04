@@ -13,28 +13,30 @@ using namespace std;
 constexpr int IINF = 1001001001;
 constexpr ll INF = 9e18;
 
-
 template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
-/*
-{-1, 0, 1} → {0, 1, 2} に変えてみると、面倒なところが消えてくれることがある
-今回の場合、全部 2 で初期化して、前から 0 でないものを選んで、-1 することで全てのパターンが作れる
-このとき最適な操作は、p[i] が最小のモノを選ぶこと
-*/
-
 int main(){
-    int n; cin >> n;
-    vector<ll> p(n);
-    rep(i, 0, n) cin >> p[i];
+    int n, m; cin >> n >> m;
+    
+    vector<ll> a(2*n);
+    rep(i, 0, n) cin >> a[i];
+    rep(i, 0, n) a[i+n] = a[i];
 
-    priority_queue<ll> que;
+    vector<ll> acc(2*n+1);
+    rep(i, 0, 2*n) acc[i+1] = acc[i]+a[i];
+
+    // s → t の距離
+    vector<int> cnt(m);
     ll ans = 0;
-    rep(i, 0, n){
-        ans += p[i];
-        que.push(-p[i]); que.push(-p[i]);
-        ans += que.top(); que.pop();
+    rep(s, 0, 2*n){
+        if(s >= n) cnt[acc[s-n]%m]--;
+        ans += (ll)cnt[acc[s]%m];
+        if(s < n) cnt[acc[s]%m]++;
+        // cout << s << ' ' << ans << endl;
     }
     cout << ans << endl;
+
+    
     return 0;
 }

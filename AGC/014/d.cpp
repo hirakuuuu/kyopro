@@ -16,6 +16,15 @@ constexpr ll INF = 9e18;
 template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
+/*
+与えられた木に完全マッチングが存在することと、後手必勝であることが同値
+- 1, 2 の場合は明らか、偶奇を分けて帰納法をする
+- 葉である頂点が2つ以上ある頂点があれば、先手必勝
+- そうで無い場合は、頂点数を減らせるので帰納法の仮定が使える
+
+木の最大マッチングは貪欲法で解ける. 
+*/
+
 
 int main(){
     int n; cin >> n;
@@ -28,47 +37,29 @@ int main(){
         g[b].push_back(a);
     }
 
-    rep(p, 0, n){
-        // 次数 1 の子が2個以上あれば先手必勝
-        int cnt = 0;
-        for(auto c: g[p]){
-            if(g[c].size() == 1) cnt++;
-        }
-        if(cnt >= 2){
-            cout << "First" << endl;
-            return 0;
-        }
-    }
-
-    // 頂点数が偶数だったら後手必勝
-    if(n%2 == 0){
-        cout << "Second" << endl;
+    if(n%2){
+        cout << "First" << endl;
         return 0;
     }
 
-    // 根付き木としてみたときに, 子の部分木の頂点数がすべて偶数だったら先手必勝？
-    vector<int> sz(n, 1), par(n, -1);
+    vector<int> used(n);
     auto dfs = [&](auto self, int pos, int pre) -> void {
         for(auto nxt: g[pos]){
             if(nxt == pre) continue;
             self(self, nxt, pos);
-            par[nxt] = pos;
-            sz[pos] += sz[nxt];
         }
+        if(pre == -1 || used[pre] || used[pos]) return;
+        used[pos] = used[pre] = 1;
     };
     dfs(dfs, 0, -1);
 
-    rep(p, 0, n){
-        bool odd = false;
-        for(auto c: g[p]){
-            if(par[c] == p) odd |= (sz[c]%2 == 1);
-            else odd |= ((n-sz[c]+1)%2 == 1);
+    rep(i, 0, n){
+        if(!used[i]){
+            cout << "First" << endl;
+            return 0;
         }
-        if(odd) continue;
-        cout << "First" << endl;
-        return 0;
     }
     cout << "Second" << endl;
-    
+
     return 0;
 }

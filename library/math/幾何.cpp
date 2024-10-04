@@ -12,6 +12,7 @@ using namespace std;
 namespace geometry {
     using D = long double;
     using Point = std::complex<D>;
+    using Polygon = vector<Point>;
     const D EPS = 1e-8;
     const D PI = M_PI;
 
@@ -23,14 +24,13 @@ namespace geometry {
         return is;
     }
     ostream &operator<<(ostream &os, Point &p) {
-        return os << fixed << setprecision(20) << p.real() << " " << p.imag();
+        return os << fixed << setprecision(20) << p.real() << ' ' << p.imag();
     }
 
     // d 倍する
     Point operator*(Point p, D d) {
     return Point(p.real() * d, p.imag() * d);
     }
-    
     // 偏角（0 <= Θ < 2π）
     D argument(Point p) {
         D res = arg(p);
@@ -153,6 +153,16 @@ namespace geometry {
         return cross_point(Line(s), Line(t));
     }
 
+    // 点の間の距離
+    D dist(Point a, Point b){
+        return abs(a-b);
+    }
+
+    // 点と直線の距離（垂線の足との距離）
+    D dist_line_point(Line l, Point p){
+        return abs(p - projection(l, p));
+    }
+
     // 線分と点の距離（点p から線分のどこかへの最短距離）
     D dist_segment_point(Segment l, Point p){
         if(dot(l.b - l.a, p - l.a) < EPS) return abs(p - l.a);
@@ -171,10 +181,11 @@ namespace geometry {
         return res;
     }
 
+
     // Todo : 円, 多角形
 
     // ２つの円の交点
-    pair< Point, Point > cross_point(const Circle &c1, const Circle &c2) {
+    pair< Point, Point > crosspoint(const Circle &c1, const Circle &c2) {
         D d = abs(c1.p - c2.p);
         D a = acos((c1.r * c1.r + d * d - c2.r * c2.r) / (2 * c1.r * d));
         D t = atan2(c2.p.imag() - c1.p.imag(), c2.p.real() - c1.p.real());
@@ -182,10 +193,31 @@ namespace geometry {
         Point p2 = c1.p + Point(cos(t - a) * c1.r, sin(t - a) * c1.r);
         return {p1, p2};
     }
+
+    // 凸性判定
+    bool is_convex(Polygon p){
+        int n = (int)p.size();
+        // ある隣り合った３点について、時計回りになっていたらダメ
+        for(int i = 0; i < n; i++){
+            if(ccw(p[(i+n-1)%n], p[i], p[(i+1)%n]) == -1) return false;
+        }
+        return true;
+    }
+
+    // 凸包
+    Polygon convex_hull(Polygon p){
+        int n = (int)p.size(), k = 0;
+        if(n <= 2) return p;
+        sort(p.begin(), p.end());
+        vector<Point> ch(2*n);
+        for(int i = 0; i < n; ch[k++] = p[i++]){
+            while(k >= 2 && cross(ch[k-1]-ch[k-2], p[i]-ch[k-1]) < EPS) --k;
+        }
+        for(int i = n-2, t = k+1; i >= 0; ch[k++] = p[i--]){
+            while(k >= t && cross(ch[k-1]-ch[k-2], p[i]-ch[k-1]) < EPS) --k;
+        }
+        ch.resize(k-1);
+        return ch;
+    }
 };
 using namespace geometry;
-
-
-int main(){
-    return 0;
-}

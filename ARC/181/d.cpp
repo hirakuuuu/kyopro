@@ -1,14 +1,17 @@
 #include <bits/stdc++.h>
+// #include <atcoder/all>
 using namespace std;
+// using namespace atcoder;
 #define rep(i, a, n) for(int i = a; i < n; i++)
 #define rrep(i, a, n) for(int i = a; i >= n; i--)
+#define inr(l, x, r) (l <= x && x < r)
 #define ll long long
-#define pii pair<int, int>
-#define pll pair<ll, ll>
-// constexpr ll MOD = 1000000007;
-constexpr ll MOD = 998244353;
+#define ld long double
+
+// using mint = modint1000000007;
+// using mint = modint998244353;
 constexpr int IINF = 1001001001;
-constexpr ll INF = 1LL<<60;
+constexpr ll INF = 9e18;
 
 template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
@@ -56,42 +59,46 @@ public:
 
 };
 
-
-
-
 int main(){
-    int n, m; cin >> n >> m;
-    vector<vector<pair<int, int>>> q(n+1);
-    rep(i, 0, m){
-        int l, r, x; cin >> l >> r >> x;
-        l--;
-        q[r].push_back({l, x});
-    }
-    rep(i, 1, n+1){
-        sort(q[i].begin(), q[i].end());
-    }
 
-    FenwickTree<int> ft(n);
-    priority_queue<int> que;
-    rep(r, 1, n+1){
-        que.push(r-1);
-        for(auto lx: q[r]){
-            auto [l, x] = lx;
-            int tmp = ft.sum(l, r);
-            if(tmp >= x) continue;
-            rep(i, 0, x-tmp){
-                int p = que.top(); que.pop();
-                ft.set(p, 1);
-            }
-        }
-    }
+    ll n; cin >> n;
+    vector<ll> p(n);
+    rep(i, 0, n){ cin >> p[i]; p[i]--; }
 
+    ll m; cin >> m;
+    vector<ll> a(m);
+    rep(i, 0, m){ cin >> a[i]; a[i]--; }
+
+    // 転倒数を求める
+    vector<ll> inv(n);
+    FenwickTree<ll> bit(n);
     rep(i, 0, n){
-        cout << ft.sum(i, i+1) << ' ';
+        inv[i] = bit.sum(p[i], n);
+        bit.add(p[i], 1);
     }
-    cout << endl;
 
+    // 始めて操作に寄与する位置を求める
+    vector<ll> l(n);
+    rep(i, 0, n){
+        int pos = lower_bound(a.begin(), a.end(), i)-a.begin();
+        l[i] = pos;
+    }
 
+    vector<ll> acc(m+1);
+    rep(i, 0, n){
+        acc[l[i]]--;
+        acc[min(m, l[i]+inv[i])]++;
+    }
+    rep(i, 0, m){
+        acc[i+1] += acc[i];
+    }
+
+    ll tot = 0;
+    rep(i, 0, n) tot += inv[i];
+    rep(i, 0, m){
+        cout << tot+acc[i] << endl;
+        tot += acc[i];
+    }
 
     
     return 0;
