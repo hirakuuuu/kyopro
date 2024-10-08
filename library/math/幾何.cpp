@@ -31,14 +31,12 @@ namespace geometry {
     Point operator*(Point p, D d) {
     return Point(p.real() * d, p.imag() * d);
     }
-
     // 偏角（0 <= Θ < 2π）
     D argument(Point p) {
         D res = arg(p);
         if(res < 0.0) res += 2.0*PI; // [-π, π] -> [0, 2π)
         return res;
     }
-
 
     // 等しいかどうか（誤差で判定）
     inline bool equal(D a, D b) { return fabs(a - b) < EPS; }
@@ -92,6 +90,7 @@ namespace geometry {
     struct Circle {
         Point p;
         D r;
+        Circle() = default;
         Circle(Point p_, D r_) : p(p_), r(r_) {}
     };
 
@@ -149,7 +148,7 @@ namespace geometry {
         
         return t.a + (t.b - t.a) * (d2/d1);
     }
-    Point cross_point(Segment s, Segment t){
+    Point cross_point(Segment s, Segment t) {
         assert(is_intersect(s, t)); // 交差する前提
         return cross_point(Line(s), Line(t));
     }
@@ -170,7 +169,6 @@ namespace geometry {
         if(dot(l.a - l.b, p - l.b) < EPS) return abs(p - l.b);
         return abs(cross(l.b - l.a, p - l.a)) / abs(l.b - l.a);
     }
-
     // 線分と線分の距離
     D dist_segment_segment(Segment s, Segment t){
         if(is_intersect(s, t)) return 0.0;

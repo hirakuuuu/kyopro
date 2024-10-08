@@ -17,6 +17,9 @@ template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
 int main(){
-    
+    string s; cin >> s;
+    int n = (int)s.size();
+    if(s.substr(n-3, 3) == "san") cout << "Yes" << endl;
+    else cout << "No" << endl;
     return 0;
 }

@@ -18,32 +18,25 @@ template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
 int main(){
     int n; cin >> n;
-    ll k; cin >> k;
-    vector<int> x(n), a(n);
-    rep(i, 0, n){ cin >> x[i]; x[i]--; }
-    rep(i, 0, n) cin >> a[i];
+    vector<ll> h(n);
+    rep(i, 0, n) cin >> h[i];
 
-    vector<vector<int>> f(61, vector<int>(n));
+    ll t = 0;
     rep(i, 0, n){
-        f[0][i] = x[i];
-    }
-    rep(j, 1, 61){
-        rep(i, 0, n){
-            f[j][i] = f[j-1][f[j-1][i]];
+        // h[i] が 0 以下になったときの T を求める
+        while(h[i] > 0 && (t+1)%3){
+            t++;
+            h[i]--;
+        }
+        t += (h[i]/5)*3;
+        h[i] %= 5;
+        while(h[i] > 0){
+            t++;
+            if(t%3) h[i]--;
+            else h[i] -= 3;
         }
     }
+    cout << t << endl;
     
-    vector<int> ans(n);
-    rep(i, 0, n){
-        int cur = i;
-        rep(j, 0, 61){
-            if((k>>j)&1) cur = f[j][cur];
-        }
-        ans[i] = a[cur];
-    }
-    rep(i, 0, n){
-        cout << ans[i] << ' ';
-    }
-    cout << endl;
     return 0;
 }

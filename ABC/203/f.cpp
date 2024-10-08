@@ -17,33 +17,28 @@ template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
 int main(){
-    int n; cin >> n;
-    ll k; cin >> k;
-    vector<int> x(n), a(n);
-    rep(i, 0, n){ cin >> x[i]; x[i]--; }
-    rep(i, 0, n) cin >> a[i];
+    int n, k; cin >> n >> k;
+    vector<int> a(n+1);
+    rep(i, 1, n+1) cin >> a[i];
+    sort(a.begin(), a.end());
 
-    vector<vector<int>> f(61, vector<int>(n));
+    vector<vector<int>> dp(n+1, vector<int>(35, IINF));
+    rep(i, 0, 35) dp[0][i] = 0;
     rep(i, 0, n){
-        f[0][i] = x[i];
-    }
-    rep(j, 1, 61){
-        rep(i, 0, n){
-            f[j][i] = f[j-1][f[j-1][i]];
+        int l = upper_bound(a.begin(), a.end(), a[i+1]/2)-a.begin();
+        l--;
+        rep(j, 0, 35){
+            chmin(dp[i+1][j], dp[i][j]+1);
+            if(j > 0) chmin(dp[i+1][j], dp[l][j-1]);
         }
     }
+    rep(i, 0, 35){
+        if(dp[n][i] <= k){
+            cout << i << ' ' << dp[n][i] << endl;
+            break;
+        }
+    }
+
     
-    vector<int> ans(n);
-    rep(i, 0, n){
-        int cur = i;
-        rep(j, 0, 61){
-            if((k>>j)&1) cur = f[j][cur];
-        }
-        ans[i] = a[cur];
-    }
-    rep(i, 0, n){
-        cout << ans[i] << ' ';
-    }
-    cout << endl;
     return 0;
 }

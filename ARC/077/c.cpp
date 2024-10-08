@@ -11,7 +11,7 @@ using namespace std;
 // using mint = modint1000000007;
 // using mint = modint998244353;
 constexpr int IINF = 1001001001;
-constexpr ll INF = 1e18;
+constexpr ll INF = 9e18;
 
 template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
@@ -196,59 +196,50 @@ public:
 };
 
 // 遅延セグメント木の準備
-struct S {
-    ll val; // 区間 min
-    ll range_l, range_r; // そのセグメントが持つ区間 [l, r)
-}; 
-struct F {
-    ll x; // 等差更新の初項
-    ll range_l, range_r; // 更新対象の区間
-};
-S op(S a, S b) {
-    S ret;
-    ret.val = min(a.val, b.val);
-    ret.range_l = min(a.range_l, b.range_l);
-    ret.range_r = max(a.range_r, b.range_r);
-    return ret;
-}
-S e() { return S(INF, -INF, INF); }
-
+using S =  ll;
+S op(S a, S b) { return min(a, b); }
+S e() { return 1e18; }
 // 一次関数 a x + b によって恒等写像と代入を表現
-S mapping(F a, S x) {
-    if(a.x == INF) return x;
-    return S(a.x+(x.range_l-a.range_l), x.range_l, x.range_r);
-}
+using F = ll;
+S mapping(F a, S x) { return a+x; }
 // a(b(x)) という包含関係
-F composition(F a, F b) {
-    if(a.x == INF) return b;
-    return a; 
-}
-F id() { return F(INF, -INF, INF); }
+F composition(F a, F b) { return a+b; }
+F id() { return 0; }
 
-
-// bool f(S a){ return a.first <= 10000000; };
 
 int main(){
-    int h, w; cin >> h >> w;
-    vector<S> init(w);
-    rep(i, 0, w) init[i] = S(0, i, i+1);
-    LazySegmentTree<S, op, e, F, mapping, composition, id> lst(init);
-
-    rep(k, 1, h+1){
-        int a, b; cin >> a >> b;
-        a--;
-        if(a == 0) lst.apply(a, b, F(w+1, a, b));
-        else lst.apply(a, b, F(lst.get(a-1).val, a-1, b));
-        ll ans = lst.all_prod().val;
-        if(ans >= w) cout << -1 << endl;
-        else cout << ans+k << endl;
-
-        // rep(i, 0, w){
-        //     cout << "{" << lst.get(i).val << "}, ";
-        // }
-        // cout << endl;
+    int n, m; cin >> n >> m;
+    vector<ll> a(n);
+    rep(i, 0, n){
+        cin >> a[i];
+        a[i]--;
     }
 
+    LazySegmentTree<S, op, e, F, mapping, composition, id> lst(vector<S>(m+1, 0));
+    rep(i, 0, n-1){
+        ll l = a[i], r = a[i+1];
+        if(l <= r){
+            ll cnt = abs(l-r);
+            lst.apply(0, cnt);
+            lst.apply(l+2, r+1, -1);
+            lst.apply(r+1, cnt-1);
+            lst.apply(m, -cnt+1);
+        }else{
+            ll cnt = m-abs(l-r);
+            lst.apply(0, r+1);
+            lst.apply(1, r+1, -1);
+            lst.apply(r+1, cnt-1);
+            lst.apply(l+2, m+1, -1);
+        }
+    }
+
+    vector<ll> acc(m+1);
+    acc[0] = lst.get(0);
+    rep(i, 1, m+1) acc[i] = acc[i-1]+lst.get(i);
+
+    ll ans = INF;
+    rep(i, 0, m) chmin(ans, acc[i]);
+    cout << ans << endl;
     
     return 0;
 }

@@ -1,20 +1,20 @@
 #include <bits/stdc++.h>
+// #include <atcoder/all>
 using namespace std;
+// using namespace atcoder;
 #define rep(i, a, n) for(int i = a; i < n; i++)
 #define rrep(i, a, n) for(int i = a; i >= n; i--)
+#define inr(l, x, r) (l <= x && x < r)
 #define ll long long
-#define pii pair<int, int>
-#define pll pair<ll, ll>
-// constexpr ll MOD = 1000000007;
-constexpr ll MOD = 998244353;
+#define ld long double
+
+// using mint = modint1000000007;
+// using mint = modint998244353;
 constexpr int IINF = 1001001001;
-constexpr ll INF = 1LL<<60;
+constexpr ll INF = 1e18;
 
 template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
-
-// 問題
-// https://atcoder.jp/contests/abc177/tasks/abc177_f
 
 template <class T, T (*op)(T, T), T (*e)(), class F, T (*mapping)(F, T), F (*composition)(F, F), F (*id)()> 
 class LazySegmentTree {
@@ -195,46 +195,61 @@ public:
     }
 };
 
-// 遅延セグメント木の準備
-int h, w;
-using S =  pair<ll, ll>;
-S op(S a, S b) { return min(a, b); }
-S e() { return {9e18, 9e18}; }
+/*
+区間 min 範囲等差更新 遅延セグメント木
+- 区間 [l, r) に対して, 初項 x, 公差 d の等差数列で更新する
+- 区間に対して、左端が数列の何項目かが分かれば更新できる
+- min なので, 左端が最小値になる 
+
+reference: https://phyllo-algo.hatenablog.com/entry/2020/09/30/185129
+*/
+
+struct S {
+    ll val; // 区間最小値
+    ll range_l, range_r; // 区間 [range_l, range_r)
+}; 
+struct F {
+    ll x; // 等差更新の初項
+    ll d; // 等差更新の公差
+    ll range_l, range_r; // 更新対象の範囲 [range_l, range_r)
+};
+S op(S a, S b) {
+    S ret;
+    ret.val = min(a.val, b.val);
+    ret.range_l = min(a.range_l, b.range_l);
+    ret.range_r = max(a.range_r, b.range_r);
+    return ret;
+}
+S e() { return S(INF, -INF, INF); }
+
 // 一次関数 a x + b によって恒等写像と代入を表現
-using F = pair<ll, ll>;
-S mapping(F a, S x) { 
-    auto [l, r] = a;
-    if(l <= x.second && x.second <= r){
-        if(r < w-1){
-            x.first += r+1-x.second+1;
-            x.second = r+1;
-        }else{
-            x = e();
-        }
-    }else{
-        x.first++;
-    }
-    return x;
+S mapping(F a, S x) {
+    if(a.x == INF) return x;
+    return S(a.x+(x.range_l-a.range_l)*a.d, x.range_l, x.range_r);
 }
-F composition(F a, F b) { 
-    return {min(a.first, b.first), max(a.second, b.second)};
+// a(b(x)) という包含関係
+F composition(F a, F b) {
+    if(a.x == INF) return b;
+    return a; 
 }
-F id() { return {-1, -1}; }
+F id() { return F(INF, INF, -INF, INF); }
 
+// verify: https://atcoder.jp/contests/abc177/tasks/abc177_f
 int main(){
-    cin >> h >> w;
-    vector<S> initial(w);
-    rep(i, 0, w) initial[i] = {0, i};
-    LazySegmentTree<S, op, e, F, mapping, composition, id> lst(initial);
+    int h, w; cin >> h >> w;
+    vector<S> init(w);
+    rep(i, 0, w) init[i] = S(0, i, i+1);
+    LazySegmentTree<S, op, e, F, mapping, composition, id> lst(init);
 
-    rep(i, 0, h){
-        int l, r; cin >> l >> r;
-        l--;
-        lst.apply(l, r, {l, r});
-        if(lst.all_prod().first == 9e18) cout << -1 << endl;
-        else cout << lst.all_prod().first << endl;
+    rep(k, 1, h+1){
+        int a, b; cin >> a >> b;
+        a--;
+        if(a == 0) lst.apply(a, b, F(w+1, 1, a, b));
+        else lst.apply(a, b, F(lst.get(a-1).val, 1, a-1, b));
+        ll ans = lst.all_prod().val;
+        if(ans >= w) cout << -1 << endl;
+        else cout << ans+k << endl;
     }
-
 
     
     return 0;

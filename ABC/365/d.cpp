@@ -18,32 +18,25 @@ template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
 int main(){
     int n; cin >> n;
-    ll k; cin >> k;
-    vector<int> x(n), a(n);
-    rep(i, 0, n){ cin >> x[i]; x[i]--; }
-    rep(i, 0, n) cin >> a[i];
+    string s; cin >> s;
+    string RPS = "RPS";
+    map<char, int> id;
+    id['R'] = 0;
+    id['P'] = 1;
+    id['S'] = 2;
+    vector<int> dp(3);
+    rep(i, 0, n){
+        int aoki = id[s[i]];
+        vector<int> dp_(3);
+        rep(j, 0, 3){
+            if((aoki+2)%3 == j) continue;
+            if(aoki == j) chmax(dp_[j], max(dp[(j+1)%3], dp[(j+2)%3]));
+            else chmax(dp_[j], max(dp[(j+1)%3], dp[(j+2)%3])+1);
+        }
+        swap(dp_, dp);
+    }
+    cout << max({dp[0], dp[1], dp[2]}) << endl;
 
-    vector<vector<int>> f(61, vector<int>(n));
-    rep(i, 0, n){
-        f[0][i] = x[i];
-    }
-    rep(j, 1, 61){
-        rep(i, 0, n){
-            f[j][i] = f[j-1][f[j-1][i]];
-        }
-    }
     
-    vector<int> ans(n);
-    rep(i, 0, n){
-        int cur = i;
-        rep(j, 0, 61){
-            if((k>>j)&1) cur = f[j][cur];
-        }
-        ans[i] = a[cur];
-    }
-    rep(i, 0, n){
-        cout << ans[i] << ' ';
-    }
-    cout << endl;
     return 0;
 }

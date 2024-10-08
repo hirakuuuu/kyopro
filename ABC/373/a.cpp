@@ -11,12 +11,18 @@ using namespace std;
 // using mint = modint1000000007;
 // using mint = modint998244353;
 constexpr int IINF = 1001001001;
-constexpr ll INF = 1e18;
+constexpr ll INF = 9e18;
 
 template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
 int main(){
+    int ans = 0;
+    rep(i, 0, 12){
+        string s; cin >> s;
+        if((int)s.size() == i+1) ans++;
+    }
+    cout << ans << endl;
     
     return 0;
 }

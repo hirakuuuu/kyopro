@@ -6,6 +6,7 @@ using namespace std;
 #define rrep(i, a, n) for(int i = a; i >= n; i--)
 #define inr(l, x, r) (l <= x && x < r)
 #define ll long long
+#define ld long double
 
 // using mint = modint1000000007;
 // using mint = modint998244353;
@@ -16,10 +17,9 @@ template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
 namespace geometry {
-    using D = double;
+    using D = long double;
     using Point = std::complex<D>;
-    using Polygon = vector<Point>;
-    const D EPS = 1e-8;
+    const D EPS = 2e-10;
     const D PI = M_PI;
 
     // 入出力ストリーム
@@ -30,24 +30,13 @@ namespace geometry {
         return is;
     }
     ostream &operator<<(ostream &os, Point &p) {
-        return os << fixed << setprecision(20) << p.real() << ' ' << p.imag();
-    }
-
-    // 足す
-    Point add(Point a, Point b) {
-        return Point(a.real() + b.real(), a.imag() + b.imag());
+        return os << fixed << setprecision(20) << p.real() << " " << p.imag();
     }
 
     // d 倍する
-    Point operator*(Point p, D d) {
-    return Point(p.real() * d, p.imag() * d);
+    Point add(Point a, Point b) {
+    return Point(a.real() + b.real(), a.imag() + b.imag());
     }
-
-    // // 比較関数
-    // Point operator<(Point a, Point b) {
-    //     if(a.real() != b.real()) return a.real() < b.real();
-    //     return a.imag() < b.imag();
-    // }
 
     // 偏角（0 <= Θ < 2π）
     D argument(Point p) {
@@ -56,7 +45,13 @@ namespace geometry {
         return res;
     }
 
-
+    // d 倍する
+    Point operator*(Point p, D d) {
+    return Point(p.real() * d, p.imag() * d);
+    }
+    Point operator/(Point p, D d) {
+    return Point(p.real() / d, p.imag() / d);
+    }
     // 等しいかどうか（誤差で判定）
     inline bool equal(D a, D b) { return fabs(a - b) < EPS; }
 
@@ -109,6 +104,7 @@ namespace geometry {
     struct Circle {
         Point p;
         D r;
+        Circle() = default;
         Circle(Point p_, D r_) : p(p_), r(r_) {}
     };
 
@@ -166,19 +162,9 @@ namespace geometry {
         
         return t.a + (t.b - t.a) * (d2/d1);
     }
-    Point cross_point(Segment s, Segment t){
+    Point cross_point(Segment s, Segment t) {
         assert(is_intersect(s, t)); // 交差する前提
         return cross_point(Line(s), Line(t));
-    }
-
-    // 点の間の距離
-    D dist(Point a, Point b){
-        return abs(a-b);
-    }
-
-    // 点と直線の距離（垂線の足との距離）
-    D dist_line_point(Line l, Point p){
-        return abs(p - projection(l, p));
     }
 
     // 線分と点の距離（点p から線分のどこかへの最短距離）
@@ -187,7 +173,6 @@ namespace geometry {
         if(dot(l.a - l.b, p - l.b) < EPS) return abs(p - l.b);
         return abs(cross(l.b - l.a, p - l.a)) / abs(l.b - l.a);
     }
-
     // 線分と線分の距離
     D dist_segment_segment(Segment s, Segment t){
         if(is_intersect(s, t)) return 0.0;
@@ -200,11 +185,10 @@ namespace geometry {
         return res;
     }
 
-
     // Todo : 円, 多角形
 
     // ２つの円の交点
-    pair< Point, Point > crosspoint(const Circle &c1, const Circle &c2) {
+    pair< Point, Point > cross_point(const Circle &c1, const Circle &c2) {
         D d = abs(c1.p - c2.p);
         D a = acos((c1.r * c1.r + d * d - c2.r * c2.r) / (2 * c1.r * d));
         D t = atan2(c2.p.imag() - c1.p.imag(), c2.p.real() - c1.p.real());
@@ -212,47 +196,51 @@ namespace geometry {
         Point p2 = c1.p + Point(cos(t - a) * c1.r, sin(t - a) * c1.r);
         return {p1, p2};
     }
-
-    // 凸性判定
-    bool is_convex(Polygon p){
-        int n = (int)p.size();
-        // ある隣り合った３点について、時計回りになっていたらダメ
-        for(int i = 0; i < n; i++){
-            if(ccw(p[(i+n-1)%n], p[i], p[(i+1)%n]) == -1) return false;
-        }
-        return true;
-    }
-
-    // 凸包
-    Polygon convex_hull(Polygon p){
-        int n = (int)p.size(), k = 0;
-        if(n <= 2) return p;
-        sort(p.begin(), p.end());
-        vector<Point> ch(2*n);
-        for(int i = 0; i < n; ch[k++] = p[i++]){
-            while(k >= 2 && cross(ch[k-1]-ch[k-2], p[i]-ch[k-1]) < EPS) --k;
-        }
-        for(int i = n-2, t = k+1; i >= 0; ch[k++] = p[i--]){
-            while(k >= t && cross(ch[k-1]-ch[k-2], p[i]-ch[k-1]) < EPS) --k;
-        }
-        ch.resize(k-1);
-        return ch;
-    }
 };
 using namespace geometry;
 
-int main(){
-    // int n; cin >> n;
-    // vector<Point> p(n);
-    // rep(i, 0, n){
-    //     cin >> p[i];
-    // }
 
-    // 重心を求める（凸多角形なので必ず内部にある）
-    // Point g;
-    // rep(i, 0, n){
-    //     g = add(g, p[i]);
-    // }
+int main(){
+    int n; cin >> n;
+    vector<Point> p(n+1);
+    rep(i, 0, n) cin >> p[i];
+
+    Point g;
+    rep(i, 0, n) g = add(g, p[i]);
+    g /= (long double)n;
+    g *= -1;
+
+    // 重心に従って平行移動
+    rep(i, 0, n){
+        p[i] = add(p[i], g);
+    }
+
+    vector<D> ar(n+1);
+    rep(i, 0, n){
+        ar[i] = argument(p[i]);
+        if(ar[i] < ar[0]) ar[i] += PI*2.0;
+    }
+    p[n] = p[0];
+    ar[n] = ar[0]+PI*2.0;
+
+    int q; cin >> q;
+    while(q--){
+        Point a; cin >> a;
+        a = add(a, g);
+        if(equal(a.real(), 0.0) && equal(a.imag(), 0.0)){
+            cout << "IN" << endl;
+            continue;
+        }
+        D ang = argument(a);
+        if(ang < ar[0]) ang += PI*2.0;
+        // どの辺の間にあるか
+        int pos = upper_bound(ar.begin(), ar.end(), ang)-ar.begin();
+        Segment e = Segment(p[pos-1], p[pos]);
+        Segment f = Segment(Point(0, 0), a);
+        if(dist_segment_point(e, a) < EPS) cout << "ON" << endl;
+        else if(is_intersect(e, f)) cout << "OUT" << endl;
+        else cout << "IN" << endl;
+    }
     
     return 0;
 }

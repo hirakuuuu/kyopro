@@ -18,32 +18,28 @@ template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
 int main(){
     int n; cin >> n;
-    ll k; cin >> k;
-    vector<int> x(n), a(n);
-    rep(i, 0, n){ cin >> x[i]; x[i]--; }
-    rep(i, 0, n) cin >> a[i];
+    vector<string> s(n);
+    rep(i, 0, n) cin >> s[i];
 
-    vector<vector<int>> f(61, vector<int>(n));
-    rep(i, 0, n){
-        f[0][i] = x[i];
-    }
-    rep(j, 1, 61){
-        rep(i, 0, n){
-            f[j][i] = f[j-1][f[j-1][i]];
+    int m = 0;
+    rep(i, 0, n) chmax(m, s[i].size());
+    vector<string> t(m);
+    rrep(i, n-1, 0){
+        rep(j, 0, s[i].size()){
+            t[j].push_back(s[i][j]);
+        }
+        rep(j, s[i].size(), m){
+            t[j].push_back('*');
         }
     }
+    // 末尾の * を消す
+    rep(j, 0, m){
+        while(!t[j].empty() && t[j].back() == '*') t[j].pop_back();
+    }
+    rep(j, 0, m){
+        cout << t[j] << endl;
+    }
+
     
-    vector<int> ans(n);
-    rep(i, 0, n){
-        int cur = i;
-        rep(j, 0, 61){
-            if((k>>j)&1) cur = f[j][cur];
-        }
-        ans[i] = a[cur];
-    }
-    rep(i, 0, n){
-        cout << ans[i] << ' ';
-    }
-    cout << endl;
     return 0;
 }

@@ -17,33 +17,23 @@ template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
 int main(){
-    int n; cin >> n;
-    ll k; cin >> k;
-    vector<int> x(n), a(n);
-    rep(i, 0, n){ cin >> x[i]; x[i]--; }
-    rep(i, 0, n) cin >> a[i];
-
-    vector<vector<int>> f(61, vector<int>(n));
-    rep(i, 0, n){
-        f[0][i] = x[i];
+    int m; cin >> m;
+    vector<int> b;
+    while(m){
+        b.push_back(m%3);
+        m /= 3;
     }
-    rep(j, 1, 61){
-        rep(i, 0, n){
-            f[j][i] = f[j-1][f[j-1][i]];
+    vector<int> a;
+    rep(i, 0, b.size()){
+        rep(j, 0, b[i]){
+            a.push_back(i);
         }
     }
-    
-    vector<int> ans(n);
-    rep(i, 0, n){
-        int cur = i;
-        rep(j, 0, 61){
-            if((k>>j)&1) cur = f[j][cur];
-        }
-        ans[i] = a[cur];
-    }
-    rep(i, 0, n){
-        cout << ans[i] << ' ';
+    cout << a.size() << endl;
+    rep(i, 0, a.size()){
+        cout << a[i] << ' ';
     }
     cout << endl;
+    
     return 0;
 }
