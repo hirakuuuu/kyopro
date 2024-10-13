@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
-#include <atcoder/all>
+// #include <atcoder/all>
 using namespace std;
-using namespace atcoder;
+// using namespace atcoder;
 #define rep(i, a, n) for(int i = a; i < n; i++)
 #define rrep(i, a, n) for(int i = a; i >= n; i--)
 #define inr(l, x, r) (l <= x && x < r)
@@ -9,18 +9,34 @@ using namespace atcoder;
 #define ld long double
 
 // using mint = modint1000000007;
-using mint = modint998244353;
+// using mint = modint998244353;
 constexpr int IINF = 1001001001;
-constexpr ll INF = 9e18;
+constexpr ll INF = 1e18;
 
 template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
-/*
-Lowlink
-- グラフの関節点、橋を求めるためのアルゴリズム
-- 二重頂点連結成分分解に応用できる
-*/
+
+// sを始点とする各頂点への距離の最小値を格納した配列を返す
+vector<ll> dijk(int s, vector<vector<pair<ll, ll>>> &g){
+    priority_queue<pair<ll, ll>, vector<pair<ll, ll>>, greater<pair<ll, ll>>> que;
+    vector<ll> dist(g.size(), INF);
+    que.push(make_pair(0, s));
+    dist[s] = 0;
+    while(!que.empty()){
+        pair<ll, ll> q = que.top(); que.pop();
+        ll d = q.first, u = q.second;
+        if(dist[u] < d) continue;
+        for(auto nq: g[u]){
+            ll v = nq.first, cost = nq.second;
+            if(dist[v] > d+cost){
+                dist[v] = d+cost;
+                que.push({dist[v], v});
+            }
+        }
+    }
+    return dist;
+}
 
 class Lowlink {
     struct Edge {
@@ -42,23 +58,18 @@ public:
         g[b].emplace_back(a, m++);
     }
 
-    vector<int> is_root; // DFSで根であるかどうか
-    vector<vector<int>> dfs_tree; // DFS木
     vector<int> ord; // 行きがけ順
     vector<int> low; // DFS木上で後退辺を１つたどっていける ord の最小値
     vector<int> par; // DFS木の親（根は -1）
     // low を求める
     void init(){
-        is_root = vector<int>(n);
-        dfs_tree = vector<vector<int>>(n);
         ord = low = par = vector<int>(n, -1);
         int k = 0;
         auto dfs = [&](auto self, int pos, int eid=-1) -> int {
             low[pos] = ord[pos] = k++;
             for(auto e: g[pos]) if(e.id != eid){
-                if(ord[e.to] == -1){ // DFS 木の辺
+                if(ord[e.to] == -1){
                     par[e.to] = pos;
-                    dfs_tree[pos].emplace_back(e.to);
                     low[pos] = min(low[pos], self(self, e.to, e.id));
                 }else if(ord[e.to] < ord[pos]){ // 後退辺
                     low[pos] = min(low[pos], ord[e.to]);
@@ -66,29 +77,10 @@ public:
             }
             return low[pos];
         };
-        for(int v = 0; v < n; v++){
-            if(ord[v] == -1){ is_root[v] = 1; dfs(dfs, v); }
-        }
+        rep(v, 0, n) if(ord[v] == -1) dfs(dfs, v);
     }
 
     // 関節点
-    vector<int> aps; // 関節点
-    void build_aps(){
-        for(int u = 0; u < n; u++){
-            if(is_root[u]){
-                // 根の場合、子が２つ以上存在すると関節点
-                if(dfs_tree[u].size() >= 2) aps.emplace_back(u);
-            }else{
-                // 根でない場合、子 v で ord[u] <= low[v] を満たすものが存在する
-                bool f = false;
-                for(auto v: dfs_tree[u]){
-                    if(ord[u] <= low[v]) f = true;
-                }
-                if(f) aps.emplace_back(u);
-            }
-        }
-    }
-
 
     // 橋
     vector<int> bridge; // 橋である辺の index , 取得したいときは edges[ind] ととる
@@ -127,49 +119,62 @@ public:
     }
 };
 
-// bcc 
-// verify: https://atcoder.jp/contests/abc334/tasks/abc334_g
+
 int main(){
-    int h, w; cin >> h >> w;
-    vector<string> s(h);
-    rep(i, 0, h) cin >> s[i];
+    int n, m; cin >> n >> m;
+    vector<int> a(m), b(m);
+    vector<ll> c(m);
+    map<pair<int, int>, int> edge_id;
+    vector<vector<pair<ll, ll>>> g(n);
+    rep(i, 0, m){
+        cin >> a[i] >> b[i] >> c[i];
+        a[i]--, b[i]--;
+        g[a[i]].push_back({b[i], c[i]});
+        g[b[i]].push_back({a[i], c[i]});
+        edge_id[{a[i], b[i]}] = edge_id[{b[i], a[i]}] = i;
+    }
+    vector<ll> dist_1 = dijk(0, g);
+    vector<ll> dist_n = dijk(n-1, g);
 
-    int n = 0;
-    vector<vector<int>> id(h, vector<int>(w, -1));
-    rep(i, 0, h) rep(j, 0, w){
-        if(s[i][j] == '#'){
-            id[i][j] = n++;
+    vector<int> ans(m);
+    vector<int> nodes;
+    rep(i, 0, m){
+        if(dist_1[n-1] == min(dist_1[a[i]]+dist_n[b[i]], dist_1[b[i]]+dist_n[a[i]])+c[i]){
+            nodes.push_back(a[i]);
+            nodes.push_back(b[i]);
         }
     }
-    Lowlink g(n);
-    rep(i, 0, h){
-        rep(j, 0, w){
-            if(s[i][j] != '#') continue;
-            rep(k, 2, 4){
-                int ni = i+(k-1)%2, nj = j+(k-2)%2;
-                if(!inr(0, ni, h) || !inr(0, nj, w)) continue;
-                if(s[ni][nj] != '#') continue;
-                g.add_edge(id[i][j], id[ni][nj]);
-            }
-        }
-    }
-    g.init();
-    g.bcc();
+    sort(nodes.begin(), nodes.end());
+    nodes.erase(unique(nodes.begin(), nodes.end()), nodes.end());
 
-    int comp = 0;
-    rep(v, 0, n) if(g.par[v] == -1) comp++;
-    mint ans = mint(comp)*n;
-    rep(i, 0, h){
-        rep(j, 0, w){
-            if(s[i][j] != '#') continue;
-            set<int> st;
-            for(auto e: g.g[id[i][j]]){
-                st.insert(g.bc_id[e.id]);
-            }
-            ans += (int)st.size()-1;
+    vector<int> node_id(n, -1);
+    rep(i, 0, (int)nodes.size()){
+        node_id[nodes[i]] = i;
+    }
+
+    Lowlink ng(nodes.size());
+    rep(i, 0, m){
+        if(dist_1[n-1] == min(dist_1[a[i]]+dist_n[b[i]], dist_1[b[i]]+dist_n[a[i]])+c[i]){
+            // cout << node_id[a[i]] << ' ' << node_id[b[i]] << endl;
+            ng.add_edge(node_id[a[i]], node_id[b[i]]);
         }
     }
-    ans /= n;
-    cout << ans.val() << endl;
+    ng.init();
+    ng.build_bridge();
+    vector<int> is_bridge(ng.edges.size());
+    for(auto id: ng.bridge) is_bridge[id] = 1;
+    rep(i, 0, ng.edges.size()){
+        if(is_bridge[i]){
+            auto [u, v] = ng.edges[i];
+            u = nodes[u], v = nodes[v];
+            // cout << u << ' ' << v << endl;
+            ans[edge_id[{u, v}]] = 1;
+        }
+    }
+    rep(i, 0, m){
+        if(ans[i]) cout << "Yes" << endl;
+        else cout << "No" << endl;
+    }
+
     return 0;
 }
