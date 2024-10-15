@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
-#include <atcoder/all>
+// #include <atcoder/all>
 using namespace std;
-using namespace atcoder;
+// using namespace atcoder;
 #define rep(i, a, n) for(int i = a; i < n; i++)
 #define rrep(i, a, n) for(int i = a; i >= n; i--)
 #define inr(l, x, r) (l <= x && x < r)
@@ -9,7 +9,7 @@ using namespace atcoder;
 #define ld long double
 
 // using mint = modint1000000007;
-using mint = modint998244353;
+// using mint = modint998244353;
 constexpr int IINF = 1001001001;
 constexpr ll INF = 9e18;
 
@@ -127,49 +127,22 @@ public:
     }
 };
 
-// bcc 
-// verify: https://atcoder.jp/contests/abc334/tasks/abc334_g
-int main(){
-    int h, w; cin >> h >> w;
-    vector<string> s(h);
-    rep(i, 0, h) cin >> s[i];
 
-    int n = 0;
-    vector<vector<int>> id(h, vector<int>(w, -1));
-    rep(i, 0, h) rep(j, 0, w){
-        if(s[i][j] == '#'){
-            id[i][j] = n++;
-        }
-    }
+// 関節点
+
+// verify: https://onlinejudge.u-aizu.ac.jp/problems/GRL_3_A
+int main(){
+    int n, m; cin >> n >> m;
     Lowlink g(n);
-    rep(i, 0, h){
-        rep(j, 0, w){
-            if(s[i][j] != '#') continue;
-            rep(k, 2, 4){
-                int ni = i+(k-1)%2, nj = j+(k-2)%2;
-                if(!inr(0, ni, h) || !inr(0, nj, w)) continue;
-                if(s[ni][nj] != '#') continue;
-                g.add_edge(id[i][j], id[ni][nj]);
-            }
-        }
+    rep(i, 0, m){
+        int s, t; cin >> s >> t;
+        g.add_edge(s, t);
     }
     g.init();
-    g.bcc();
-
-    int comp = 0;
-    rep(v, 0, n) if(g.par[v] == -1) comp++;
-    mint ans = mint(comp)*n;
-    rep(i, 0, h){
-        rep(j, 0, w){
-            if(s[i][j] != '#') continue;
-            set<int> st;
-            for(auto e: g.g[id[i][j]]){
-                st.insert(g.bc_id[e.id]);
-            }
-            ans += (int)st.size()-1;
-        }
+    g.build_aps();
+    for(auto ap: g.aps){
+        cout << ap << endl;
     }
-    ans /= n;
-    cout << ans.val() << endl;
+
     return 0;
 }
