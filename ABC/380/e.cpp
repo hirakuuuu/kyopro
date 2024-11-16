@@ -1,10 +1,21 @@
 #include <bits/stdc++.h>
+// #include <atcoder/all>
 using namespace std;
+// using namespace atcoder;
 #define rep(i, a, n) for(int i = a; i < n; i++)
+#define rrep(i, a, n) for(int i = a; i >= n; i--)
+#define inr(l, x, r) (l <= x && x < r)
 #define ll long long
+#define ld long double
 
+// using mint = modint1000000007;
+// using mint = modint998244353;
+constexpr int IINF = 1001001001;
+constexpr ll INF = 1e18;
 
-// ここから
+template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
+template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
+
 class UnionFind {
     vector<ll> parent, maxi, mini;
     inline ll root(ll n){
@@ -60,15 +71,36 @@ public:
         iota(mini.begin(), mini.end(), 0);
     }
 };
-// ここまで
 
 int main(){
-    ll n = 10;
+    int n, q; cin >> n >> q;
     UnionFind uf(n);
+    vector<int> col(n), cnt(n, 1);
+    iota(col.begin(), col.end(), 0);
+    while(q--){
+        int op; cin >> op;
+        if(op == 1){
+            int x, c; cin >> x >> c; x--, c--;
+            cnt[col[uf[x]]] -= uf.size(x);
+            col[uf[x]] = c;
+            cnt[c] += uf.size(x);
 
-    uf.unite(0, 1);
-    uf.unite(1, 2);
-    cout << uf.size(0) << endl;
-    cout << uf.size(3) << endl;
-    cout << uf[2] << endl;
+            int mxi = uf.max(x), mii = uf.min(x);
+            if(mxi < n-1 && col[uf[mxi+1]] == col[uf[x]]){
+                uf.unite(mxi+1, x);
+            }
+            if(mii > 0 && col[uf[mii-1]] == col[uf[x]]){
+                uf.unite(mii-1, x);
+            }
+        }else{
+            int c; cin >> c; c--;
+            cout << cnt[c] << endl;
+        }
+        // rep(i, 0, n){
+        //     cout << cnt[i] << ' ';
+        // }
+        // cout << endl;
+    }
+    
+    return 0;
 }
