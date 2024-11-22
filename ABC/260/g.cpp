@@ -18,28 +18,30 @@ template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
 int main(){
     int n, m; cin >> n >> m;
-    vector<vector<ll>> x(n, vector<ll>(3));
-    rep(i, 0, n){
-        rep(j, 0, 3){
-            cin >> x[i][j];
-        }
-    }
+    vector<string> s(n);
+    rep(i, 0, n) cin >> s[i];
 
-    ll ans = -INF;
-    rep(i, 0, 8){
-        vector<ll> c(n);
-        rep(j, 0, n){
-            rep(k, 0, 3){
-                if((i>>k)&1) c[j] += x[j][k];
-                else c[j] -= x[j][k];
-            }
+    vector<vector<int>> acc(n, vector<int>(n+1));
+    rep(i, 0, n){
+        rep(j, 1, n+1){
+            acc[i][j] = acc[i][j-1];
+            if(s[i][j-1] == 'O') acc[i][j]++;
         }
-        sort(c.rbegin(), c.rend());
-        ll tmp = 0;
-        rep(j, 0, m) tmp += c[j];
-        chmax(ans, tmp);
+    }   
+
+    int q; cin >> q;
+    while(q--){
+        int x, y; cin >> x >> y; x--, y--;
+        int ans = 0;
+        rep(i, 0, x+1){
+            int l = -2*i-2*m+2*x+y;
+            // cout << i << ' ' << l <<  ' ' << y << endl;
+            if(l >= y) continue;
+            if(l < 0) l = 0;
+            else l++;
+            ans += max(0, acc[i][y+1]-acc[i][l]);
+        }
+        cout << ans << endl;
     }
-    cout << ans << endl;
-    
     return 0;
 }
