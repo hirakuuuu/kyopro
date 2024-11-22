@@ -23,19 +23,41 @@ int main(){
     vector<string> s(n);
     rep(i, 0, n) cin >> s[i];
 
-    rrep(i, m-1, 0){
-        rep(l, 0, n+1){
-            rep(r, l+1, n+1){
-                rep(nl, 0, 10) rep(nr, nl+1, 10){
-                    // dp[i][l][r][nl][nr] := s[l:r] を上から i 桁目を nl:nr を使って辞書順にする
-                    // 分け方全通り試す必要がある？
+    rep(i, 0, 41) rep(j, 0, 41) rep(k, 0, 41) rep(l, 0, 11) rep(r, 0, 11){
+        dp[i][j][k][l][r] = 0;
+        if(i == m && k-j <= 1) dp[i][j][k][l][r] = 1;
+        if(j == k) dp[i][j][k][l][r] = 1;
+    }
 
+    rrep(i, m-1, 0){
+        rep(g, 1, n+1){
+            rep(l, 0, n+1){
+                int r = l+g;
+                if(r > n) break;
+                rep(j, 0, 11) rep(k, j+1, 11){
+                    // dp[i][l][r][j][k]
+                    if(s[l][i] == '?'){
+                        rep(o, j, k) rep(nr, l+1, r+1){
+                            if(s[nr-1][i] != '?' && s[nr-1][i]-'0' != o) break;
+                            dp[i][l][r][j][k] += dp[i+1][l][nr][0][10]*dp[i][nr][r][o+1][k];
+                        }
+                    }else{
+                        int tmp = s[l][i]-'0';
+                        if(inr(j, tmp, k)){
+                            rep(nr, l+1, r+1){
+                                if(s[nr-1][i] != '?' && s[nr-1][i]-'0' != tmp) break;
+                                dp[i][l][r][j][k] += dp[i+1][l][nr][0][10]*dp[i][nr][r][tmp+1][k];
+                            }
+                        }
+                    }
+                    // cout << i << ' ' << l << ' ' << r << ' ' << j << ' ' << k << ' ' << dp[i][l][r][j][k].val() << endl;
                 }
             }
         }
     }
-    
+    cout << dp[0][0][n][0][10].val() << endl;
 
+    
 
     
     return 0;
