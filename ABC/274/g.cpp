@@ -16,6 +16,14 @@ constexpr ll INF = 9e18;
 template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
+/*
+カメラを置く向きは，下向きと右向きに絞ってよい．
+また，下向きカメラを置くマスは，その一つ上のマスに障害物があるとしてよい．(右向きも同様)
+障害物がない直線上のマスの集合で極大なものを考えると，カメラを置く位置は一意に定まる．
+縦，横でそのマスの集合の集合を考え，同じマスが属するマスをつないだ二部グラフを考えると，元の問題は最小頂点被覆に一致する．
+二部グラフの最大頂点被覆は，最大マッチングに帰着され，これは最大流を求めればよい．
+*/
+
 template <class Cap> 
 class Dinic {
     int _n;
@@ -157,62 +165,42 @@ int main(){
     vector<string> s(h);
     rep(i, 0, h) cin >> s[i];
 
-    auto id = [&](int i, int j, int k) -> int {
-        return ((i*w+j)<<2)+k;
-    };
-    mcf_graph<ll, ll> mf(5*h*w+2);
-    int so = 5*h*w, ta = 5*h*w+1;
-    rep(i, 0, h){
-        rep(j, 0, w){
-            
+    vector<vector<int>> S(h, vector<int>(w, -1));
+    vector<vector<int>> T(h, vector<int>(w, -1));
+    int id = 0;
+    {
+        rep(i, 0, h) rep(j, 0, w){
+            if(s[i][j] == '#') continue;
+            if(j == 0 || s[i][j-1] == '#') id++;
+            S[i][j] = id;
+        }
+        rep(i, 0, w) rep(j, 0, h){
+            if(s[j][i] == '#') continue;
+            if(j == 0 || s[j-1][i] == '#') id++;
+            T[j][i] = id;
         }
     }
+
+    Dinic<int> mf(id+2);
+    int source = id, target = id+1;
+    map<pair<int, int>, bool> seen;
+    rep(i, 0, h) rep(j, 0, w){
+        if(s[i][j] == '#') continue;
+        if(!seen[{source, S[i][j]-1}]){
+            seen[{source, S[i][j]-1}] = true;
+            mf.add_edge(source, S[i][j]-1, 1);
+        }
+        if(!seen[{T[i][j]-1, target}]){
+            seen[{T[i][j]-1, target}] = true;
+            mf.add_edge(T[i][j]-1, target, 1);
+        }
+        if(!seen[{S[i][j]-1, T[i][j]-1}]){
+            seen[{S[i][j]-1, T[i][j]-1}] = true;
+            mf.add_edge(S[i][j]-1, T[i][j]-1, 1);
+        }
+    }
+    cout << mf.flow(source, target) << endl;
     
-    auto id2 = [&](int i, int j) -> int {
-        return 4*h*w+(i*w+j);
-    };
 
-    rep(i, 0, h){
-        rep(j, 0, w){
-            if(s[i][j] == '#') continue;
-            rep(k, 0, 4){
-                mf.add_edge(so, id(i, j, k), h*w, IINF);
-            }
-        }
-    }
-
-    vector<int> dh = {1, 0, -1, 0};
-    vector<int> dw = {0, 1, 0, -1};
-    rep(i, 0, h){
-        rep(j, 0, w){
-            if(s[i][j] == '#') continue;
-            rep(k, 0, 4){
-                int ni = i, nj = j;
-                while(inr(0, ni, h) && inr(0, nj, w)){
-                    if(s[ni][nj] == '#') break;
-                    mf.add_edge(id(i, j, k), id2(ni, nj), 1, 0);
-                    ni += dh[k], nj += dw[k];
-                }
-            }
-        }
-    }
-
-    rep(i, 0, h){
-        rep(j, 0, w){
-            if(s[i][j] == '#') continue;
-            mf.add_edge(id2(i, j), ta, 1, 1);
-        }
-    }
-
-
-    ll tot = 0;
-    rep(i, 0, h){
-        rep(j, 0, w){
-            if(s[i][j] == '#') continue;
-            tot++;
-        }
-    }
-    cout << mf.flow(so, ta, tot).second << endl;
-    
     return 0;
 }
