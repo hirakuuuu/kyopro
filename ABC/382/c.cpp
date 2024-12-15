@@ -46,7 +46,7 @@ public:
         d[p] = x;
         for(int i = 1; i <= log; i++) update(p >> i);
     }
-    
+
     void apply(int p, T x){
         set(p, op(x, d[p+size]));
     }
@@ -131,97 +131,34 @@ public:
     }
 };
 
-using S = pair<int, int>;
-S op(S a, S b){ return min(a, b); }
-S e(){ return {IINF, IINF}; }
+using S = int;
+S op(S a, S b) {
+    return min(a, b);
+}
+S e() {
+    return IINF;
+}
 
 int main(){
-    int n, k; cin >> n >> k;
-    vector<int> p(n);
-    rep(i, 0, n) cin >> p[i];
+    int n, m; cin >> n >> m;
+    vector<int> a(n), b(m);
+    rep(i, 0, n) cin >> a[i];
+    rep(i, 0, m) cin >> b[i];
 
-    // 前から k+1 個以内にある要素か，
-    // 後ろから k 個以内にある要素は先頭に持っていける
-    // その中で最も小さい値が先頭になるべき
-    int mii = IINF, miv = IINF;
-    rep(i, 0, n){
-        if(i <= k || n-k <= i){
-            if(miv > p[i]){
-                miv = p[i], mii = i;
-            }
+    SegmentTree<S, op, e> st(a);
+    rep(i, 0, m){
+        if(st.all_prod() > b[i]){
+            cout << -1 << endl;
+            continue;
         }
+        int ok = n, ng = 0;
+        while(ok-ng > 1){
+            int mid = (ok+ng)/2;
+            if(st.prod(0, mid) > b[i]) ng = mid;
+            else ok = mid;
+        }
+        cout << ok << endl;
     }
-
-    // 前から削除して先頭に持っていける場合
-    vector<int> f = {IINF};
-    if(mii <= k){
-        f.clear();
-        vector<int> q = p;
-        SegmentTree<S, op, e> st(n);
-        rep(i, 0, n) st.set(i, {q[i], i});
-        int l = mii, rest = k-mii;
-        // cout << l << ' ' << rest << endl;
-        while(l < n && rest){
-            // cout << l << ' ' << l+rest+1 << endl;
-            auto [mi, id] = st.prod(l, min(n, l+rest+1));
-            f.push_back(mi);
-            rest -= id-l;
-            l = id+1;
-        }
-        if(rest){
-            while(rest) f.pop_back(), rest--;
-        }else{
-            rep(i, l, n) f.push_back(q[i]);
-        }
-    }
-
-    // 後ろから先頭に持っていける場合
-    vector<int> g = {IINF};
-    if(n-k <= mii){
-        // n-mii 個までは，残すにも消すにもコストが 1 かかる
-        // それより後ろは，消すときにコストが 1 かかる
-        g.clear();
-        vector<int> q = p;
-        rotate(q.begin(), q.begin()+mii, q.end());
-        SegmentTree<S, op, e> st(n);
-        rep(i, 0, n) st.set(i, {q[i], i});
-        int l = n-mii, rest = k-(n-mii);
-        // cout << l << ' ' << rest << endl;
-        while(l < n && rest){
-            // cout << l << ' ' << l+rest+1 << endl;
-            auto [mi, id] = st.prod(l, min(n, l+rest+1));
-            g.push_back(mi);
-            rest -= id-l;
-            l = id+1;
-        }
-        if(rest){
-            while(rest) g.pop_back(), rest--;
-        }else{
-            rep(i, l, n) g.push_back(q[i]);
-        }
-        reverse(g.begin(), g.end());
-        rrep(i, n-1-mii, 0){
-            if(g.empty()) continue;
-            if(q[i] < g.back()) g.push_back(q[i]); 
-        }
-        reverse(g.begin(), g.end());
-    }
-    // for(auto ff: f){
-    //     cout << ff << ' ';
-    // }
-    // cout << endl;
-    // for(auto gg: g){
-    //     cout << gg << ' ';
-    // }
-    // cout << endl;
-    vector<int> ans = min(f, g);
-    for(auto aa: ans){
-        cout << aa << ' ';
-    }
-    cout << endl;
-    
-
-
     
     return 0;
 }
