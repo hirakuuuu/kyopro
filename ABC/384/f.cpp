@@ -16,32 +16,28 @@ constexpr ll INF = 1e18;
 template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
-/*
-あまりに着目したのはOK
-だけど，x > y のときに余りが y 以上でわたる可能性があるのを見逃していた
-*/
-
 int main(){
-    ll n, x, y; cin >> n >> x >> y;
+    int n; cin >> n;
     vector<ll> a(n);
     rep(i, 0, n) cin >> a[i];
-    bool f = false;
-    rep(i, 0, n){
-        if(a[i]%(x+y) >= x) f = true;
-    }
-    if(!f){
-        cout << "Second" << endl;
-    }else if(x <= y){
-        cout << "First" << endl;
-    }else{
-        f = false;
-        rep(i, 0, n){
-            if(a[i]%(x+y) >= x) a[i] -= x;
-            if(a[i]%(x+y) >= y) f = true;
+
+    const int K = 25;
+    vector<ll> d(K+1);
+    rep(i, 0, K+1){
+        map<ll, pair<ll, ll>> memo;
+        ll two = (1<<i);
+        rep(j, 0, n){
+            ll r = a[j]&(two-1);
+            ll q = (two-r)&(two-1);
+            memo[r].first++;
+            memo[r].second += a[j];
+            d[i] += a[j]*memo[q].first+memo[q].second;
         }
-        if(f) cout << "Second" << endl;
-        else cout << "First" << endl;
     }
-    
+    ll ans = 0;
+    rep(i, 0, K){
+        ans += (d[i]-d[i+1])>>i;
+    }
+    cout << ans << endl;
     return 0;
 }

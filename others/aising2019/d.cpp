@@ -16,31 +16,28 @@ constexpr ll INF = 1e18;
 template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
 template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
-/*
-あまりに着目したのはOK
-だけど，x > y のときに余りが y 以上でわたる可能性があるのを見逃していた
-*/
-
 int main(){
-    ll n, x, y; cin >> n >> x >> y;
-    vector<ll> a(n);
+    int n, q; cin >> n >> q;
+    vector<int> a(n);
     rep(i, 0, n) cin >> a[i];
-    bool f = false;
-    rep(i, 0, n){
-        if(a[i]%(x+y) >= x) f = true;
-    }
-    if(!f){
-        cout << "Second" << endl;
-    }else if(x <= y){
-        cout << "First" << endl;
-    }else{
-        f = false;
-        rep(i, 0, n){
-            if(a[i]%(x+y) >= x) a[i] -= x;
-            if(a[i]%(x+y) >= y) f = true;
+
+    auto calc = [&](int x, int l) -> bool {
+        int pl = lower_bound(a.begin(), a.end(), x-l)-a.begin();
+        int pr = upper_bound(a.begin(), a.end(), x+l)-a.begin();
+        int len = pr-pl;
+        // [pl, pr) と [N-len, N) に共通部分があるかどうか
+        return pr <= n-len;
+    };
+
+    while(q--){
+        int x; cin >> x;
+        int ok = 0, ng = IINF;
+        while(ng-ok > 1){
+            int mid = (ok+ng)/2;
+            if(calc(x, mid)) ok = mid;
+            else ng = mid;
         }
-        if(f) cout << "Second" << endl;
-        else cout << "First" << endl;
+        cout << ok << endl;
     }
     
     return 0;
