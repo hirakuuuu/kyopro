@@ -35,6 +35,23 @@ vector<pair<int, int>> prime_factorization(ll x){
     return res;
 };
 
+// N 以下の素数列挙
+vector<int> prime_enumerate(int N) {
+  vector<bool> is_prime(N + 1, true);
+  vector<int> primes;
+  if (N < 2) return primes;
+  is_prime[0] = is_prime[1] = false;
+  for (int i = 2; i * i <= N; ++i) {
+    if (is_prime[i]) {
+      for (int j = i * i; j <= N; j += i) is_prime[j] = false;
+    }
+  }
+  for (int i = 2; i <= N; ++i) {
+    if (is_prime[i]) primes.push_back(i);
+  }
+  return primes;
+}
+
 
 int main(){
     return 0;

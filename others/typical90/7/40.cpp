@@ -28,6 +28,9 @@ ll power(ll a, ll b, ll m=MOD){
 /*
 燃やす埋める
 辺の向きを考えるときは、頂点が2つの場合とかを考えると良い
+
+最大値を求めたいときは向きが逆になることに注意する
+https://qiita.com/ningenMe/items/69ed7ce43c9cd0a2de38
 */
 
 template <class Cap> 

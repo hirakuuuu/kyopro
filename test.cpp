@@ -1,44 +1,37 @@
-// レビュアー解法
 #include <bits/stdc++.h>
+// #include <atcoder/all>
 using namespace std;
-
-#define rep(i, a, n) for (int i = a; i < n; i++)
+// using namespace atcoder;
+#define rep(i, a, n) for(int i = a; i < n; i++)
+#define rrep(i, a, n) for(int i = a; i >= n; i--)
 #define inr(l, x, r) (l <= x && x < r)
-using ll = long long;
+#define ll long long
+#define ld long double
 
-int main() {
-    ll N = 5000;
-    cout << N << endl;
+// using mint = modint1000000007;
+// using mint = modint998244353;
+constexpr int IINF = 1001001001;
+constexpr ll INF = 1e18;
 
-    // A は sqrt(N) 個ごとに区切れる箇所ができるようにする
-    vector<ll> A(N);
-    for (ll pos = 0; pos < N;) {
-        ll len = rand() % 10 + 1;  // 長さが 1 ~ 10 になるようにする
-        ll l = pos, r = min(N, pos + len);
+template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
+template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
-        // [l, r) の区間を部分問題とする
-        ll mid = rand() % (r - l) + l;
-        while (pos <= l + max(mid - l, r - 1 - mid) + 1) {
-            A[pos] = mid;
-            pos++;
-        }
-        while (pos < r) {
-            A[pos] = rand() % (r - l) + l;
-            pos++;
-        }
+int main(){
+    auto f = [&](double x) -> double {
+      return x/log2(x);
+    };
+    double ok = 1e18, ng = 0.0;
+    while((ok-ng) > 1e-9){
+        double mid = (ok+ng)/2;
+        if(f(mid) > 8000) ok = mid;
+        else ng = mid;
     }
-
-    for(int i = 0; i < N; i++){
-        cout << A[i] << ' ';
-    }
-    cout << endl;
-
-    for(int i = 0; i < N; i++){
-        cout << 1 << ' ';
-    }
-    cout << endl;
+    cout << setprecision(10) << ok << endl;
+    cout << setprecision(10) << f(ok-1) << endl;
+    cout << setprecision(10) << f(ok) << endl;
 
 
 
+    
     return 0;
 }
