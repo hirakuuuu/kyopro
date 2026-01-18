@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
-// #include <atcoder/all>
+#include <atcoder/all>
 using namespace std;
-// using namespace atcoder;
+using namespace atcoder;
 #define rep(i, a, n) for(int i = a; i < n; i++)
 #define rrep(i, a, n) for(int i = a; i >= n; i--)
 #define inr(l, x, r) (l <= x && x < r)
@@ -18,33 +18,14 @@ template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
 
 int main(){
     int n; cin >> n;
-    vector<int> a(n), b(n);
-    rep(i, 0, n) cin >> a[i];
-    rep(i, 0, n) cin >> b[i];
-
-    vector<vector<int>> mb(29, vector<int>(n));
-    rep(i, 0, 29){
-        rep(j, 0, n){
-            mb[i][j] = b[j]%(1<<i+1);
-        }
-        sort(mb[i].begin(), mb[i].end());
-    }
-    vector<int> cnt(29);
+    vector<int> a(n);
+    vector<int> f(200001);
     rep(i, 0, n){
-        rep(j, 0, 29){
-            int tmp = a[i]%(1<<j+1);
-            auto cnt1 = lower_bound(mb[j].begin(), mb[j].end(), 2*(1<<j)-tmp)-lower_bound(mb[j].begin(), mb[j].end(), (1<<j)-tmp);
-            auto cnt2 = lower_bound(mb[j].begin(), mb[j].end(), 4*(1<<j)-tmp)-lower_bound(mb[j].begin(), mb[j].end(), 3*(1<<j)-tmp);
-            cnt[j] += (cnt1+cnt2);
-        }
+        cin >> a[i];
+        f[a[i]]++;
     }
-    int ans = 0;
-    rep(i, 0, 29){
-        if(cnt[i]%2) ans += (1<<i);
-    }
-    cout << ans << endl;
+    vector<int> b(n);
+    vecotr<int> 
 
-
-    
     return 0;
 }

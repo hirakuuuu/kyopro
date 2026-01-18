@@ -21,49 +21,34 @@ int main(){
     while(t--){
         int n; cin >> n;
         ll w; cin >> w;
-
-        vector<vector<ll>> v(60);
+        vector<vector<ll>> items(61);
         rep(i, 0, n){
             int x; cin >> x;
             ll y; cin >> y;
-            v[x].push_back(y);
-        }
-        rep(i, 0, 60){
-            sort(v[i].rbegin(), v[i].rend());
-        }
-        vector<vector<ll>> acc(60);
-        rep(i, 0, 60){
-            acc[i].resize(v[i].size()+1);
-            rep(j, 0, (int)v[i].size()){
-                acc[i][j+1] += acc[i][j]+v[i][j];
-            }
+            items[x].push_back(y);
         }
         ll ans = 0;
-        rrep(i, 59, 0){
-            cout << i << ' ' << w << endl;
-            rep(j, 0, (int)v[i].size()){
-                if(w < (1LL<<i)) break;
-                bool ok = true;
-                rrep(k, i-1, 0){
-                    ll m = min((ll)acc[k].size()-1, (1LL<<(i-k)));
-                    // cout << k << ' ' << (ll)acc[k].size()-1 << ' ' << (1LL<<(i-k)) << endl;
-                    // cout << i << ' ' << v[i][j] << ' ' << k << ' ' << acc[k].back()-acc[k][(int)acc[k].size()-m] << ' ' << v[i][j] << endl;
-                    if(m > 0 && acc[k][m] >= v[i][j]){
-                        ok = false;
-                        break;
-                    }
+        rep(i, 0, 60){
+            sort(items[i].begin(), items[i].end());
+            if(((w>>i)&1) && !items[i].empty()){
+                ans += items[i].back();
+                items[i].pop_back();
+                w -= 1LL<<i;
+            }
+            while(items[i].size() >= 2){
+                ll tmp = 0;
+                rep(_, 0, 2){
+                    tmp += items[i].back();
+                    items[i].pop_back();
                 }
-                if(ok){
-                    w -= 1LL<<i;
-                    ans += v[i][j];
-                    v[i].pop_back();
-                }else{
-                    break;
-                }
+                items[i+1].push_back(tmp);
+            }
+            if(!items[i].empty()){
+                items[i+1].push_back(items[i].back());
+                items[i].pop_back();
             }
         }
-        cout << w << ' ' << ans << endl;
-
+        cout << ans << endl;
     }
     return 0;
 }
