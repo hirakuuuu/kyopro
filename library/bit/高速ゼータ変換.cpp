@@ -37,7 +37,7 @@ int main(){
 
     vector<pair<ll, ll>> dp(1<<n);
     rep(i, 0, 1<<n) dp[i] = {a[i], 0};
-    rep(i, 0, n){
+    rep(i, 0, n){ // このループの順番が重要
         rep(x, 0, 1<<n){
             if((x>>i)&1){
                 auto [a1, a2] = dp[x];

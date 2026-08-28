@@ -1,6 +1,21 @@
 #include <bits/stdc++.h>
+// #include <atcoder/all>
 using namespace std;
+// using namespace atcoder;
 #define rep(i, a, n) for(int i = a; i < n; i++)
+#define rrep(i, a, n) for(int i = a; i >= n; i--)
+#define inr(l, x, r) (l <= x && x < r)
+#define ll long long
+#define ld long double
+
+// using mint = modint1000000007;
+// using mint = modint998244353;
+constexpr int IINF = 1001001001;
+constexpr ll INF = 1e18;
+
+template<class t,class u> void chmax(t&a,u b){if(a<b)a=b;}
+template<class t,class u> void chmin(t&a,u b){if(b<a)a=b;}
+
 
 /*
 前提
@@ -12,7 +27,8 @@ using namespace std;
 namespace geometry {
     using D = long double;
     using Point = std::complex<D>;
-    const D EPS = 2e-10;
+    using Polygon = vector<Point>;
+    const D EPS = 1e-8;
     const D PI = M_PI;
 
     // 入出力ストリーム
@@ -23,12 +39,12 @@ namespace geometry {
         return is;
     }
     ostream &operator<<(ostream &os, Point &p) {
-        return os << fixed << setprecision(20) << p.real() << " " << p.imag();
+        return os << fixed << setprecision(20) << p.real() << ' ' << p.imag();
     }
 
     // d 倍する
-    Point add(Point a, Point b) {
-    return Point(a.real() + b.real(), a.imag() + b.imag());
+    Point operator*(Point p, D d) {
+    return Point(p.real() * d, p.imag() * d);
     }
 
     // 偏角（0 <= Θ < 2π）
@@ -38,13 +54,7 @@ namespace geometry {
         return res;
     }
 
-    // d 倍する
-    Point operator*(Point p, D d) {
-    return Point(p.real() * d, p.imag() * d);
-    }
-    Point operator/(Point p, D d) {
-    return Point(p.real() / d, p.imag() / d);
-    }
+
     // 等しいかどうか（誤差で判定）
     inline bool equal(D a, D b) { return fabs(a - b) < EPS; }
 
@@ -97,7 +107,6 @@ namespace geometry {
     struct Circle {
         Point p;
         D r;
-        Circle() = default;
         Circle(Point p_, D r_) : p(p_), r(r_) {}
     };
 
@@ -148,16 +157,29 @@ namespace geometry {
 
     // 交点（交差する前提）
     Point cross_point(Line s, Line t){
+        if(is_parallel(s,t)){ 
+            return {IINF,IINF};
+        }
         D d1 = cross(s.b - s.a, t.b - t.a);
         D d2 = cross(s.b - s.a, s.b - t.a);
         // s, t が一致する場合（適当な１点を返す）
-        if(equal(abs(d1), 0) && equal(abs(d2), 0)) return t.a; 
+        // if(equal(abs(d1), 0) && equal(abs(d2), 0)) return t.a; 
         
         return t.a + (t.b - t.a) * (d2/d1);
     }
-    Point cross_point(Segment s, Segment t) {
+    Point cross_point(Segment s, Segment t){
         assert(is_intersect(s, t)); // 交差する前提
         return cross_point(Line(s), Line(t));
+    }
+
+    // 点の間の距離
+    D dist(Point a, Point b){
+        return abs(a-b);
+    }
+
+    // 点と直線の距離（垂線の足との距離）
+    D dist_line_point(Line l, Point p){
+        return abs(p - projection(l, p));
     }
 
     // 線分と点の距離（点p から線分のどこかへの最短距離）
@@ -166,6 +188,7 @@ namespace geometry {
         if(dot(l.a - l.b, p - l.b) < EPS) return abs(p - l.b);
         return abs(cross(l.b - l.a, p - l.a)) / abs(l.b - l.a);
     }
+
     // 線分と線分の距離
     D dist_segment_segment(Segment s, Segment t){
         if(is_intersect(s, t)) return 0.0;
@@ -178,16 +201,49 @@ namespace geometry {
         return res;
     }
 
+
     // Todo : 円, 多角形
 
     // ２つの円の交点
-    pair< Point, Point > cross_point(const Circle &c1, const Circle &c2) {
+    pair< Point, Point > crosspoint(const Circle &c1, const Circle &c2) {
         D d = abs(c1.p - c2.p);
         D a = acos((c1.r * c1.r + d * d - c2.r * c2.r) / (2 * c1.r * d));
         D t = atan2(c2.p.imag() - c1.p.imag(), c2.p.real() - c1.p.real());
         Point p1 = c1.p + Point(cos(t + a) * c1.r, sin(t + a) * c1.r);
         Point p2 = c1.p + Point(cos(t - a) * c1.r, sin(t - a) * c1.r);
         return {p1, p2};
+    }
+
+    ll cross_cht(Point o, Point a, Point b){
+        return (a.real() - o.real()) * (b.imag() - o.imag()) - (a.imag() - o.imag()) * (b.real() - o.real());
+    }
+
+    // 凸包
+    Polygon convex_hull(Polygon ps) {
+        int n = ps.size(), k = 0;
+        if (n <= 2) return ps;
+        sort(ps.begin(), ps.end(), [](const Point &a, const Point &b) {
+            return real(a) != real(b) ? real(a) < real(b) : imag(a) < imag(b);
+        });
+        Polygon res;
+        for(auto p : ps){
+            while((int)res.size() >= 2 && cross_cht(res[k-1], res[k-2], p) >= 0){
+                res.pop_back();
+                k--;
+            }
+            res.push_back(p);
+            k++;
+        }
+        int t = res.size();
+        rrep(i,n-2,0){
+            while((int)res.size() > t && cross_cht(res[k-1], res[k-2], ps[i]) >= 0){
+                res.pop_back();
+                k--;
+            }
+            res.push_back(ps[i]);
+            k++;
+        }
+        return res;
     }
 };
 using namespace geometry;

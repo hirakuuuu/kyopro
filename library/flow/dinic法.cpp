@@ -133,6 +133,7 @@ public:
     vector<bool> min_cut(int s){
         vector<bool> visited(_n);
         queue<int> que;
+        que.push(s);
         while(!que.empty()){
             int p = que.front(); que.pop();
             visited[p] = true;
